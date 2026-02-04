@@ -9,6 +9,7 @@ const SnakeSquiggle = ({
 }) => {
     const [path, setPath] = useState("");
     const [duration, setDuration] = useState(0);
+    const [points, setPoints] = useState([]);
 
     useEffect(() => {
         const generatePoint = () => {
@@ -25,7 +26,7 @@ const SnakeSquiggle = ({
         const start = generatePoint();
         const end = generatePoint();
 
-        const points = [`M ${start.x} ${start.y} `];
+        const pathPoints = [`M ${start.x} ${start.y} `];
         let currentX = start.x;
         let currentY = start.y;
 
@@ -40,17 +41,19 @@ const SnakeSquiggle = ({
             const cp2x = currentX + (nextX - currentX) / 2;
             const cp2y = nextY;
 
-            points.push(`C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${nextX} ${nextY} `);
+            pathPoints.push(`C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${nextX} ${nextY} `);
             currentX = nextX;
             currentY = nextY;
         }
 
-        setPath(points.join(" "));
+        setPath(pathPoints.join(" "));
         const distance = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2));
         setDuration(distance / (speed * 5));
     }, [speed]);
 
     if (!path) return null;
+
+    const dotCount = 12;
 
     return (
         <svg
@@ -64,25 +67,58 @@ const SnakeSquiggle = ({
                 zIndex: -1
             }}
         >
-            <motion.path
-                d={path}
-                stroke={color}
-                strokeWidth={strokeWidth}
-                strokeLinecap="round"
-                fill="none"
-                opacity={opacity}
-                initial={{ pathLength: 0, pathOffset: 1 }}
-                animate={{
-                    pathLength: [0.1, 0.2, 0.1],
-                    pathOffset: [-0.2, 1.2]
-                }}
-                transition={{
-                    duration: duration,
-                    repeat: Infinity,
-                    ease: "linear",
-                    delay: Math.random() * 5
-                }}
-            />
+            <defs>
+                <filter id="glow">
+                    <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+            </defs>
+            {[...Array(dotCount)].map((_, i) => (
+                <motion.circle
+                    key={i}
+                    r={strokeWidth / 2}
+                    fill={color}
+                    opacity={opacity}
+                    style={{
+                        filter: 'url(#glow)',
+                    }}
+                    initial={{ offsetDistance: "0%", scale: 0 }}
+                    animate={{
+                        offsetDistance: ["0%", "100%"],
+                        scale: [0, 1, 1, 0],
+                        y: [0, -10, 0] // Added a small bounce
+                    }}
+                    transition={{
+                        offsetDistance: {
+                            duration: duration,
+                            repeat: Infinity,
+                            ease: "linear",
+                            delay: (i * 0.1) + (Math.random() * 2)
+                        },
+                        scale: {
+                            duration: duration,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: (i * 0.1) + (Math.random() * 2)
+                        },
+                        y: {
+                            duration: 0.5,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                        }
+                    }}
+                >
+                    <animateMotion
+                        path={path}
+                        dur={`${duration}s`}
+                        repeatCount="indefinite"
+                        begin={`${i * 0.15}s`}
+                    />
+                </motion.circle>
+            ))}
         </svg>
     );
 };
