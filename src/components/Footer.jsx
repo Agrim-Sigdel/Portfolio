@@ -66,14 +66,14 @@ const Footer = () => {
                 <div className="flex justify-between items-end mt-20 text-sm text-muted"
                     style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6rem', flexWrap: 'wrap', gap: '2rem' }}>
                     <div className="text-left">
-                        <p>&copy; 2026 Agrim Sigdel</p>
+
                         <p>Kathmandu, Bagmati, Nepal</p>
                         <p style={{ marginTop: '0.5rem', opacity: 0.6 }}>sigdelagrim35@gmail.com</p>
                     </div>
                     <div className="flex gap-4" style={{ display: 'flex', gap: '1.5rem' }}>
                         <a href="https://github.com/Agrim-Sigdel" target="_blank" rel="noopener noreferrer" className="hover:text-white">GitHub</a>
-                        <a href="#" className="hover:text-white">LinkedIn</a>
-                        <a href="#" className="hover:text-white">Twitter</a>
+                        <a href="https://www.linkedin.com/in/agrim-sigdel-34b532151/" className="hover:text-white">LinkedIn</a>
+                        <a href="https://www.instagram.com/_agrimsigdel_/" className="hover:text-white">Instagram</a>
                     </div>
                 </div>
             </div>
