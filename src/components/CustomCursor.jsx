@@ -83,7 +83,7 @@ const CustomCursor = () => {
                     <img
                         src="/gojo.png"
                         alt="trail"
-                        style={{ width: '64px', height: '64px', objectFit: 'contain' }}
+                        style={{ width: '256px', height: '256px', objectFit: 'contain' }}
                     />
                 </motion.div>
 
