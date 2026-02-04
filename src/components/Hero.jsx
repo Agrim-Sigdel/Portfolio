@@ -1,21 +1,6 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
-
-// Hand-drawn squiggle SVG
-const Squiggle = () => (
-    <svg width="200" height="40" viewBox="0 0 200 40" fill="none" xmlns="http://www.w3.org/2000/svg"
-        style={{ position: 'absolute', top: '-20px', right: '-10px', zIndex: -1 }}>
-        <motion.path
-            d="M10 30C40 10 70 30 100 10C130 -10 160 30 190 20"
-            stroke="var(--accent-red)"
-            strokeWidth="6"
-            strokeLinecap="round"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 1.5, delay: 1, ease: "easeInOut" }}
-        />
-    </svg>
-);
+import Squiggle from './Squiggle';
 
 const Hero = () => {
     const sectionRef = useRef(null);
@@ -51,6 +36,7 @@ const Hero = () => {
                             transition={{ duration: 1, delay: 0.6 }}
                             style={{ display: 'inline-block' }}
                         >
+
                             Hi, I’m <span className="text-accent" style={{ fontWeight: 400, fontStyle: 'italic' }}>Agrim</span>.
                         </motion.span>
                         <br />
@@ -60,10 +46,11 @@ const Hero = () => {
                             transition={{ duration: 1, delay: 0.8 }}
                             style={{ display: 'inline-block' }}
                         >
-                            I <span style={{ fontStyle: 'italic', fontWeight: 400 }}>build</span> things{' '}
+                            I   <span style={{ fontStyle: 'italic', fontWeight: 400 }}>build </span>
+                            things{' '}
                             <span style={{ position: 'relative', display: 'inline-block' }}>
                                 that work.
-                                <Squiggle />
+
                             </span>
                         </motion.span>
                     </motion.h1>
@@ -86,6 +73,7 @@ const Hero = () => {
                         <br />
                         <span style={{ fontSize: '1rem', marginTop: '1.5rem', display: 'block', opacity: 0.8, fontWeight: '500' }}>
                             Specializing in <span className="text-accent">Computer Vision</span> and <span className="text-accent">NLP</span> model integration.
+
                         </span>
                     </motion.p>
                 </motion.div>

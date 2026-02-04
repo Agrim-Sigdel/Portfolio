@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import Squiggle from './Squiggle';
 
 const About = () => {
     const tools = [
@@ -18,7 +19,18 @@ const About = () => {
                     transition={{ duration: 0.8 }}
                     style={{ textAlign: 'left' }}
                 >
-                    <p className="text-accent uppercase tracking-widest text-xs font-bold mb-4">About Me</p>
+                    <div style={{ position: 'relative', display: 'inline-block' }}>
+                        <Squiggle
+                            style={{ top: '-10px', left: '-20px' }}
+                            animateType="float"
+                            strokeColor="var(--text-muted)"
+                            strokeWidth="5"
+                            width="150"
+                            height="50"
+                            viewBox="0 0 400 100"
+                        />
+                        <p className="text-accent uppercase tracking-widest text-xs font-bold mb-4">About Me</p>
+                    </div>
                     <h2 className="font-serif text-5xl mb-12">The <span style={{ fontStyle: 'italic' }}>Human</span> Bit</h2>
 
                     <div style={{ marginBottom: '3rem' }}>

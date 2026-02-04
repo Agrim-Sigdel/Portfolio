@@ -110,8 +110,8 @@ section {
   position: relative;
   width: 100%;
   clear: both;
-  background-color: var(--bg-black);
-  /* Ensure background is opaque */
+  background-color: transparent;
+  /* Make sections transparent to see snakes in background */
 }
 
 @media (min-width: 768px) {
@@ -127,7 +127,7 @@ section {
   width: 100%;
   padding: 8rem 0;
   clear: both;
-  background-color: var(--bg-black);
+  background-color: transparent;
 }
 
 .hero-section {

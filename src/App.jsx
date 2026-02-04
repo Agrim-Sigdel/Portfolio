@@ -9,6 +9,7 @@ import CustomCursor from './components/CustomCursor';
 import Preloader from './components/Preloader';
 import TickerSection from './components/TickerSection';
 import { AnimatePresence, motion } from 'framer-motion';
+import SnakeBackground from './components/SnakeBackground';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -25,6 +26,7 @@ function App() {
   return (
     <div className="App">
       <CustomCursor />
+      <SnakeBackground />
       <AnimatePresence mode="wait">
         {isLoading && <Preloader onComplete={() => setIsLoading(false)} />}
       </AnimatePresence>

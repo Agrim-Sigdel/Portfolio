@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import Squiggle from './Squiggle';
 
 const projects = [
     {
@@ -62,6 +63,14 @@ const WorkGrid = () => {
                                 background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)',
                                 opacity: 0.6
                             }}
+                        />
+                        <Squiggle
+                            style={{ bottom: '20px', right: '10px', opacity: 0.1 }}
+                            animateType="pulse"
+                            strokeColor="#fff"
+                            strokeWidth="2"
+                            width="200"
+                            height="80"
                         />
                         <div style={{ position: 'relative', zIndex: 1 }}>
                             <p className="text-sm text-muted uppercase tracking-wider mb-2">{project.category}</p>

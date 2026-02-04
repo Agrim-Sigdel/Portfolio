@@ -1,3 +1,5 @@
+import Squiggle from './Squiggle';
+
 const Footer = () => {
     return (
         <footer
@@ -23,18 +25,29 @@ const Footer = () => {
             />
 
             <div className="container" style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-                <h2
-                    className="font-serif"
-                    style={{
-                        fontSize: 'clamp(3rem, 7vw, 6rem)',
-                        marginBottom: '4rem',
-                        lineHeight: 1.1,
-                        maxWidth: '900px',
-                        margin: '0 auto 4rem'
-                    }}
-                >
-                    Have a project in mind? <br /> <span className="text-accent" style={{ fontStyle: 'italic' }}>Let’s make it happen.</span>
-                </h2>
+                <div style={{ position: 'relative', display: 'inline-block' }}>
+                    <Squiggle
+                        style={{ top: '-40px', left: '50%', transform: 'translateX(-50%)' }}
+                        animateType="draw"
+                        strokeColor="var(--accent-red)"
+                        strokeWidth="8"
+                        width="300"
+                        height="80"
+                        delay={0.5}
+                    />
+                    <h2
+                        className="font-serif"
+                        style={{
+                            fontSize: 'clamp(3rem, 7vw, 6rem)',
+                            marginBottom: '4rem',
+                            lineHeight: 1.1,
+                            maxWidth: '900px',
+                            margin: '0 auto 4rem'
+                        }}
+                    >
+                        Have a project in mind? <br /> <span className="text-accent" style={{ fontStyle: 'italic' }}>Let’s make it happen.</span>
+                    </h2>
+                </div>
 
                 <button
                     className="bg-accent-red"
