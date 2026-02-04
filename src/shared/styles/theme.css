@@ -1,0 +1,257 @@
+/* Theme Variables - Light Mode */
+[data-theme="light"] {
+  --bg-black: #ffffff;
+  --bg-panel: #f5f5f5;
+  --text-cream: #1a1a1a;
+  --text-muted: #666666;
+  --accent-red: #dc2626;
+  --accent-pink: #db2777;
+}
+
+/* Theme Variables - Dark Mode (default) */
+[data-theme="dark"] {
+  --bg-black: #0b0b0b;
+  --bg-panel: #111111;
+  --text-cream: #f5f5f5;
+  --text-muted: #888888;
+  --accent-red: #ff4c2b;
+  --accent-pink: #e0115f;
+}
+
+/* Root theme styling */
+:root {
+  /* Typography */
+  --font-serif: "Fraunces", serif;
+  --font-sans: "Inter", sans-serif;
+  --font-display: "Fraunces", serif;
+
+  /* Spacing */
+  --spacing-container: 90vw;
+
+  cursor: none;
+
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  font-weight: 400;
+
+  color: var(--text-cream);
+  background-color: var(--bg-black);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Light mode specific adjustments */
+[data-theme="light"] {
+  color-scheme: light;
+  background-color: #ffffff;
+}
+
+/* Dark mode specific adjustments */
+[data-theme="dark"] {
+  color-scheme: dark;
+  background-color: #0b0b0b;
+}
+
+/* Smooth transition between themes */
+html,
+body,
+* {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* Light mode borders and backgrounds */
+[data-theme="light"] {
+  --border-color: #e5e5e5;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+  --border-color: #333333;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Light mode text adjustments */
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4,
+[data-theme="light"] h5,
+[data-theme="light"] h6 {
+  color: #1a1a1a;
+}
+
+/* Light mode link colors */
+[data-theme="light"] a {
+  color: #dc2626;
+}
+
+[data-theme="light"] a:hover {
+  color: #991b1b;
+}
+
+/* Light mode button styling */
+[data-theme="light"] button {
+  background-color: #f5f5f5;
+  color: #1a1a1a;
+  border-color: #e5e5e5;
+}
+
+[data-theme="light"] button:hover {
+  background-color: #e5e5e5;
+}
+
+/* Light mode input styling */
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  background-color: #ffffff;
+  color: #1a1a1a;
+  border-color: #e5e5e5;
+}
+
+[data-theme="light"] input:focus,
+[data-theme="light"] textarea:focus,
+[data-theme="light"] select:focus {
+  border-color: #dc2626;
+  outline: none;
+}
+
+/* Light mode scrollbar */
+[data-theme="light"] ::-webkit-scrollbar {
+  width: 10px;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: #cccccc;
+  border-radius: 5px;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: #dc2626;
+}
+
+/* Dark mode scrollbar */
+[data-theme="dark"] ::-webkit-scrollbar {
+  width: 10px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: #0b0b0b;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #888888;
+  border-radius: 5px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #ff4c2b;
+}
+
+/* Light mode specific component styles */
+[data-theme="light"] .hero-section {
+  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+}
+
+[data-theme="light"] section {
+  border-top-color: #e5e5e5;
+}
+
+[data-theme="light"] .container {
+  background: transparent;
+}
+
+/* Light mode accent cards */
+[data-theme="light"] .work-card,
+[data-theme="light"] .process-card,
+[data-theme="light"] .skill-badge {
+  background-color: #f5f5f5;
+  border-color: #e5e5e5;
+}
+
+[data-theme="light"] .work-card:hover {
+  background-color: #eeeeee;
+  border-color: #dc2626;
+}
+
+/* Light mode footer */
+[data-theme="light"] footer {
+  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+  border-top-color: #e5e5e5;
+}
+
+/* Light mode grid background */
+[data-theme="light"] [style*="backgroundImage"] {
+  --grid-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Light mode text selection */
+[data-theme="light"] ::selection {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+[data-theme="dark"] ::selection {
+  background-color: #ff4c2b;
+  color: #ffffff;
+}
+
+/* Light mode code blocks */
+[data-theme="light"] code,
+[data-theme="light"] pre {
+  background-color: #f5f5f5;
+  color: #1a1a1a;
+  border-color: #e5e5e5;
+}
+
+/* Light mode blockquotes */
+[data-theme="light"] blockquote {
+  border-left-color: #dc2626;
+  background-color: #f5f5f5;
+}
+
+/* Ticker section theme */
+[data-theme="light"] .ticker-section {
+  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+}
+
+[data-theme="light"] .ticker-line {
+  color: #1a1a1a;
+}
+
+/* Theme toggle button visibility */
+.theme-toggle {
+  transition: all 0.3s ease !important;
+}
+
+/* Light mode theme button */
+[data-theme="light"] .theme-toggle {
+  border-color: #dc2626;
+  color: #dc2626;
+  background-color: #f5f5f5;
+}
+
+[data-theme="light"] .theme-toggle:hover {
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
+}
+
+/* Dark mode theme button */
+[data-theme="dark"] .theme-toggle {
+  border-color: #ff4c2b;
+  color: #ff4c2b;
+  background-color: #111111;
+}
+
+[data-theme="dark"] .theme-toggle:hover {
+  box-shadow: 0 0 20px rgba(255, 76, 43, 0.3);
+}

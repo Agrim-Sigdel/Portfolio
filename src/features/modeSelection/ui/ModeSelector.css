@@ -1,0 +1,132 @@
+.mode-selector {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10001;
+}
+
+.mode-selector-content {
+  text-align: center;
+  max-width: 900px;
+  padding: 2rem;
+}
+
+.mode-selector-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.mode-selector-subtitle {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  margin-bottom: 4rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 300;
+}
+
+.mode-buttons {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.mode-button {
+  background: transparent;
+  border: 2px solid #333;
+  color: #fff;
+  padding: 3rem 4rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  min-width: 280px;
+  position: relative;
+  overflow: hidden;
+}
+
+.mode-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.05));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mode-button:hover::before {
+  opacity: 1;
+}
+
+.mode-button-label {
+  font-family: var(--font-serif);
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.mode-button-desc {
+  font-size: 0.9rem;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 400;
+}
+
+.fun-button:hover {
+  border-color: var(--accent-red);
+  box-shadow: 0 0 30px rgba(220, 38, 38, 0.3);
+}
+
+.work-button:hover {
+  border-color: #00ff00;
+  box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+}
+
+.normal-button:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+}
+
+@media (max-width: 768px) {
+  .mode-buttons {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .mode-button {
+    min-width: 100%;
+    padding: 2rem 3rem;
+  }
+
+  .mode-button-label {
+    font-size: 2.5rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .mode-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+
+  .normal-button {
+    grid-column: 1 / -1;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+}

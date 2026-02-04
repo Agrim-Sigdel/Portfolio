@@ -1,22 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import WorkGrid from './components/WorkGrid';
-import Process from './components/Process';
-import About from './components/About';
-import Footer from './components/Footer';
-import CustomCursor from './components/CustomCursor';
-import Preloader from './components/Preloader';
-import TickerSection from './components/TickerSection';
-import ModeSelector from './components/ModeSelector';
-import Terminal from './components/work/Terminal';
-import NormalMode from './components/NormalMode';
-import ReturnToStartButton from './components/ReturnToStartButton';
-import { AnimatePresence, motion } from 'framer-motion';
-import SnakeBackground from './components/SnakeBackground';
+import { AnimatePresence } from 'framer-motion';
+import ModeSelector from './features/modeSelection/ui/ModeSelector';
+import Preloader from './shared/ui/Preloader';
+import Terminal from './features/terminalMode/ui/Terminal';
+import FunModePage from './pages/funMode/FunModePage';
+import NormalModePage from './pages/normalMode/NormalModePage';
+import './pages/funMode/funMode.css';
+import './App.css';
 
 function App() {
-  const [selectedMode, setSelectedMode] = useState(null); // null, 'fun', or 'work'
+  const [selectedMode, setSelectedMode] = useState(null); // null, 'fun', 'work', or 'normal'
   const [isLoading, setIsLoading] = useState(false);
   const [showPreloader, setShowPreloader] = useState(false);
 
@@ -78,26 +71,9 @@ function App() {
       {/* Render content based on selected mode */}
       {selectedMode && !isLoading && (
         <>
-          {/* FUN MODE - Current modern website */}
+          {/* FUN MODE - Modern interactive website */}
           {selectedMode === 'fun' && (
-            <>
-              <CustomCursor />
-              <SnakeBackground />
-              <ReturnToStartButton onResetMode={handleResetMode} />
-              <motion.div
-                initial={{ y: 100, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 1.2, ease: [0.77, 0, 0.175, 1], delay: 0.2 }}
-              >
-                <Navbar />
-                <Hero />
-                <About />
-                <TickerSection />
-                <WorkGrid />
-                <Process />
-                <Footer onResetMode={handleResetMode} />
-              </motion.div>
-            </>
+            <FunModePage onResetMode={handleResetMode} onSwitchMode={handleSwitchToNormal} />
           )}
 
           {/* WORK MODE - Terminal interface */}
@@ -110,7 +86,9 @@ function App() {
           )}
 
           {/* NORMAL MODE - Clean simple HTML */}
-          {selectedMode === 'normal' && <NormalMode onResetMode={handleResetMode} />}
+          {selectedMode === 'normal' && (
+            <NormalModePage onResetMode={handleResetMode} />
+          )}
         </>
       )}
     </div>

@@ -1,0 +1,200 @@
+/* Fun Mode Page Theme Styles */
+
+/* Dark mode - Project cards */
+[data-theme="dark"] .masonry-grid > div {
+  background: linear-gradient(135deg, #1a1a1a 0%, #111111 100%) !important;
+  border: 1px solid #222;
+}
+
+[data-theme="dark"] .masonry-grid > div:hover {
+  border-color: #ff4c2b;
+  box-shadow: 0 10px 40px rgba(255, 76, 43, 0.2);
+}
+
+/* Light mode - Project cards */
+[data-theme="light"] .masonry-grid > div {
+  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%) !important;
+  border: 2px solid #e5e5e5;
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .masonry-grid > div:hover {
+  border-color: #dc2626;
+  box-shadow: 0 10px 40px rgba(220, 38, 38, 0.15);
+}
+
+[data-theme="light"] .masonry-grid > div h3 {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .masonry-grid > div p {
+  color: #333333;
+}
+
+/* Light mode - Hero section */
+[data-theme="light"] .hero-section {
+  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+}
+
+[data-theme="light"] .hero-section h1 {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .hero-section .text-accent {
+  color: #dc2626;
+}
+
+/* Light mode - Process section */
+[data-theme="light"] .process-grid > div {
+  border-top: 1px solid #e5e5e5;
+}
+
+[data-theme="light"] .process-grid > div h3 {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .process-grid > div p {
+  color: #333333;
+}
+
+/* Light mode - About section */
+[data-theme="light"] .about-grid {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .about-grid h2 {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .about-grid p {
+  color: #333333;
+}
+
+[data-theme="light"] .about-grid .text-accent {
+  color: #dc2626;
+}
+
+/* Light mode - Skill badges */
+[data-theme="light"] .skill-badge {
+  background-color: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  color: #dc2626;
+}
+
+/* Light mode - Ticker section */
+[data-theme="light"] .ticker-section {
+  background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+}
+
+[data-theme="light"] .ticker-line {
+  color: #1a1a1a;
+}
+
+/* Light mode - Footer */
+[data-theme="light"] footer {
+  background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+  border-top: 1px solid #e5e5e5;
+}
+
+[data-theme="light"] footer h2 {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] footer button {
+  background-color: #dc2626;
+  color: #ffffff;
+  border: 2px solid #dc2626;
+}
+
+[data-theme="light"] footer button:hover {
+  background-color: #b91c1c;
+  border-color: #b91c1c;
+  box-shadow: 0 15px 40px rgba(220, 38, 38, 0.3);
+}
+
+/* Navbar styling - white text in both modes */
+.Navbar-wrapper {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.navbar-link {
+  color: white !important;
+}
+
+.navbar-link:hover {
+  color: var(--accent-red) !important;
+}
+
+/* Light mode - Navbar */
+[data-theme="light"] .Navbar-wrapper {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+[data-theme="light"] .Navbar-wrapper nav {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+[data-theme="light"] .navbar-link {
+  color: white !important;
+}
+
+[data-theme="light"] .navbar-link:hover {
+  color: var(--accent-red) !important;
+}
+
+/* Light mode - Grid backgrounds */
+[data-theme="light"] [style*="backgroundImage"] {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px) !important;
+}
+
+/* Light mode - Borders */
+[data-theme="light"] section {
+  border-top-color: #e5e5e5;
+}
+
+[data-theme="light"] .normal-section {
+  border-bottom-color: #e5e5e5;
+}
+
+/* Light mode - Custom Cursor adjustments */
+[data-theme="light"] .custom-cursor-container {
+  filter: invert(1);
+}
+
+/* Light mode - Squiggle SVG */
+[data-theme="light"] .squiggle {
+  stroke: rgba(220, 38, 38, 0.5);
+}
+
+/* Light mode - Text utilities */
+[data-theme="light"] .text-muted {
+  color: #666666;
+}
+
+[data-theme="light"] .text-cream {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .uppercase {
+  color: #666666;
+}
+
+/* Smooth theme transitions */
+html,
+body,
+* {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* Preserve animation states during theme switch */
+[class*="animate"] {
+  transition-property: background-color, color, border-color, box-shadow;
+}
