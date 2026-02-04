@@ -1,6 +1,6 @@
 import Squiggle from './Squiggle';
 
-const Footer = () => {
+const Footer = ({ onResetMode }) => {
     return (
         <footer
             style={{
@@ -25,16 +25,41 @@ const Footer = () => {
             />
 
             <div className="container" style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+                {/* Return to Start Button */}
+                {onResetMode && (
+                    <div style={{ marginBottom: '3rem' }}>
+                        {/* <button
+                            onClick={onResetMode}
+                            style={{
+                                background: 'transparent',
+                                border: '2px solid var(--accent-red)',
+                                color: 'var(--accent-red)',
+                                padding: '1rem 2rem',
+                                fontSize: '0.9rem',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                borderRadius: '4px',
+                                transition: 'all 0.3s ease',
+                                fontFamily: 'inherit',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.1em'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.target.style.background = 'var(--accent-red)';
+                                e.target.style.color = '#000';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.background = 'transparent';
+                                e.target.style.color = 'var(--accent-red)';
+                            }}
+                        >
+                            ↩ Return to Mode Selection
+                        </button> */}
+                    </div>
+                )}
+
                 <div style={{ position: 'relative', display: 'inline-block' }}>
-                    <Squiggle
-                        style={{ top: '-40px', left: '50%', transform: 'translateX(-50%)' }}
-                        animateType="draw"
-                        strokeColor="var(--accent-red)"
-                        strokeWidth="8"
-                        width="300"
-                        height="80"
-                        delay={0.5}
-                    />
+
                     <h2
                         className="font-serif"
                         style={{
@@ -49,7 +74,7 @@ const Footer = () => {
                     </h2>
                 </div>
 
-                <button
+                {/* <button
                     className="bg-accent-red"
                     data-cursor="Let's Talk"
                     style={{
@@ -74,13 +99,12 @@ const Footer = () => {
                     }}
                 >
                     Let's Connect
-                </button>
+                </button> */}
 
                 <div className="flex justify-between items-end mt-20 text-sm text-muted"
                     style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6rem', flexWrap: 'wrap', gap: '2rem' }}>
                     <div className="text-left">
 
-                        <p>Kathmandu, Bagmati, Nepal</p>
                         <p style={{ marginTop: '0.5rem', opacity: 0.6 }}>sigdelagrim35@gmail.com</p>
                     </div>
                     <div className="flex gap-4" style={{ display: 'flex', gap: '1.5rem' }}>

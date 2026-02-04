@@ -5,8 +5,12 @@ const CustomCursor = () => {
     const [cursorText, setCursorText] = useState('');
     const [isHovering, setIsHovering] = useState(false);
 
-    const mouseX = useMotionValue(0);
-    const mouseY = useMotionValue(0);
+    // Initialize cursor after "Agrim" ends, between navbar and the name
+    const initialX = typeof window !== 'undefined' ? window.innerWidth / 2 + 180 : 0; // Further to the right
+    const initialY = typeof window !== 'undefined' ? window.innerHeight * 0.18 : 0; // Between navbar and name
+
+    const mouseX = useMotionValue(initialX);
+    const mouseY = useMotionValue(initialY);
 
     // Smooth springs for the cursor dot
     const springConfig = { damping: 25, stiffness: 700 };

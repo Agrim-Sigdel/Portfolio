@@ -1,0 +1,250 @@
+/* NORMAL Mode Styling - Clean & Professional */
+.normal-mode {
+    min-height: 100vh;
+    background: #ffffff;
+    color: #1a1a1a;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    line-height: 1.6;
+    overflow-y: auto;
+    display: flex;
+}
+
+/* Navigation Sidebar */
+.normal-nav {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 200px;
+    background: #f8f8f8;
+    border-right: 2px solid #e5e5e5;
+    padding: 2rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 100;
+}
+
+.normal-nav-link {
+    background: none;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    text-align: left;
+    font-size: 1rem;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.normal-nav-link:hover {
+    background: #e5e5e5;
+    color: #1a1a1a;
+    padding-left: 2rem;
+}
+
+.normal-nav-divider {
+    height: 2px;
+    background: #e5e5e5;
+    margin: 1rem 1.5rem;
+}
+
+.normal-nav-return {
+    color: #3b82f6;
+    font-weight: 600;
+    margin-top: auto;
+}
+
+.normal-nav-return:hover {
+    background: #e0f2fe;
+    color: #2563eb;
+}
+
+.normal-container {
+    max-width: 800px;
+    margin: 0 auto;
+    margin-left: 200px;
+    padding: 4rem 2rem;
+    flex: 1;
+}
+
+/* Header */
+.normal-header {
+    text-align: center;
+    margin-bottom: 4rem;
+    padding-bottom: 2rem;
+    border-bottom: 3px solid #1a1a1a;
+}
+
+.normal-header h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    letter-spacing: -0.02em;
+}
+
+.normal-subtitle {
+    font-size: 1.25rem;
+    color: #666;
+    margin: 0;
+    font-weight: 400;
+}
+
+/* Sections */
+.normal-section {
+    margin-bottom: 3rem;
+}
+
+.normal-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 1.5rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e5e5e5;
+    color: #1a1a1a;
+}
+
+.normal-section h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: #1a1a1a;
+}
+
+/* Lead Paragraph */
+.normal-lead {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: #333;
+}
+
+/* Items */
+.normal-item {
+    margin-bottom: 2rem;
+}
+
+.normal-item:last-child {
+    margin-bottom: 0;
+}
+
+.normal-meta {
+    font-size: 1rem;
+    color: #666;
+    margin: 0.25rem 0 0.75rem 0;
+    font-style: italic;
+}
+
+.normal-outcome {
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #f5f5f5;
+    border-left: 4px solid #3b82f6;
+    font-size: 0.95rem;
+}
+
+/* Lists */
+.normal-list {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+.normal-list li {
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+/* Skills */
+.normal-skills-category {
+    margin-bottom: 1.5rem;
+}
+
+.normal-skills-category h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #1a1a1a;
+}
+
+.normal-skills-category p {
+    margin: 0;
+    color: #555;
+    line-height: 1.7;
+}
+
+/* Contact List */
+.normal-contact-list {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0;
+}
+
+.normal-contact-list li {
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    color: #333;
+}
+
+.normal-contact-list strong {
+    color: #1a1a1a;
+    margin-right: 0.5rem;
+}
+
+/* Footer */
+.normal-footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 2px solid #e5e5e5;
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Print Styles */
+@media print {
+    .normal-container {
+        max-width: 100%;
+        padding: 1rem;
+    }
+
+    .normal-section {
+        page-break-inside: avoid;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .normal-nav {
+        display: none;
+    }
+
+    .normal-container {
+        margin-left: 0;
+        padding: 2rem 1.5rem;
+    }
+
+    .normal-header h1 {
+        font-size: 2.25rem;
+    }
+
+    .normal-subtitle {
+        font-size: 1rem;
+    }
+
+    .normal-section h2 {
+        font-size: 1.75rem;
+    }
+
+    .normal-section h3 {
+        font-size: 1.25rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .normal-nav {
+        width: 160px;
+    }
+
+    .normal-container {
+        margin-left: 160px;
+    }
+}
