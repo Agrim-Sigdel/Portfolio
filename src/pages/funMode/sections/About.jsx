@@ -1,9 +1,12 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import Squiggle from '../../../shared/ui/Squiggle';
-import { skillsData } from '../../../entities/portfolio/model';
+import content from '../../../data/content.json';
 
 const About = () => {
+    const { common, funMode } = content;
+    const { about } = funMode;
+
     return (
         <section id="about" className="container" style={{ padding: '8rem 0', borderTop: '1px solid #222' }}>
             <div className="about-grid">
@@ -30,18 +33,17 @@ const About = () => {
                     <h2 className="font-serif text-5xl mb-12">The <span style={{ fontStyle: 'italic' }}>Human</span> Bit</h2>
 
                     <div style={{ marginBottom: '3rem' }}>
-                        <h4 className="text-sm uppercase tracking-widest mb-4 opacity-50">Professional Summary</h4>
+                        <h4 className="text-sm uppercase tracking-widest mb-4 opacity-50">{about.subtitle}</h4>
                         <p className="leading-relaxed text-lg" style={{ color: 'var(--text-cream)' }}>
-                            Versatile Full-Stack Developer with a strong foundation in modern AI, specializing in React/TypeScript and Python.
-                            I bridge the gap between complex AI models and user-centric applications, delivering production-ready code for Computer Vision and NLP domains.
+                            {common.personal.summary}
                         </p>
                     </div>
 
                     <div style={{ marginBottom: '3rem' }}>
                         <h4 className="text-sm uppercase tracking-widest mb-4 opacity-50">Education & Background</h4>
                         <p className="leading-relaxed text-lg" style={{ color: 'var(--text-cream)' }}>
-                            BSc. Computer Science and Information Technology (CSIT) from Prime College, Kathmandu.
-                            Expected Graduation: April 2026.
+                            {common.education[0].degree} from {common.education[0].school}.
+                            {common.education[0].year}.
                         </p>
                     </div>
                 </motion.div>
@@ -54,9 +56,9 @@ const About = () => {
                     transition={{ duration: 0.8 }}
                     style={{ textAlign: 'left' }}
                 >
-                    <p className="text-accent uppercase tracking-widest text-xs font-bold mb-8">Tech Stack</p>
+                    <p className="text-accent uppercase tracking-widest text-xs font-bold mb-8">{about.techStackTitle}</p>
                     <div className="flex flex-wrap gap-3">
-                        {skillsData.map((skill, index) => (
+                        {common.skills.flatList.map((skill, index) => (
                             <motion.span
                                 key={index}
                                 initial={{ opacity: 0, y: 10 }}

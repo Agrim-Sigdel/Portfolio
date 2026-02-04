@@ -1,49 +1,28 @@
+import content from '../../../data/content.json';
+
+const { common, terminalMode } = content;
+
 // Terminal view content generators
 export const getWelcomeView = () => {
-  return `
-╔══════════════════════════════════════════════════════════════════╗
-║                                                                  ║
-║           Welcome to Agrim Sigdel's Portfolio Terminal          ║
-║                                                                  ║
-╚══════════════════════════════════════════════════════════════════╝
+    return `
+${terminalMode.welcome.border.replace('{name}', common.personal.name)}
 
-Full-Stack Developer | AI Enthusiast | Creative Problem Solver
+${common.personal.tagline}
 
-Type 'help' to see available commands.
-Type 'menu' to see all sections.
+${terminalMode.welcome.helpHint}
 
 `;
 };
 
 export const getHelpView = () => {
   return `
-Available Commands:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${terminalMode.help.header}
 
-  menu              Show main menu with all sections
-  help              Display this help message
-  start             Return to mode selection screen
+${terminalMode.help.commands.join('\n')}
   
-  about             View professional summary
-  projects          View project portfolio
-  experience        View work experience
-  skills            View technical skills
-  contact           View contact information
+${terminalMode.help.modeSwitching.join('\n')}
   
-  <ref.number>      Navigate to section (e.g., 1, 2, 3)
-  back              Return to previous view
-  clear             Clear terminal screen
-  
-  Mode Switching:
-  close             Switch to FUN mode
-  minimize          Switch to NORMAL mode
-  maximize          Toggle fullscreen mode
-  fun               Switch to FUN mode
-  normal            Switch to NORMAL mode
-  
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Tip: Use arrow keys (↑↓) to navigate command history.
+${terminalMode.help.footer}
 
 `;
 };
@@ -73,23 +52,20 @@ export const getAboutView = () => {
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Professional Summary:
-Versatile Full-Stack Developer with a strong foundation in modern AI, 
-specializing in React/TypeScript and Python. I bridge the gap between 
-complex AI models and user-centric applications, delivering 
-production-ready code for Computer Vision and NLP domains.
+${common.personal.summary}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Education:
-  BSc. CSIT — Prime College, Kathmandu
-  Expected Graduation: April 2026
+  ${common.education[0].degree} — ${common.education[0].school}
+  ${common.education[0].year}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Experience:
-  Creative Lead — Prime College Graduation Committee
-  Led creative direction and brand guidelines for 625+ attendees,
-  managing cross-functional teams for visual and marketing materials.
+  ${common.experience[0].role} — ${common.experience[0].company}
+  ${common.experience[0].description[0]}
+  ${common.experience[0].description[1]}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 

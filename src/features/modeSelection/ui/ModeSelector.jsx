@@ -53,7 +53,7 @@ const ModeSelector = ({ onSelectMode }) => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
-                        <span className="mode-button-label">WORK</span>
+                        <span className="mode-button-label">Old</span>
                         <span className="mode-button-desc">Terminal Interface</span>
                     </motion.button>
 

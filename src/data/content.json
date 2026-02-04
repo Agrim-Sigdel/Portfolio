@@ -1,0 +1,182 @@
+{
+  "common": {
+    "personal": {
+      "name": "Agrim Sigdel",
+      "firstName": "Agrim",
+      "tagline": "Full-Stack Developer | AI Enthusiast | Creative Problem Solver",
+      "summary": "Versatile Full-Stack Developer with a strong foundation in modern AI, specializing in React/TypeScript and Python. I bridge the gap between complex AI models and user-centric applications, delivering production-ready code for Computer Vision and NLP domains.",
+      "shortSummary": "Full-Stack Developer focused on AI Innovation and building production-ready code with React, TypeScript, and Python."
+    },
+    "contact": {
+      "email": "agrim.sigdel@example.com",
+      "linkedin": "linkedin.com/in/agrimsigdel",
+      "github": "github.com/agrimsigdel",
+      "portfolio": "agrimsigdel.com"
+    },
+    "education": [
+      {
+        "degree": "BSc. Computer Science and Information Technology (CSIT)",
+        "school": "Prime College, Kathmandu",
+        "year": "Expected Graduation: April 2026"
+      }
+    ],
+    "experience": [
+      {
+        "role": "Creative Lead",
+        "company": "Prime College Graduation Committee",
+        "period": "2024 - 2026",
+        "description": [
+          "Led creative direction and brand guidelines for 625+ attendees",
+          "Managed cross-functional teams for visual and marketing materials",
+          "Coordinated event planning and execution",
+          "Developed comprehensive branding strategy"
+        ]
+      },
+      {
+        "role": "Full-Stack Developer & AI Engineer",
+        "company": "Freelance / Personal Projects",
+        "period": "2022 - Present",
+        "description": [
+          "Developed production-ready AI applications",
+          "Built modern web applications with React/TypeScript",
+          "Implemented Computer Vision and NLP solutions",
+          "Delivered scalable backend systems"
+        ]
+      }
+    ],
+    "projects": [
+      {
+        "id": 1,
+        "title": "ANPR System",
+        "category": "AI & Full-Stack",
+        "description": "Highly optimized YOLOv8 backend with a modern React/TypeScript frontend for Nepali plate recognition.",
+        "outcome": "30 FPS live processing with custom Devanagari recognition logic.",
+        "color": "#111"
+      },
+      {
+        "id": 2,
+        "title": "Parking Management",
+        "category": "Automation & Backend",
+        "description": "End-to-end automatic parking system utilizing custom ANPR for real-time verification and access control.",
+        "outcome": "Automated gate entry/exit reducing manual verification significantly.",
+        "color": "#151515"
+      },
+      {
+        "id": 3,
+        "title": "Reddit Sentiment Analysis",
+        "category": "NLP / Deep Learning",
+        "description": "Deep NLP pipeline using fine-tuned BERT for nuanced emotion classification on large-scale Reddit data.",
+        "outcome": "Practiced advanced prompt engineering and LLM-based interfaces.",
+        "color": "#0d0d0d"
+      }
+    ],
+    "skills": {
+      "categories": [
+        {
+          "name": "Frontend Development",
+          "items": [
+            "TypeScript",
+            "React",
+            "Next.js",
+            "TailwindCSS",
+            "Framer Motion",
+            "Vite"
+          ]
+        },
+        {
+          "name": "Backend Development",
+          "items": [
+            "Python",
+            "Django",
+            "Flask",
+            "REST APIs",
+            "MySQL",
+            "PostgreSQL"
+          ]
+        },
+        {
+          "name": "AI & Machine Learning",
+          "items": [
+            "PyTorch",
+            "YOLOv8",
+            "RT-DETR",
+            "BERT",
+            "TensorFlow",
+            "OpenCV"
+          ]
+        },
+        {
+          "name": "Tools & Technologies",
+          "items": [
+            "Git/GitHub",
+            "Figma",
+            "Docker",
+            "VS Code",
+            "Postman",
+            "Linux"
+          ]
+        }
+      ],
+      "flatList": [
+        "TypeScript",
+        "React",
+        "Next.js",
+        "TailwindCSS",
+        "Python",
+        "PyTorch",
+        "YOLOv8",
+        "RT-DETR",
+        "BERT",
+        "MySQL",
+        "REST APIs",
+        "Git/GitHub",
+        "Figma"
+      ]
+    }
+  },
+  "funMode": {
+    "hero": {
+      "greeting": "Hi, I'm",
+      "action": "I build things that work.",
+      "specialization": ["Computer Vision", "NLP"]
+    },
+    "about": {
+      "title": "The Human Bit",
+      "subtitle": "Professional Summary",
+      "techStackTitle": "Tech Stack"
+    }
+  },
+  "terminalMode": {
+    "welcome": {
+      "border": "╔══════════════════════════════════════════════════════════════════╗\n║                                                                  ║\n║           Welcome to {name}'s Portfolio Terminal          ║\n║                                                                  ║\n╚══════════════════════════════════════════════════════════════════╝",
+      "helpHint": "Type 'help' to see available commands.\nType 'menu' to see all sections."
+    },
+    "help": {
+      "header": "Available Commands:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+      "commands": [
+        "  menu              Show main menu with all sections",
+        "  help              Display this help message",
+        "  start             Return to mode selection screen",
+        "",
+        "  about             View professional summary",
+        "  projects          View project portfolio",
+        "  experience        View work experience",
+        "  skills            View technical skills",
+        "  contact           View contact information",
+        "",
+        "  <ref.number>      Navigate to section (e.g., 1, 2, 3)",
+        "  back              Return to previous view",
+        "  clear             Clear terminal screen"
+      ],
+      "modeSwitching": [
+        "  Mode Switching:",
+        "  close             Switch to FUN mode",
+        "  minimize          Switch to NORMAL mode",
+        "  maximize          Toggle fullscreen mode",
+        "  fun               Switch to FUN mode",
+        "  normal            Switch to NORMAL mode"
+      ],
+      "footer": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nTip: Use arrow keys (↑↓) to navigate command history."
+    }
+  }
+}

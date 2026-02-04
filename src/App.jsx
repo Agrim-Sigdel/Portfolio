@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
+import { useTheme } from './shared/lib/ThemeContext';
 import ModeSelector from './features/modeSelection/ui/ModeSelector';
 import Preloader from './shared/ui/Preloader';
 import Terminal from './features/terminalMode/ui/Terminal';
@@ -9,9 +10,29 @@ import './pages/funMode/funMode.css';
 import './App.css';
 
 function App() {
+  const { theme } = useTheme();
   const [selectedMode, setSelectedMode] = useState(null); // null, 'fun', 'work', or 'normal'
   const [isLoading, setIsLoading] = useState(false);
   const [showPreloader, setShowPreloader] = useState(false);
+
+  // Handle Theme Application based on Mode
+  useEffect(() => {
+    const root = document.documentElement;
+    
+    if (selectedMode === 'fun') {
+      // Fun mode respects user preference (light/dark)
+      root.setAttribute('data-theme', theme);
+    } else if (selectedMode === 'work') {
+      // Work/Terminal mode is always dark
+      root.setAttribute('data-theme', 'dark');
+    } else if (selectedMode === 'normal') {
+      // Normal mode is always light
+      root.setAttribute('data-theme', 'light');
+    } else {
+      // Start page (null) defaults to light
+      root.setAttribute('data-theme', 'light');
+    }
+  }, [selectedMode, theme]);
 
   useEffect(() => {
     // Prevent scrolling during loading or mode selection

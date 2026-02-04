@@ -1,7 +1,7 @@
 .mode-selector {
   position: fixed;
   inset: 0;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  background: #d6d6d63f;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -18,14 +18,14 @@
   font-family: var(--font-serif);
   font-size: clamp(2.5rem, 8vw, 5rem);
   font-weight: 900;
-  color: #ffffff;
+  color: #1a1a1a;
   margin-bottom: 1rem;
   letter-spacing: -0.02em;
 }
 
 .mode-selector-subtitle {
   font-size: 1.2rem;
-  color: var(--text-muted);
+  color: #4a4a4a;
   margin-bottom: 4rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -40,9 +40,9 @@
 }
 
 .mode-button {
-  background: transparent;
+  background: white;
   border: 2px solid #333;
-  color: #fff;
+  color: #1a1a1a;
   padding: 3rem 4rem;
   font-size: 1rem;
   font-weight: 600;
@@ -87,7 +87,7 @@
 }
 
 .fun-button:hover {
-  border-color: var(--accent-red);
+  border-color: #ff4c2b;
   box-shadow: 0 0 30px rgba(220, 38, 38, 0.3);
 }
 
@@ -102,18 +102,25 @@
 }
 
 @media (max-width: 768px) {
+  .mode-selector-content {
+    padding: 1rem;
+    width: 100%;
+  }
+
   .mode-buttons {
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
+    width: 100%;
   }
 
   .mode-button {
-    min-width: 100%;
-    padding: 2rem 3rem;
+    min-width: unset;
+    width: 100%;
+    padding: 2rem 1.5rem;
   }
 
   .mode-button-label {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
 }
 

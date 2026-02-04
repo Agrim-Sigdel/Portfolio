@@ -50,7 +50,7 @@ const Preloader = ({ onComplete }) => {
                         animate={{ y: '0%' }}
                         exit={{ y: '-100%' }}
                         transition={{ duration: 0.5, ease: "circOut" }}
-                        style={{ display: 'block', fontSize: '1.2rem', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '4px' }}
+                        style={{ display: 'block', fontSize: '1.2rem', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '4px', color: '#fff' }}
                     >
                         {words[currentWordIndex]}
                     </motion.span>
@@ -62,7 +62,8 @@ const Preloader = ({ onComplete }) => {
                     fontSize: 'clamp(4rem, 15vw, 12rem)',
                     fontWeight: '900',
                     margin: 0,
-                    fontVariantNumeric: 'tabular-nums'
+                    fontVariantNumeric: 'tabular-nums',
+                    color: '#fff'
                 }}
             >
                 {percentage}%
@@ -75,7 +76,8 @@ const Preloader = ({ onComplete }) => {
                 fontSize: '0.8rem',
                 opacity: 0.4,
                 textTransform: 'uppercase',
-                letterSpacing: '2px'
+                letterSpacing: '2px',
+                color: '#fff'
             }}>
                 © 2026 Portfolio Original
             </div>

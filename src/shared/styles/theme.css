@@ -28,7 +28,7 @@
   /* Spacing */
   --spacing-container: 90vw;
 
-  cursor: none;
+  cursor: auto;
 
   font-family: var(--font-sans);
   line-height: 1.5;

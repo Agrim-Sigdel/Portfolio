@@ -17,8 +17,8 @@
   /* Spacing */
   --spacing-container: 90vw;
 
-  cursor: none;
-  /* Hide default cursor globally */
+  cursor: auto;
+  /* Reset cursor globally */
 
   font-family: var(--font-sans);
   line-height: 1.5;

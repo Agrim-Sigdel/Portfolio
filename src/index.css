@@ -17,7 +17,7 @@
   /* Spacing */
   --spacing-container: 90vw;
 
-  cursor: none;
+  cursor: auto;
 
   font-family: var(--font-sans);
   line-height: 1.5;
@@ -165,13 +165,12 @@ section {
 
   h1,
   .hero-section h1 {
-    font-size: 3.5rem !important;
-    /* Slightly larger on mobile */
+    font-size: clamp(2.5rem, 8vw, 3.5rem) !important;
     line-height: 1.1;
   }
 
   h2 {
-    font-size: 2.8rem !important;
+    font-size: 2rem !important;
   }
 
   .container {

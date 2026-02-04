@@ -1,9 +1,11 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import Squiggle from '../../../shared/ui/Squiggle';
+import content from '../../../data/content.json';
 
 const Hero = () => {
     const sectionRef = useRef(null);
+    const { hero, common } = { hero: content.funMode.hero, common: content.common };
     const { scrollYProgress } = useScroll({
         target: sectionRef,
         offset: ["start start", "end start"]
@@ -37,7 +39,7 @@ const Hero = () => {
                             style={{ display: 'inline-block' }}
                         >
 
-                            Hi, I'm <span className="text-accent" style={{ fontWeight: 400, fontStyle: 'italic' }}>Agrim</span>.
+                            {hero.greeting} <span className="text-accent" style={{ fontWeight: 400, fontStyle: 'italic' }}>{common.personal.firstName}</span>.
                         </motion.span>
                         <br />
                         <motion.span
@@ -46,12 +48,7 @@ const Hero = () => {
                             transition={{ duration: 1, delay: 0.8 }}
                             style={{ display: 'inline-block' }}
                         >
-                            I   <span style={{ fontStyle: 'italic', fontWeight: 400 }}>build </span>
-                            things{' '}
-                            <span style={{ position: 'relative', display: 'inline-block' }}>
-                                that work.
-
-                            </span>
+                            {hero.action}
                         </motion.span>
                     </motion.h1>
 
@@ -69,11 +66,10 @@ const Hero = () => {
                             margin: '4rem auto 0'
                         }}
                     >
-                        Full-Stack Developer focused on <span style={{ color: 'var(--text-cream)' }}>AI Innovation</span> and building production-ready code with React, TypeScript, and Python.
+                        {common.personal.shortSummary}
                         <br />
                         <span style={{ fontSize: '1rem', marginTop: '1.5rem', display: 'block', opacity: 0.8, fontWeight: '500' }}>
-                            Specializing in <span className="text-accent">Computer Vision</span> and <span className="text-accent">NLP</span> model integration.
-
+                           Specializing in <span className="text-accent">{hero.specialization[0]}</span> and <span className="text-accent">{hero.specialization[1]}</span> model integration.
                         </span>
                     </motion.p>
                 </motion.div>

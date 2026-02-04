@@ -4,23 +4,22 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
     const [theme, setTheme] = useState(() => {
-        // Get theme from localStorage or default to 'dark'
+        // Get theme from localStorage or default to 'light'
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('theme');
-            return saved || 'dark';
+            return saved || 'light';
         }
-        return 'dark';
+        return 'light';
     });
 
     useEffect(() => {
-        // Update document root with theme
-        const root = document.documentElement;
-        root.setAttribute('data-theme', theme);
+        // Save preference to localStorage, but DON'T update DOM here
+        // DOM update is handled in App.jsx based on active mode
         localStorage.setItem('theme', theme);
     }, [theme]);
 
     const toggleTheme = () => {
-        setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+        setTheme(prev => prev === 'light' ? 'dark' : 'light');
     };
 
     return (
