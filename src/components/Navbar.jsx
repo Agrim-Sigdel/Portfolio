@@ -18,7 +18,7 @@ const Navbar = () => {
             >
                 <div className="left flex gap-6 text-sm uppercase tracking-widest" style={{ display: 'flex', gap: '2rem', fontSize: '0.8rem', letterSpacing: '2px', textTransform: 'uppercase', minWidth: '150px' }}>
                     <a href="#work" className="hover:text-accent transition-colors" data-cursor="Projects">Work</a>
-                    <a href="#services" className="hover:text-accent transition-colors" data-cursor="About">Services</a>
+                    <a href="#about" className="hover:text-accent transition-colors" data-cursor="About">About</a>
                 </div>
 
                 <div className="logo font-serif text-2xl font-bold italic" style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', fontWeight: 'bold', fontStyle: 'italic', textAlign: 'center' }} data-cursor="Home">

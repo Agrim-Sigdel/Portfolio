@@ -3,26 +3,26 @@ import { motion } from 'framer-motion';
 const projects = [
     {
         id: 1,
-        title: 'The Big One',
-        category: 'Full-Stack Platform',
-        pitch: 'The project that kept me up at night.',
-        outcome: 'Successful launch with 20% efficiency gain.',
+        title: 'ANPR System',
+        category: 'AI & Full-Stack',
+        pitch: 'Highly optimized YOLOv8 backend with a modern React/TypeScript frontend for Nepali plate recognition.',
+        outcome: '30 FPS live processing with custom Devanagari recognition logic.',
         color: '#111'
     },
     {
         id: 2,
-        title: 'The Problem Solver',
-        category: 'Internal Automation',
-        pitch: 'Someone said "this is impossible," so I did it.',
-        outcome: 'Streamlined workflow saved 15+ hours/week.',
+        title: 'Parking Management',
+        category: 'Automation & Backend',
+        pitch: 'End-to-end automatic parking system utilizing custom ANPR for real-time verification and access control.',
+        outcome: 'Automated gate entry/exit reducing manual verification significantly.',
         color: '#151515'
     },
     {
         id: 3,
-        title: 'The Passion Project',
-        category: 'Lab Experiment',
-        pitch: 'Built just to see if I could.',
-        outcome: 'Exploration of reactive state management.',
+        title: 'Reddit Sentiment Analysis',
+        category: 'NLP / Deep Learning',
+        pitch: 'Deep NLP pipeline using fine-tuned BERT for nuanced emotion classification on large-scale Reddit data.',
+        outcome: 'Practiced advanced prompt engineering and LLM-based interfaces.',
         color: '#0d0d0d'
     },
 ];

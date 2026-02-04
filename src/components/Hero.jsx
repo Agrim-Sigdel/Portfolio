@@ -21,8 +21,7 @@ const Hero = () => {
         <section className="hero-section">
             <motion.h1
                 initial={{ clipPath: 'inset(100% 0% 0% 0%)', opacity: 0 }}
-                whileInView={{ clipPath: 'inset(0% 0% 0% 0%)', opacity: 1 }}
-                viewport={{ once: true }}
+                animate={{ clipPath: 'inset(0% 0% 0% 0%)', opacity: 1 }}
                 transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
                 style={{
                     fontSize: 'clamp(3.5rem, 9vw, 8.5rem)',
@@ -56,10 +55,10 @@ const Hero = () => {
                     margin: '4rem auto 0'
                 }}
             >
-                An adaptive professional focused on <span style={{ color: 'var(--text-cream)' }}>Software Engineering</span> and solving complex problems with simple, elegant solutions.
+                Full-Stack Developer focused on <span style={{ color: 'var(--text-cream)' }}>AI Innovation</span> and building production-ready code with React, TypeScript, and Python.
                 <br />
                 <span style={{ fontSize: '1rem', marginTop: '1.5rem', display: 'block', opacity: 0.8, fontWeight: '500' }}>
-                    Currently exploring the intersection of <span className="text-accent">AI Agents</span> and <span className="text-accent">E-commerce Scalability</span>.
+                    Specializing in <span className="text-accent">Computer Vision</span> and <span className="text-accent">NLP</span> model integration.
                 </span>
             </motion.p>
         </section>

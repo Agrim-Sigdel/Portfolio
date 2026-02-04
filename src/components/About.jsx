@@ -1,7 +1,11 @@
 import { motion } from 'framer-motion';
 
 const About = () => {
-    const tools = ['Python', 'React', 'TypeScript', 'PostgreSQL', 'Docker', 'AWS', 'Django', 'Framer Motion'];
+    const tools = [
+        'TypeScript', 'React', 'Next.js', 'TailwindCSS',
+        'Python', 'PyTorch', 'YOLOv8', 'RT-DETR', 'BERT',
+        'MySQL', 'REST APIs', 'Git/GitHub', 'Figma'
+    ];
 
     return (
         <section id="about" className="container" style={{ padding: '8rem 0', borderTop: '1px solid #222' }}>
@@ -18,18 +22,26 @@ const About = () => {
                     <h2 className="font-serif text-5xl mb-12">The <span style={{ fontStyle: 'italic' }}>Human</span> Bit</h2>
 
                     <div style={{ marginBottom: '3rem' }}>
-                        <h4 className="text-sm uppercase tracking-widest mb-4 opacity-50">Professional Side</h4>
+                        <h4 className="text-sm uppercase tracking-widest mb-4 opacity-50">Professional Summary</h4>
                         <p className="leading-relaxed text-lg" style={{ color: 'var(--text-cream)' }}>
-                            I’m an authentic, adaptive collaborator who prefers candor over fluff.
-                            I value clarity and insight, focusing on building sustainable systems that solve real problems.
+                            Versatile Full-Stack Developer with a strong foundation in modern AI, specializing in React/TypeScript and Python.
+                            I bridge the gap between complex AI models and user-centric applications, delivering production-ready code for Computer Vision and NLP domains.
+                        </p>
+                    </div>
+
+                    <div style={{ marginBottom: '3rem' }}>
+                        <h4 className="text-sm uppercase tracking-widest mb-4 opacity-50">Experience</h4>
+                        <p className="leading-relaxed text-lg">
+                            <span className="font-bold">Creative Lead</span> — Prime College Graduation Committee<br />
+                            <span className="text-sm opacity-70">Led creative direction and brand guidelines for 625+ attendees, managing cross-functional teams for visual and marketing materials.</span>
                         </p>
                     </div>
 
                     <div>
-                        <h4 className="text-sm uppercase tracking-widest mb-4 opacity-50">Personal Side</h4>
+                        <h4 className="text-sm uppercase tracking-widest mb-4 opacity-50">Education</h4>
                         <p className="leading-relaxed text-lg">
-                            When I’m not at my desk, you can find me exploring new technologies or figuring out how to automate my life.
-                            I believe in lifelong learning and the power of simple, effective design.
+                            <span className="font-bold">BSc. CSIT</span> — Prime College, Kathmandu<br />
+                            <span className="text-sm opacity-70">Expected Graduation: April 2026</span>
                         </p>
                     </div>
                 </motion.div>
