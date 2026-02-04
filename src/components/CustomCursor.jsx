@@ -81,7 +81,7 @@ const CustomCursor = () => {
                     }}
                 >
                     <img
-                        src="/kurama-pointer.png"
+                        src="/gojo.png"
                         alt="trail"
                         style={{ width: '64px', height: '64px', objectFit: 'contain' }}
                     />
