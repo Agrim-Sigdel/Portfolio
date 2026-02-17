@@ -68,7 +68,7 @@
         "description": "Deep NLP pipeline using fine-tuned BERT for nuanced emotion classification on large-scale Reddit data.",
         "outcome": "Practiced advanced prompt engineering and LLM-based interfaces.",
         "color": "#0d0d0d"
-      }
+      },
       {
         "id": 4,
         "title": "Styles",
