@@ -8,16 +8,16 @@
       "shortSummary": "Full-Stack Developer focused on AI Innovation and building production-ready code with React, TypeScript, and Python."
     },
     "contact": {
-      "email": "agrim.sigdel@example.com",
-      "linkedin": "linkedin.com/in/agrimsigdel",
-      "github": "github.com/agrimsigdel",
+      "email": "sigdelagrim35@gmail.com",
+      "linkedin": "linkedin.com/in/agrim-sigdel-34b532151",
+      "github": "github.com/Agrim-Sigdel",
       "portfolio": "agrimsigdel.com"
     },
     "education": [
       {
         "degree": "BSc. Computer Science and Information Technology (CSIT)",
         "school": "Prime College, Kathmandu",
-        "year": "Expected Graduation: April 2026"
+        "year": "2022 - 2026"
       }
     ],
     "experience": [
@@ -68,6 +68,14 @@
         "description": "Deep NLP pipeline using fine-tuned BERT for nuanced emotion classification on large-scale Reddit data.",
         "outcome": "Practiced advanced prompt engineering and LLM-based interfaces.",
         "color": "#0d0d0d"
+      }
+      {
+        "id": 4,
+        "title": "Styles",
+        "category": "Website",
+        "description": "A modern, responsive website built with PHP and html .",
+        "outcome": "Responsive design with optimized performance and accessibility.",
+        "color": "#1d1d1d"
       }
     ],
     "skills": {
