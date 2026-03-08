@@ -2,6 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion as Motion } from 'framer-motion';
 import './ModeSelector.css';
 
+const AVAILABLE_MODES = {
+    fun: false,
+    work: false,
+    normal: true
+};
+
 const ModeSelector = ({ onSelectMode }) => {
     const [ripples, setRipples] = useState([]);
     const [transitionMode, setTransitionMode] = useState(null);
@@ -18,7 +24,7 @@ const ModeSelector = ({ onSelectMode }) => {
     }, []);
 
     const handleModeClick = (mode) => {
-        if (isSwitching) {
+        if (isSwitching || !AVAILABLE_MODES[mode]) {
             return;
         }
 
@@ -126,9 +132,9 @@ const ModeSelector = ({ onSelectMode }) => {
 
                 <div className="mode-buttons">
                     <Motion.button
-                        className="mode-button fun-button"
+                        className="mode-button fun-button is-locked"
                         onClick={() => handleModeClick('fun')}
-                        disabled={isSwitching}
+                        disabled={isSwitching || !AVAILABLE_MODES.fun}
                         initial={{ x: -50, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.7, duration: 0.8 }}
@@ -137,14 +143,14 @@ const ModeSelector = ({ onSelectMode }) => {
                     >
                         <span className="mode-button-label">FUN</span>
                         <span className="mode-button-reels" aria-hidden="true"><span></span><span></span></span>
-                        <span className="mode-button-cta">Click here</span>
+                        <span className="mode-button-cta">Coming soon</span>
                         <span className="mode-button-desc">Visual & interactive</span>
                     </Motion.button>
 
                     <Motion.button
-                        className="mode-button work-button"
+                        className="mode-button work-button is-locked"
                         onClick={() => handleModeClick('work')}
-                        disabled={isSwitching}
+                        disabled={isSwitching || !AVAILABLE_MODES.work}
                         initial={{ x: 50, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.7, duration: 0.8 }}
@@ -153,13 +159,14 @@ const ModeSelector = ({ onSelectMode }) => {
                     >
                         <span className="mode-button-label">WORK</span>
                         <span className="mode-button-reels" aria-hidden="true"><span></span><span></span></span>
+                        <span className="mode-button-cta">Coming soon</span>
                         <span className="mode-button-desc">Terminal focused</span>
                     </Motion.button>
 
                     <Motion.button
                         className="mode-button normal-button"
                         onClick={() => handleModeClick('normal')}
-                        disabled={isSwitching}
+                        disabled={isSwitching || !AVAILABLE_MODES.normal}
                         initial={{ y: 50, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.9, duration: 0.8 }}

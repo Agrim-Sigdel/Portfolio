@@ -579,6 +579,24 @@
     0 8px 18px rgba(63, 43, 34, 0.12);
 }
 
+.mode-button:disabled {
+  cursor: not-allowed;
+}
+
+.mode-button.is-locked {
+  opacity: 0.58;
+  filter: grayscale(0.15);
+  box-shadow:
+    inset 0 1px 0 rgba(228, 210, 189, 0.08),
+    inset 0 -8px 0 rgba(63, 43, 34, 0.04),
+    0 4px 10px rgba(63, 43, 34, 0.1);
+}
+
+.mode-button.is-locked .mode-button-cta {
+  background: rgba(63, 43, 34, 0.16);
+  border-style: solid;
+}
+
 .mode-selector .mode-button,
 .mode-selector .mode-button:focus,
 .mode-selector .mode-button:active {
@@ -690,12 +708,12 @@
   text-transform: uppercase;
 }
 
-.fun-button:hover .mode-button-cta {
+.fun-button:not(.is-locked):hover .mode-button-cta {
   background: rgba(63, 43, 34, 0.92);
   color: var(--tape-highlight);
 }
 
-.fun-button:hover {
+.fun-button:not(.is-locked):hover {
   background: linear-gradient(
     180deg,
     rgba(228, 210, 189, 0.7) 0%,
@@ -706,7 +724,7 @@
   box-shadow: 0 12px 24px rgba(63, 43, 34, 0.22);
 }
 
-.mode-selector .fun-button:hover {
+.mode-selector .fun-button:not(.is-locked):hover {
   background: linear-gradient(
     180deg,
     rgba(228, 210, 189, 0.7) 0%,
@@ -714,7 +732,7 @@
   );
 }
 
-.work-button:hover {
+.work-button:not(.is-locked):hover {
   background: linear-gradient(
     180deg,
     rgba(222, 204, 184, 0.7) 0%,
@@ -725,7 +743,7 @@
   box-shadow: 0 12px 24px rgba(63, 43, 34, 0.22);
 }
 
-.mode-selector .work-button:hover {
+.mode-selector .work-button:not(.is-locked):hover {
   background: linear-gradient(
     180deg,
     rgba(222, 204, 184, 0.7) 0%,
