@@ -225,7 +225,7 @@ GitHub:
   github.com/agrimsigdel
 
 Portfolio:
-  agrimsigdel.com
+  agrimsigdel.com.np
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 

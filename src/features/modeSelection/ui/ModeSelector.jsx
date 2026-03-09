@@ -8,10 +8,18 @@ const AVAILABLE_MODES = {
     normal: true
 };
 
+const modeOptions = [
+    { id: 'fun', label: 'FUN' },
+    { id: 'work', label: 'WORK' },
+    { id: 'normal', label: 'NORMAL' },
+];
+
 const ModeSelector = ({ onSelectMode }) => {
     const [ripples, setRipples] = useState([]);
     const [transitionMode, setTransitionMode] = useState(null);
     const [isSwitching, setIsSwitching] = useState(false);
+    const [currentIndex, setCurrentIndex] = useState(2);
+    const currentMode = modeOptions[currentIndex];
     const lastRippleAtRef = useRef(0);
     const switchTimeoutRef = useRef(null);
 
@@ -98,7 +106,7 @@ const ModeSelector = ({ onSelectMode }) => {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.2, duration: 0.8 }}
                 >
-                   Agrim Sigdel - Portfolio
+                    Agrim Sigdel - Portfolio
                 </Motion.p>
 
                 <Motion.h1
@@ -109,7 +117,7 @@ const ModeSelector = ({ onSelectMode }) => {
                 >
                     Pick Your Experience
                 </Motion.h1>
-{/* 
+                {/* 
                 <motion.p
                     className="mode-selector-subtitle"
                     initial={{ y: -10, opacity: 0 }}
@@ -130,53 +138,35 @@ const ModeSelector = ({ onSelectMode }) => {
                     <span><strong>NORMAL</strong> — clean</span>
                 </motion.div> */}
 
-                <div className="mode-buttons">
-                    <Motion.button
-                        className="mode-button fun-button is-locked"
-                        onClick={() => handleModeClick('fun')}
-                        disabled={isSwitching || !AVAILABLE_MODES.fun}
-                        initial={{ x: -50, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 0.7, duration: 0.8 }}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                    >
-                        <span className="mode-button-label">FUN</span>
-                        <span className="mode-button-reels" aria-hidden="true"><span></span><span></span></span>
-                        <span className="mode-button-cta">Coming soon</span>
-                        <span className="mode-button-desc">Visual & interactive</span>
-                    </Motion.button>
+                <div className="mode-buttons-wrapper">
+                    <span
+                        className="mode-carousel-nav"
+                        aria-hidden="true"
+                        onClick={() => setCurrentIndex(prev => (prev === 0 ? modeOptions.length - 1 : prev - 1))}
+                    >&lsaquo;</span>
 
-                    <Motion.button
-                        className="mode-button work-button is-locked"
-                        onClick={() => handleModeClick('work')}
-                        disabled={isSwitching || !AVAILABLE_MODES.work}
-                        initial={{ x: 50, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 0.7, duration: 0.8 }}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                    >
-                        <span className="mode-button-label">WORK</span>
-                        <span className="mode-button-reels" aria-hidden="true"><span></span><span></span></span>
-                        <span className="mode-button-cta">Coming soon</span>
-                        <span className="mode-button-desc">Terminal focused</span>
-                    </Motion.button>
+                    <div className="mode-buttons">
+                        <Motion.button
+                            key={currentMode.id}
+                            className={`mode-button ${currentMode.id}-button ${!AVAILABLE_MODES[currentMode.id] ? 'is-locked' : ''}`}
+                            onClick={() => handleModeClick(currentMode.id)}
+                            disabled={isSwitching || !AVAILABLE_MODES[currentMode.id]}
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            <span className="mode-button-label">{currentMode.label}</span>
+                        </Motion.button>
+                    </div>
 
-                    <Motion.button
-                        className="mode-button normal-button"
-                        onClick={() => handleModeClick('normal')}
-                        disabled={isSwitching || !AVAILABLE_MODES.normal}
-                        initial={{ y: 50, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.9, duration: 0.8 }}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                    >
-                        <span className="mode-button-label">NORMAL</span>
-                        <span className="mode-button-reels" aria-hidden="true"><span></span><span></span></span>
-                        <span className="mode-button-desc">Quick and clean</span>
-                    </Motion.button>
+                    <span
+                        className="mode-carousel-nav"
+                        aria-hidden="true"
+                        onClick={() => setCurrentIndex(prev => (prev === modeOptions.length - 1 ? 0 : prev + 1))}
+                    >&rsaquo;</span>
                 </div>
             </div>
         </Motion.div>

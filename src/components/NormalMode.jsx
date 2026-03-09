@@ -133,7 +133,7 @@ const NormalMode = ({ onResetMode }) => {
                         <li><strong>Email:</strong> agrim.sigdel@example.com</li>
                         <li><strong>LinkedIn:</strong> linkedin.com/in/agrimsigdel</li>
                         <li><strong>GitHub:</strong> github.com/agrimsigdel</li>
-                        <li><strong>Portfolio:</strong> agrimsigdel.com</li>
+                        <li><strong>Portfolio:</strong> agrimsigdel.com.np</li>
                     </ul>
                 </section>
 

@@ -4,7 +4,7 @@ const { common, terminalMode } = content;
 
 // Terminal view content generators
 export const getWelcomeView = () => {
-    return `
+  return `
 ${terminalMode.welcome.border.replace('{name}', common.personal.name)}
 
 ${common.personal.tagline}
@@ -201,7 +201,7 @@ GitHub:
   github.com/agrimsigdel
 
 Portfolio:
-  agrimsigdel.com
+  agrimsigdel.com.np
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
