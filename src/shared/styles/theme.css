@@ -95,13 +95,6 @@ body,
   color: #991b1b;
 }
 
-/* Light mode button styling */
-[data-theme="light"] button {
-  background-color: #f5f5f5;
-  color: #1a1a1a;
-  border-color: #e5e5e5;
-}
-
 [data-theme="light"] button:hover {
   background-color: #e5e5e5;
 }
@@ -182,12 +175,6 @@ body,
 [data-theme="light"] .work-card:hover {
   background-color: #eeeeee;
   border-color: #dc2626;
-}
-
-/* Light mode footer */
-[data-theme="light"] footer {
-  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
-  border-top-color: #e5e5e5;
 }
 
 /* Light mode grid background */

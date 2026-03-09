@@ -16,9 +16,17 @@ const NormalModeLayout = ({ onResetMode }) => {
 
     return (
         <div className="normal-mode">
+            {/* Decorative tape reels - subtle background decoration */}
+            <div className="normal-mode-decoration" aria-hidden="true">
+                <div className="normal-mode-reel normal-mode-reel-left"></div>
+                <div className="normal-mode-reel normal-mode-reel-right"></div>
+            </div>
+
             {/* Mobile Header */}
             <div className="normal-mobile-header">
-                <div className="normal-mobile-brand">AS</div>
+                <div className="normal-mobile-brand">
+                    <img src="/favicon_io-2/apple-touch-icon.png" alt="Logo" />
+                </div>
                 <button 
                     className="normal-mobile-menu-toggle"
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -29,12 +37,17 @@ const NormalModeLayout = ({ onResetMode }) => {
 
             {/* Navigation Sidebar */}
             <nav className={`normal-nav ${isMobileMenuOpen ? 'open' : ''}`}>
-                <button onClick={() => scrollToSection('about')} className="normal-nav-link">About</button>
-                <button onClick={() => scrollToSection('education')} className="normal-nav-link">Education</button>
-                <button onClick={() => scrollToSection('experience')} className="normal-nav-link">Experience</button>
-                <button onClick={() => scrollToSection('projects')} className="normal-nav-link">Projects</button>
-                <button onClick={() => scrollToSection('skills')} className="normal-nav-link">Skills</button>
-                <button onClick={() => scrollToSection('contact')} className="normal-nav-link">Contact</button>
+                <div className="normal-nav-logo">
+                    <img src="/favicon_io-2/apple-touch-icon.png" alt="Logo" />
+                </div>
+                <div className="normal-nav-links">
+                    <button onClick={() => scrollToSection('about')} className="normal-nav-link">About</button>
+                    <button onClick={() => scrollToSection('education')} className="normal-nav-link">Education</button>
+                    <button onClick={() => scrollToSection('experience')} className="normal-nav-link">Experience</button>
+                    <button onClick={() => scrollToSection('projects')} className="normal-nav-link">Projects</button>
+                    <button onClick={() => scrollToSection('skills')} className="normal-nav-link">Skills</button>
+                    <button onClick={() => scrollToSection('contact')} className="normal-nav-link">Contact</button>
+                </div>
                 <div className="normal-nav-divider"></div>
                 <button onClick={onResetMode} className="normal-nav-link normal-nav-return">↩ Return to Start</button>
             </nav>
@@ -108,12 +121,12 @@ const NormalModeLayout = ({ onResetMode }) => {
                 {/* Contact */}
                 <section id="contact" className="normal-section">
                     <h2>Contact</h2>
-                    <p>Let's connect! I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision.</p>
+                    <p className="normal-lead">Let's connect! I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision.</p>
                     <ul className="normal-contact-list">
                         <li><strong>Email:</strong> {common.contact.email}</li>
-                        <li><strong>LinkedIn:</strong> {common.contact.linkedin}</li>
+                        {/* <li><strong>LinkedIn:</strong> {common.contact.linkedin}</li> */}
                         <li><strong>GitHub:</strong> {common.contact.github}</li>
-                        <li><strong>Portfolio:</strong> {common.contact.portfolio}</li>
+                        {/* <li><strong>Portfolio:</strong> {common.contact.portfolio}</li> */}
                     </ul>
                 </section>
 

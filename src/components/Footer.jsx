@@ -105,7 +105,7 @@ const Footer = ({ onResetMode }) => {
                     style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6rem', flexWrap: 'wrap', gap: '2rem' }}>
                     <div className="text-left">
 
-                        <p style={{ marginTop: '0.5rem', opacity: 0.6 }}>sigdelagrim35@gmail.com</p>
+                        <p style={{ marginTop: '0.5rem', opacity: 0.6 }}>contact@agrimsigdel.com.np</p>
                     </div>
                     <div className="flex gap-4" style={{ display: 'flex', gap: '1.5rem' }}>
                         <a href="https://github.com/Agrim-Sigdel" target="_blank" rel="noopener noreferrer" className="hover:text-white">GitHub</a>

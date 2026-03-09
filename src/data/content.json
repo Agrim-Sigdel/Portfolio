@@ -8,10 +8,9 @@
       "shortSummary": "Full-Stack Developer focused on AI Innovation and building production-ready code with React, TypeScript, and Python."
     },
     "contact": {
-      "email": "sigdelagrim35@gmail.com",
-      "linkedin": "linkedin.com/in/agrim-sigdel-34b532151",
-      "github": "github.com/Agrim-Sigdel",
-      "portfolio": "agrimsigdel.com.np"
+      "email": "contact@agrimsigdel.com.np",
+
+      "github": "github.com/Agrim-Sigdel"
     },
     "education": [
       {
@@ -146,10 +145,7 @@
     "hero": {
       "greeting": "Hi, I'm",
       "action": "I build things that work.",
-      "specialization": [
-        "Computer Vision",
-        "NLP"
-      ]
+      "specialization": ["Computer Vision", "NLP"]
     },
     "about": {
       "title": "The Human Bit",
