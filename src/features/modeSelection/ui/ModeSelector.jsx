@@ -8,19 +8,77 @@ const AVAILABLE_MODES = {
     normal: true
 };
 
+// Icon components
+const RocketIcon = () => (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
+        <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
+        <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path>
+        <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path>
+    </svg>
+);
+
+const BriefcaseIcon = () => (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+    </svg>
+);
+
+const LayoutIcon = () => (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="3" y1="9" x2="21" y2="9"></line>
+        <line x1="9" y1="21" x2="9" y2="9"></line>
+    </svg>
+);
+
+const ArrowIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="7" y1="17" x2="17" y2="7"></line>
+        <polyline points="7 7 17 7 17 17"></polyline>
+    </svg>
+);
+
+const iconMap = {
+    rocket: RocketIcon,
+    briefcase: BriefcaseIcon,
+    layout: LayoutIcon
+};
+
 const modeOptions = [
-    { id: 'fun', label: 'FUN' },
-    { id: 'work', label: 'WORK' },
-    { id: 'normal', label: 'NORMAL' },
+    {
+        id: 'fun',
+        label: 'Fun Mode',
+        description: 'Interactive & Playful',
+        stat: 'Creative',
+        statLabel: 'experience',
+        icon: 'rocket',
+        gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+    },
+    {
+        id: 'work',
+        label: 'Work Mode',
+        description: 'Professional Portfolio',
+        stat: 'Terminal',
+        statLabel: 'interface',
+        icon: 'briefcase',
+        gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+    },
+    {
+        id: 'normal',
+        label: 'Normal Mode',
+        description: 'Clean & Simple',
+        stat: 'Classic',
+        statLabel: 'layout',
+        icon: 'layout',
+        gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
+    },
 ];
 
 const ModeSelector = ({ onSelectMode }) => {
-    const [ripples, setRipples] = useState([]);
     const [transitionMode, setTransitionMode] = useState(null);
     const [isSwitching, setIsSwitching] = useState(false);
-    const [currentIndex, setCurrentIndex] = useState(2);
-    const currentMode = modeOptions[currentIndex];
-    const lastRippleAtRef = useRef(0);
     const switchTimeoutRef = useRef(null);
 
     useEffect(() => {
@@ -44,137 +102,92 @@ const ModeSelector = ({ onSelectMode }) => {
         }, 520);
     };
 
-    const handlePointerMove = (event) => {
-        const now = performance.now();
-        if (now - lastRippleAtRef.current < 90) {
-            return;
-        }
-
-        const newRipple = {
-            id: `${now}-${Math.random()}`,
-            x: event.clientX,
-            y: event.clientY
-        };
-
-        lastRippleAtRef.current = now;
-
-        setRipples((prev) => {
-            const next = [...prev, newRipple];
-            return next.length > 14 ? next.slice(next.length - 14) : next;
-        });
-
-        window.setTimeout(() => {
-            setRipples((prev) => prev.filter((ripple) => ripple.id !== newRipple.id));
-        }, 900);
-    };
-
     return (
-        <Motion.div
-            className={`mode-selector ${transitionMode ? `mode-${transitionMode}` : ''} ${isSwitching ? 'is-switching' : ''}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            onMouseMove={handlePointerMove}
-        >
-            <div className="tape-rolling-bg" aria-hidden="true">
-                <div className="tape-rolling-reel tape-rolling-reel-left"><span></span></div>
-                <div className="tape-rolling-path tape-rolling-path-top"></div>
-                <div className="tape-rolling-path tape-rolling-path-bottom"></div>
-                <div className="tape-rolling-wrap tape-rolling-wrap-left"></div>
-                <div className="tape-rolling-wrap tape-rolling-wrap-right"></div>
-                <div className="tape-rolling-reel tape-rolling-reel-right"><span></span></div>
-            </div>
-
-            <div className="mode-selector-ripple-layer" aria-hidden="true">
-                {ripples.map((ripple) => (
-                    <span
-                        key={ripple.id}
-                        className="mode-selector-ripple"
-                        style={{
-                            left: `${ripple.x}px`,
-                            top: `${ripple.y}px`
-                        }}
-                    />
-                ))}
-            </div>
-
-            {/* Decorative wave for landing theme */}
-            <div className="mode-wave" aria-hidden="true"></div>
-
-            <div className="mode-selector-content">
-                <div className="mode-panel">
-                <Motion.p
-                    className="mode-selector-kicker"
-                    initial={{ y: -20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.2, duration: 0.8 }}
+        <div className="mode-selector-page">
+            <div className="mode-selector-container">
+                <Motion.div
+                    className="mode-content-wrapper"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
                 >
-                    Agrim Sigdel - Portfolio
-                </Motion.p>
+                    {/* Title */}
+                    <Motion.h1
+                        className="mode-page-title"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2, duration: 0.6 }}
+                    >
+                        Choose Your Experience
+                    </Motion.h1>
 
-                <Motion.h1
-                    className="mode-selector-title"
-                    initial={{ y: -20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.3, duration: 0.8 }}
-                >
-                    Pick Your Experience
-                </Motion.h1>
-                {/* 
-                <motion.p
-                    className="mode-selector-subtitle"
-                    initial={{ y: -10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.5, duration: 0.8 }}
-                >
-                    Choose a mode and dive in.
-                </motion.p>
+                    {/* Cards Grid */}
+                    <div className="mode-cards-grid">
+                        {modeOptions.map((mode, index) => {
+                            const ModeIcon = iconMap[mode.icon];
 
-                <motion.div
-                    className="mode-info-strip"
-                    initial={{ y: -10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.6, duration: 0.8 }}
-                >
-                    <span><strong>FUN</strong> — animated</span>
-                    <span><strong>WORK</strong> — terminal</span>
-                    <span><strong>NORMAL</strong> — clean</span>
-                </motion.div> */}
-
-                <div className="mode-buttons-wrapper">
-                    <span
-                        className="mode-carousel-nav"
-                        aria-hidden="true"
-                        onClick={() => setCurrentIndex(prev => (prev === 0 ? modeOptions.length - 1 : prev - 1))}
-                    >&lsaquo;</span>
-
-                    <div className="mode-buttons">
-                        <Motion.button
-                            key={currentMode.id}
-                            className={`mode-button ${currentMode.id}-button ${!AVAILABLE_MODES[currentMode.id] ? 'is-locked' : ''}`}
-                            onClick={() => handleModeClick(currentMode.id)}
-                            disabled={isSwitching || !AVAILABLE_MODES[currentMode.id]}
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.8, opacity: 0 }}
-                            transition={{ duration: 0.3 }}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            <span className="mode-button-label">{currentMode.label}</span>
-                        </Motion.button>
+                            return (
+                                <Motion.div
+                                    key={mode.id}
+                                    className="mode-option-card"
+                                    onClick={() => handleModeClick(mode.id)}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
+                                    whileHover={{ y: -8, transition: { duration: 0.2 } }}
+                                >
+                                    <div
+                                        className="mode-card-visual"
+                                        style={{ background: mode.gradient }}
+                                    >
+                                        <div className="mode-card-icon-wrapper">
+                                            <ModeIcon />
+                                        </div>
+                                        <div className="mode-card-stat">
+                                            <div className="mode-stat-number">{mode.stat}</div>
+                                            <div className="mode-stat-label">{mode.statLabel}</div>
+                                        </div>
+                                    </div>
+                                    <div className="mode-card-footer">
+                                        <div className="mode-card-info">
+                                            <h3 className="mode-card-label">{mode.label}</h3>
+                                            <p className="mode-card-description">{mode.description}</p>
+                                        </div>
+                                        <div className="mode-card-arrow">
+                                            <ArrowIcon />
+                                        </div>
+                                    </div>
+                                </Motion.div>
+                            );
+                        })}
                     </div>
 
-                    <span
-                        className="mode-carousel-nav"
-                        aria-hidden="true"
-                        onClick={() => setCurrentIndex(prev => (prev === modeOptions.length - 1 ? 0 : prev + 1))}
-                    >&rsaquo;</span>
-                </div>
+                    {/* Large Background Text */}
+                    <div className="mode-background-text">
+                        Portfolio
+                    </div>
+
+                    {/* Footer */}
+                    <Motion.footer
+                        className="mode-page-footer"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.8, duration: 0.6 }}
+                    >
+                        <div className="mode-footer-content">
+                            <div className="mode-footer-left">
+                                <p>© 2024 Agrim Sigdel. All rights reserved.</p>
+                            </div>
+                            <div className="mode-footer-right">
+                                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">Twitter</a>
+                                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                                <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
+                            </div>
+                        </div>
+                    </Motion.footer>
+                </Motion.div>
             </div>
-            </div>
-        </Motion.div>
+        </div>
     );
 };
 

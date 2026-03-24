@@ -77,15 +77,6 @@ body,
 }
 
 /* Light mode text adjustments */
-[data-theme="light"] h1,
-[data-theme="light"] h2,
-[data-theme="light"] h3,
-[data-theme="light"] h4,
-[data-theme="light"] h5,
-[data-theme="light"] h6 {
-  color: #1a1a1a;
-}
-
 /* Light mode link colors */
 [data-theme="light"] a {
   color: #dc2626;
