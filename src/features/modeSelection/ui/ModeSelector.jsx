@@ -3,8 +3,8 @@ import { motion as Motion } from 'framer-motion';
 import './ModeSelector.css';
 
 const AVAILABLE_MODES = {
-    fun: false,
-    work: false,
+    fun: true,
+    work: true,
     normal: true
 };
 
@@ -99,7 +99,11 @@ const ModeSelector = ({ onSelectMode }) => {
                 ))}
             </div>
 
+            {/* Decorative wave for landing theme */}
+            <div className="mode-wave" aria-hidden="true"></div>
+
             <div className="mode-selector-content">
+                <div className="mode-panel">
                 <Motion.p
                     className="mode-selector-kicker"
                     initial={{ y: -20, opacity: 0 }}
@@ -168,6 +172,7 @@ const ModeSelector = ({ onSelectMode }) => {
                         onClick={() => setCurrentIndex(prev => (prev === modeOptions.length - 1 ? 0 : prev + 1))}
                     >&rsaquo;</span>
                 </div>
+            </div>
             </div>
         </Motion.div>
     );

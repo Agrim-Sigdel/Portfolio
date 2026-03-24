@@ -398,6 +398,132 @@
   }
 }
 
+/* --- Landing theme overrides for ModeSelector (abstract gradient + curved wave) --- */
+.mode-selector {
+  background: linear-gradient(135deg, #0f0f10 0%, #1f1b24 30%, #ff5a5f 100%);
+  color: #fff;
+}
+
+/* Hide cassette-specific decorative pieces */
+.tape-rolling-bg,
+.tape-rolling-reel,
+.tape-rolling-path,
+.tape-rolling-wrap,
+.mode-selector::after {
+  display: none;
+}
+
+.mode-selector::before {
+  /* large soft gradient circle */
+  content: '';
+  position: absolute;
+  width: 900px;
+  height: 900px;
+  right: -200px;
+  top: -200px;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.06), transparent 30%), radial-gradient(circle at 60% 60%, rgba(255,90,95,0.22), transparent 35%);
+  transform: rotate(-8deg);
+  filter: blur(40px);
+  z-index: 0;
+  opacity: 0.9;
+  border: none;
+  box-shadow: none;
+}
+
+/* curved wave at bottom */
+.mode-selector .mode-wave {
+  position: absolute;
+  left: -10%;
+  bottom: -10%;
+  width: 120%;
+  height: 60%;
+  background: linear-gradient(90deg, rgba(255,90,95,0.95), rgba(255,130,100,0.9));
+  border-radius: 50% 50% 0 0 / 30% 30% 0 0;
+  transform: rotate(-6deg) translateY(10%);
+  z-index: 0;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.4) inset;
+}
+
+.mode-selector-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.mode-selector-kicker {
+  color: rgba(255,255,255,0.75);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.mode-selector-title {
+  color: #fff;
+  font-size: clamp(2rem, 4.5vw, 3.75rem);
+  margin: 0.5rem 0 1.25rem 0;
+  font-family: var(--font-serif);
+  letter-spacing: -0.02em;
+}
+
+.mode-buttons-wrapper { z-index: 2; }
+
+.mode-button {
+  background: linear-gradient(90deg,#ff6a6f,#ff3d5b);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  box-shadow: 0 12px 40px rgba(255,90,95,0.16);
+}
+
+.mode-button.is-locked,
+.mode-button[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .mode-selector::before { display: none; }
+  .mode-selector .mode-wave { left: -30%; height: 50%; }
+  .mode-selector-title { font-size: clamp(1.75rem, 7.5vw, 2.25rem); }
+}
+
+/* Insert wave element into markup using pseudo-element fallback if needed */
+.mode-selector .mode-wave-fallback { display: none; }
+
+/* --- Card / Panel for ModeSelector content --- */
+.mode-panel {
+  width: min(980px, 92%);
+  margin: 0 auto;
+  /* removed background/padding/border to let landing background show through */
+  padding: 0;
+  z-index: 3;
+  position: relative;
+}
+
+.mode-panel .mode-selector-kicker {
+  margin-bottom: 0.25rem;
+}
+
+.mode-panel .mode-selector-title { margin-bottom: 0.75rem; }
+
+.mode-buttons { display:flex; align-items:center; justify-content:center; gap:1rem; }
+
+.mode-carousel-nav { color: rgba(255,255,255,0.85); font-size: 2rem; cursor: pointer; user-select:none; }
+
+/* Make the card slightly inset on larger screens to show the background waves */
+@media (min-width: 1100px) {
+  .mode-panel { width: 72%; }
+}
+
+@media (max-width: 768px) {
+  .mode-panel { padding: 1.5rem; }
+  .mode-carousel-nav { font-size: 1.5rem; }
+  .mode-panel .mode-selector-title { font-size: 1.6rem; }
+}
+
 @keyframes tape-band-roll-reverse {
   from {
     background-position: 60px 0;
@@ -440,15 +566,10 @@
 }
 
 .mode-selector-content {
-  background: linear-gradient(
-    170deg,
-    rgba(225, 206, 185, 0.9) 0%,
-    rgba(202, 178, 153, 0.85) 100%
-  );
-  border: 4px solid var(--tape-ink);
-  box-shadow:
-    inset 0 0 10px rgba(0, 0, 0, 0.1),
-    0 15px 35px rgba(44, 28, 20, 0.35);
+  /* Make container transparent so landing background shows through */
+  background: transparent;
+  border: none;
+  box-shadow: none;
   border-radius: 20px;
   text-align: center;
   width: min(400px, calc(100vw - 1.5rem));
@@ -458,20 +579,12 @@
   padding: 1.5rem;
   position: relative;
   z-index: 2;
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
-  transform: scale(0.95);
-  transition:
-    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.4s ease,
-    border-color 0.4s ease;
+  transform: none;
+  transition: transform 0.2s ease;
 }
 
 .mode-selector-content:hover {
-  transform: scale(1);
-  box-shadow:
-    inset 0 0 10px rgba(0, 0, 0, 0.1),
-    0 25px 50px rgba(44, 28, 20, 0.45);
+  transform: none;
 }
 
 .mode-selector-content::-webkit-scrollbar {
@@ -480,12 +593,13 @@
 }
 
 .mode-selector-content::before {
+  /* remove heavy inner border so background remains visible */
   content: "";
   position: absolute;
   inset: 1rem;
-  border: 2px solid rgba(63, 43, 34, 0.45);
   border-radius: 18px;
   pointer-events: none;
+  border: 1px solid rgba(255,255,255,0.04);
 }
 
 .mode-selector-kicker {

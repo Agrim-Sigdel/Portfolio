@@ -10,24 +10,28 @@ const NormalModeLayout = ({ onResetMode }) => {
         const element = document.getElementById(id);
         if (element) {
             element.scrollIntoView({ behavior: 'smooth' });
-            setIsMobileMenuOpen(false); // Close menu on selection
+            setIsMobileMenuOpen(false);
         }
     };
 
+    const contactLine = [];
+    if (common.contact?.location) contactLine.push(common.contact.location);
+    if (common.contact?.email) contactLine.push(common.contact.email);
+    if (common.contact?.phone) contactLine.push(common.contact.phone);
+    if (common.contact?.github) contactLine.push(common.contact.github);
+
     return (
         <div className="normal-mode">
-            {/* Decorative tape reels - subtle background decoration */}
             <div className="normal-mode-decoration" aria-hidden="true">
                 <div className="normal-mode-reel normal-mode-reel-left"></div>
                 <div className="normal-mode-reel normal-mode-reel-right"></div>
             </div>
 
-            {/* Mobile Header */}
             <div className="normal-mobile-header">
                 <div className="normal-mobile-brand">
                     <img src="/favicon_io-2/apple-touch-icon.png" alt="Logo" />
                 </div>
-                <button 
+                <button
                     className="normal-mobile-menu-toggle"
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 >
@@ -35,7 +39,6 @@ const NormalModeLayout = ({ onResetMode }) => {
                 </button>
             </div>
 
-            {/* Navigation Sidebar */}
             <nav className={`normal-nav ${isMobileMenuOpen ? 'open' : ''}`}>
                 <div className="normal-nav-logo">
                     <img src="/favicon_io-2/apple-touch-icon.png" alt="Logo" />
@@ -53,34 +56,33 @@ const NormalModeLayout = ({ onResetMode }) => {
             </nav>
 
             <div className="normal-container">
-                {/* Header */}
-                <header className="normal-header">
-                    <h1>{common.personal.name}</h1>
-                    <p className="normal-subtitle">{common.personal.tagline}</p>
+                <header className="normal-header cv-header">
+                    <h1 className="cv-name">{common.personal.name}</h1>
+                    <p className="cv-role">{common.personal.tagline}</p>
+                    <p className="cv-contact">{contactLine.join(' • ')}</p>
+                    <p>
+                        <a className="cv-download" href="/Agrim%20Sigdel%20CV.pdf" download>
+                            Download CV
+                        </a>
+                    </p>
                 </header>
 
-                {/* About Section */}
-                <section id="about" className="normal-section">
-                    <h2>About Me</h2>
-                    <p className="normal-lead">
-                        {common.personal.summary}
-                    </p>
+                <section id="about" className="normal-section cv-summary">
+                    <h2>Profile</h2>
+                    <p className="normal-lead">{common.personal.summary}</p>
                 </section>
 
-                {/* Education */}
-                <section id="education" className="normal-section">
-                    <h2>Education</h2>
-                    {common.education.map((edu, index) => (
-                        <div key={index} className="normal-item">
-                            <h3>{edu.degree}</h3>
-                            <p className="normal-meta">{edu.school} • {edu.year}</p>
-                        </div>
-                    ))}
-                </section>
+                {common.personal?.areasOfExpertise && (
+                    <section id="expertise" className="normal-section">
+                        <h2>Areas of Expertise</h2>
+                        <p className="normal-meta">
+                            {common.personal.areasOfExpertise.join(' • ')}
+                        </p>
+                    </section>
+                )}
 
-                {/* Experience */}
                 <section id="experience" className="normal-section">
-                    <h2>Experience</h2>
+                    <h2>Work Experience</h2>
                     {common.experience.map((exp, index) => (
                         <div key={index} className="normal-item">
                             <h3>{exp.role}</h3>
@@ -94,46 +96,41 @@ const NormalModeLayout = ({ onResetMode }) => {
                     ))}
                 </section>
 
-                {/* Projects */}
-                <section id="projects" className="normal-section">
-                    <h2>Projects</h2>
-                    {common.projects.map((project) => (
-                        <div key={project.id} className="normal-item">
-                            <h3>{project.title}</h3>
-                            <p className="normal-meta">{project.category}</p>
-                            <p>{project.description}</p>
-                            <p className="normal-outcome"><strong>Outcome:</strong> {project.outcome}</p>
+                <section id="education" className="normal-section">
+                    <h2>Education</h2>
+                    {common.education.map((edu, index) => (
+                        <div key={index} className="normal-item">
+                            <h3>{edu.degree}</h3>
+                            <p className="normal-meta">{edu.school} • {edu.year}</p>
                         </div>
                     ))}
                 </section>
 
-                {/* Skills */}
                 <section id="skills" className="normal-section">
-                    <h2>Technical Skills</h2>
-                    {common.skills.categories.map((category, index) => (
-                        <div key={index} className="normal-skills-category">
-                            <h3>{category.name}</h3>
-                            <p>{category.items.join(', ')}</p>
+                    <h2>Skills</h2>
+                    {common.skills?.categories?.map((cat, i) => (
+                        <div key={i} className="normal-skills-category">
+                            <h3>{cat.name}</h3>
+                            <p>{cat.items.join(', ')}</p>
                         </div>
                     ))}
                 </section>
 
-                {/* Contact */}
                 <section id="contact" className="normal-section">
                     <h2>Contact</h2>
-                    <p className="normal-lead">Let's connect! I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision.</p>
                     <ul className="normal-contact-list">
-                        <li><strong>Email:</strong> {common.contact.email}</li>
-                        {/* <li><strong>LinkedIn:</strong> {common.contact.linkedin}</li> */}
-                        <li><strong>GitHub:</strong> {common.contact.github}</li>
-                        {/* <li><strong>Portfolio:</strong> {common.contact.portfolio}</li> */}
+                        {common.contact && (
+                            <li>
+                                <strong>Contact</strong>
+                                <div>{common.contact.email}</div>
+                                {common.contact.phone && <div>{common.contact.phone}</div>}
+                                {common.contact.github && <div>{common.contact.github}</div>}
+                            </li>
+                        )}
                     </ul>
                 </section>
 
-                {/* Footer */}
-                <footer className="normal-footer">
-                    <p>© {new Date().getFullYear()} {common.personal.name}. All rights reserved.</p>
-                </footer>
+                <footer className="normal-footer">{common.personal.shortSummary}</footer>
             </div>
         </div>
     );

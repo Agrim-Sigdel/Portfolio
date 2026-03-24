@@ -373,6 +373,50 @@
   text-shadow: 3px 3px 0 rgba(228, 210, 189, 0.5);
 }
 
+/* CV-specific header overrides */
+.cv-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 1rem;
+  border-bottom: none;
+}
+
+.cv-name {
+  font-size: 3.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.cv-role {
+  font-size: 1rem;
+  color: var(--tape-ink-soft);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.cv-contact {
+  font-size: 0.95rem;
+  color: var(--tape-ink-soft);
+  opacity: 0.95;
+}
+
+.cv-download {
+  display: inline-block;
+  margin-top: 0.75rem;
+  padding: 0.45rem 0.9rem;
+  background: rgba(63, 43, 34, 0.85);
+  color: var(--tape-highlight);
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.cv-download:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(63,43,34,0.18);
+}
+
 .normal-subtitle {
   font-size: 1.4rem;
   color: var(--tape-ink-soft);

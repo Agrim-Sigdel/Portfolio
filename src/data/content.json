@@ -3,43 +3,52 @@
     "personal": {
       "name": "Agrim Sigdel",
       "firstName": "Agrim",
-      "tagline": "Full-Stack Developer | AI Enthusiast | Creative Problem Solver",
-      "summary": "Versatile Full-Stack Developer with a strong foundation in modern AI, specializing in React/TypeScript and Python. I bridge the gap between complex AI models and user-centric applications, delivering production-ready code for Computer Vision and NLP domains.",
-      "shortSummary": "Full-Stack Developer focused on AI Innovation and building production-ready code with React, TypeScript, and Python."
+      "tagline": "FULL-STACK DEVELOPER | AI ENTHUSIAST",
+      "summary": "Versatile Full-Stack Developer with a strong foundation in modern AI, currently working using React/TypeScript and Python. I bridge the gap between complex AI models and user-centric applications, delivering production-ready code. Creative problem solver with experience leading cross-functional teams in high-impact environments.",
+      "areasOfExpertise": [
+        "TypeScript / React",
+        "Python / Django",
+        "Computer Vision",
+        "NLP / Transformers",
+        "Next.js / Tailwind",
+        "REST API Design",
+        "PostgreSQL / MySQL",
+        "Docker / Git",
+        "Creative Leadership"
+      ],
+      "shortSummary": "Full-Stack Developer focused on AI and building production-ready applications with React, TypeScript, and Python."
     },
     "contact": {
-      "email": "contact@agrimsigdel.com.np",
-
+      "email": "sigdelagrim35@gmail.com",
+      "phone": "+977 9869081558",
+      "location": "Kathmandu, Nepal",
+      "website": "agrimsigdel.com.np",
       "github": "github.com/Agrim-Sigdel"
     },
     "education": [
       {
         "degree": "BSc. Computer Science and Information Technology (CSIT)",
-        "school": "Prime College, Kathmandu",
-        "year": "2022 - 2026"
+        "school": "Prime College | Kathmandu, Nepal",
+        "year": "2022 – 2026"
       }
     ],
     "experience": [
       {
-        "role": "Creative Lead",
-        "company": "Prime College Graduation Committee",
-        "period": "2024 - 2026",
+        "role": "FULL-STACK DEVELOPER",
+        "company": "Kingsoft Tech | On-site, Kathmandu",
+        "period": "Oct 2025 – Present",
         "description": [
-          "Led creative direction and brand guidelines for 625+ attendees",
-          "Managed cross-functional teams for visual and marketing materials",
-          "Coordinated event planning and execution",
-          "Developed comprehensive branding strategy"
+          "Currently contributing to full-stack development projects using modern web technologies.",
+          "Collaborating with on-site teams to deliver robust software solutions and production-ready applications."
         ]
       },
       {
-        "role": "Full-Stack Developer & AI Engineer",
-        "company": "Freelance / Personal Projects",
-        "period": "2022 - Present",
+        "role": "CREATIVE LEAD",
+        "company": "Prime College Graduation Committee | Kathmandu",
+        "period": "2025",
         "description": [
-          "Developed production-ready AI applications",
-          "Built modern web applications with React/TypeScript",
-          "Implemented Computer Vision and NLP solutions",
-          "Delivered scalable backend systems"
+          "Led creative direction and brand guidelines for 625+ attendees.",
+          "Managed cross-functional teams for visual and marketing materials, coordinating event planning and execution."
         ]
       }
     ],
@@ -49,95 +58,71 @@
         "title": "ANPR System",
         "category": "AI & Full-Stack",
         "description": "Highly optimized YOLOv8 backend with a modern React/TypeScript frontend for Nepali plate recognition.",
-        "outcome": "30 FPS live processing with custom Devanagari recognition logic.",
-        "color": "#111"
+        "outcome": "Achieved 30 FPS live processing with custom recognition logic."
       },
       {
         "id": 2,
-        "title": "Parking Management",
-        "category": "Automation & Backend",
+        "title": "Parking Management System",
+        "category": "Automation",
         "description": "End-to-end automatic parking system utilizing custom ANPR for real-time verification and access control.",
-        "outcome": "Automated gate entry/exit reducing manual verification significantly.",
-        "color": "#151515"
+        "outcome": "Significantly reduced manual verification time."
       },
       {
         "id": 3,
         "title": "Reddit Sentiment Analysis",
-        "category": "NLP / Deep Learning",
+        "category": "NLP",
         "description": "Deep NLP pipeline using fine-tuned BERT for nuanced emotion classification on large-scale Reddit data.",
-        "outcome": "Practiced advanced prompt engineering and LLM-based interfaces.",
-        "color": "#0d0d0d"
-      },
-      {
-        "id": 4,
-        "title": "Styles",
-        "category": "Website",
-        "description": "A modern, responsive website built with PHP and html .",
-        "outcome": "Responsive design with optimized performance and accessibility.",
-        "color": "#1d1d1d"
+        "outcome": "Practiced advanced prompt engineering and LLM-based interfaces."
       }
     ],
     "skills": {
       "categories": [
         {
-          "name": "Frontend Development",
+          "name": "Core",
           "items": [
-            "TypeScript",
-            "React",
-            "Next.js",
-            "TailwindCSS",
-            "Framer Motion",
-            "Vite"
+            "TypeScript / React",
+            "Python / Django",
+            "Next.js / Tailwind",
+            "REST API Design"
           ]
         },
         {
-          "name": "Backend Development",
+          "name": "AI & CV",
           "items": [
-            "Python",
-            "Django",
-            "Flask",
-            "REST APIs",
-            "MySQL",
-            "PostgreSQL"
-          ]
-        },
-        {
-          "name": "AI & Machine Learning",
-          "items": [
+            "Computer Vision",
+            "NLP / Transformers",
             "PyTorch",
-            "YOLOv8",
-            "RT-DETR",
-            "BERT",
-            "TensorFlow",
-            "OpenCV"
+            "YOLOv8"
           ]
         },
         {
-          "name": "Tools & Technologies",
+          "name": "Data & Infra",
           "items": [
-            "Git/GitHub",
-            "Figma",
+            "PostgreSQL / MySQL",
             "Docker",
-            "VS Code",
-            "Postman",
-            "Linux"
+            "Git"
+          ]
+        },
+        {
+          "name": "Leadership",
+          "items": [
+            "Creative Leadership",
+            "Cross-functional Collaboration"
           ]
         }
       ],
       "flatList": [
         "TypeScript",
         "React",
-        "Next.js",
-        "TailwindCSS",
         "Python",
+        "Django",
+        "Computer Vision",
+        "NLP",
         "PyTorch",
         "YOLOv8",
-        "RT-DETR",
-        "BERT",
-        "MySQL",
-        "REST APIs",
-        "Git/GitHub",
-        "Figma"
+        "PostgreSQL",
+        "Docker",
+        "Git"
       ]
     }
   },
