@@ -5,6 +5,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import './ModeSelector.css'; // Import the new CSS file
 
 /**
+ * Helper function to convert hex color to RGB
+ */
+const hexToRgb = (hex) => {
+    if (!hex) return '0, 0, 0';
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `${r}, ${g}, ${b}`;
+};
+
+/**
  * CONFIGURATION & THEME
  */
 const AVAILABLE_MODES = {
@@ -61,7 +72,9 @@ const MODULES = [
 const ModeSelector = ({ onSelectMode }) => { // Changed from export default function App()
     const mountRef = useRef(null);
     const [hoveredModule, setHoveredModule] = useState(MODULES[1]);
+    const [clickedModuleData, setClickedModuleData] = useState(null);
     const [selectedModule, setSelectedModule] = useState(null);
+    const [clickFeedbackModuleId, setClickFeedbackModuleId] = useState(null);
     const [activeIndex, setActiveIndex] = useState(1);
     const [isSwitching, setIsSwitching] = useState(false);
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
@@ -286,7 +299,14 @@ const ModeSelector = ({ onSelectMode }) => { // Changed from export default func
             const targetObjects = podiumGroups.map(p => p.children[12]); 
             const intersects = stateRef.current.raycaster.intersectObjects(targetObjects);
             if (intersects.length > 0) {
-                handleModuleSelect(intersects[0].object.parent.userData.id);
+                const clickedModule = intersects[0].object.parent.userData;
+                if (clickedModuleData && clickedModuleData.id === clickedModule.id) {
+                    setClickedModuleData(null); // Close if already open
+                } else {
+                    setClickedModuleData(MODULES.find(m => m.id === clickedModule.id));
+                }
+            } else {
+                setClickedModuleData(null); // Close if clicked outside
             }
         };
 
@@ -314,10 +334,13 @@ const ModeSelector = ({ onSelectMode }) => { // Changed from export default func
                     setHoveredModule(MODULES[hoveredIdx]);
                 }
             }
-            grid.material.color.set(hoveredModule?.color || PALETTE.cyan);
+            grid.material.color.set(clickedModuleData?.color || hoveredModule?.color || PALETTE.cyan);
 
             podiumGroups.forEach((p, i) => {
-                const isActive = i === stateRef.current.activeIndex;
+                const isHovered = i === stateRef.current.activeIndex;
+                const isClicked = clickedModuleData && p.userData.id === clickedModuleData.id;
+                const isFeedbackClicked = clickFeedbackModuleId && p.userData.id === clickFeedbackModuleId; // New feedback state
+                const isActive = isHovered || isClicked;
                 const data = p.userData;
                 const pulse = (Math.sin(time * 4) * 0.5 + 0.5);
                 const activePulse = isActive ? (0.8 + pulse * 0.2) : 0.2;
@@ -351,7 +374,11 @@ const ModeSelector = ({ onSelectMode }) => { // Changed from export default func
                     0.1
                 );
 
-                const targetScale = isActive ? 1.12 : 1.0;
+                let targetScale = isActive ? 1.12 : 1.0;
+                if (isFeedbackClicked) {
+                    // Exaggerate scale briefly for click feedback
+                    targetScale = 1.2 + Math.sin(time * 20) * 0.05; // Quick pulse effect
+                }
                 p.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
             });
 
@@ -393,7 +420,13 @@ const ModeSelector = ({ onSelectMode }) => { // Changed from export default func
     }, [handleModuleSelect]);
 
     return (
-        <div className="mode-selector-hud" style={{ '--active-color': hoveredModule?.colorStr || '#00f2ff' }}>
+        <div 
+            className="mode-selector-hud" 
+            style={{ 
+                '--active-color': hoveredModule?.colorStr || '#00f2ff',
+                '--active-color-rgb': hexToRgb(hoveredModule?.colorStr || '#00f2ff')
+            }}
+        >
             {/* <BackButton /> */} {/* Commented out */}
             <div className="vignette" />
             <div className="scanline" />
@@ -418,11 +451,11 @@ const ModeSelector = ({ onSelectMode }) => { // Changed from export default func
                     </div>
                     <div className="status-indicator">
                         <span className="blink-dot" />
-                        <p className="status-text">SYSTEM_ACTIVE // BROADCASTING_EXPERIENCE_SIGNAL</p>
+                        <p className="status-text">SYSTEM_ACTIVE // PROVIDING_CHOOSE_OPTIONS</p>
                     </div>
                 </motion.div>
 
-                <div className="side-monitor">
+                {/* <div className="side-monitor">
                     <div className="monitor-row">
                         <span>CPU_LOAD</span>
                         <div className="mini-bar"><div className="fill" style={{ width: '65%' }} /></div>
@@ -436,45 +469,34 @@ const ModeSelector = ({ onSelectMode }) => { // Changed from export default func
                         <div className="mini-bar"><div className="fill" style={{ width: '34%' }} /></div>
                     </div>
                     <div className="monitor-footer">ENCRYPT_LEVEL: OMEGA_8</div>
-                </div>
+                </div> */}
 
                 <AnimatePresence mode="wait">
-                    {hoveredModule && !isSwitching && (
+                    {clickedModuleData && !isSwitching && (
                         <motion.div 
-                            key={hoveredModule.id}
+                            key={clickedModuleData.id}
                             className="cyber-card"
-                            initial={{ opacity: 0, rotateX: 20, y: 50, scale: 0.95 }}
-                            animate={{ opacity: 1, rotateX: 0, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: -10, scale: 0.98, filter: 'blur(10px)' }}
-                            transition={{ type: 'spring', damping: 20, stiffness: 100 }}
+                            initial={{ opacity: 0, y: 100, scale: 0.8 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 100, scale: 0.8, filter: 'blur(10px)' }}
+                            transition={{ type: 'spring', damping: 15, stiffness: 120, duration: 0.4 }}
                         >
                             <div className="card-glitch-border" />
                             <div className="card-header">
-                                <div className="card-id-tag">{hoveredModule.code}</div>
-                                <div className="card-category">{hoveredModule.name}</div>
+                                <div className="card-id-tag">{clickedModuleData.id.toUpperCase()}</div>
+                                <div className="card-category">{clickedModuleData.name}</div>
                             </div>
                             
                             <div className="card-body">
-                                <h2 className="card-title">{hoveredModule.title}</h2>
-                                <p className="card-desc">{hoveredModule.description}</p>
-                                
-                                <div className="feature-grid">
-                                    {hoveredModule.features.map((f, i) => (
-                                        <div key={f} className="feature-node" style={{ animationDelay: `${i * 0.1}s` }}>
-                                            <div className="node-dot" />
-                                            <span>{f}</span>
-                                        </div>
-                                    ))}
-                                </div>
+                                <h2 className="card-title">{clickedModuleData.title}</h2>
                             </div>
 
                             <div className="card-footer">
-                                <div className="initialize-prompt">
+                                <button className="go-button" onClick={() => handleModuleSelect(clickedModuleData.id)}>
                                     <span className="prompt-arrows">&gt;&gt;</span>
-                                    INIT_DRIVE
+                                    GO
                                     <span className="prompt-bracket">]</span>
-                                </div>
-                                <div className="card-serial">SN_{hoveredModule.id.toUpperCase()}</div>
+                                </button>
                             </div>
                         </motion.div>
                     )}
@@ -485,6 +507,7 @@ const ModeSelector = ({ onSelectMode }) => { // Changed from export default func
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                 >
+                    <div className="click-prompt">CLICK A PILLAR TO EXPLORE</div>
                     <div className="coord-panel">
                         <div className="coord-item">LAT: 27.6710° N</div>
                         <div className="coord-item">LNG: 85.3414° E</div>
