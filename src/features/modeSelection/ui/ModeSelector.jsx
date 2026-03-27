@@ -1,8 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import CustomCursor from '../../../shared/ui/CustomCursor';
 import * as THREE from 'three';
-import { motion as Motion, AnimatePresence } from 'framer-motion';
-import './ModeSelector.css';
+import { motion, AnimatePresence } from 'framer-motion';
+import './ModeSelector.css'; // Import the new CSS file
 
+/**
+ * CONFIGURATION & THEME
+ */
 const AVAILABLE_MODES = {
     fun: true,
     work: true,
@@ -14,7 +18,8 @@ const PALETTE = {
     gold: 0xffcc00,
     purple: 0xaa00ff,
     dark: 0x000b14,
-    grid: 0x002233
+    grid: 0x002233,
+    white: 0xffffff
 };
 
 const MODULES = [
@@ -23,527 +28,499 @@ const MODULES = [
         name: 'CREATIVE',
         code: 'CX-9',
         title: 'Fun Mode',
-        description: 'Interactive animations and playful design',
+        description: 'Interactive animations, playful physics, and experimental design.',
         features: ['Smooth Animations', 'Interactive Elements', 'Modern UI'],
         x: -5.5,
-        color: PALETTE.cyan
+        color: PALETTE.cyan,
+        colorStr: '#00f2ff'
     },
     {
         id: 'work',
         name: 'TERMINAL',
         code: 'TX-1',
         title: 'Work Mode',
-        description: 'Command-line interface experience',
-        features: ['Terminal Commands', 'Developer Tools', 'Efficient Navigation'],
+        description: 'Professional command-line interface with developer tools.',
+        features: ['Terminal Commands', 'Efficient Navigation', 'Project Logs'],
         x: 0,
-        color: PALETTE.gold
+        color: PALETTE.gold,
+        colorStr: '#ffcc00'
     },
     {
         id: 'normal',
         name: 'CLASSIC',
         code: 'CL-4',
         title: 'Normal Mode',
-        description: 'Clean and straightforward layout',
-        features: ['Simple Design', 'Fast Loading', 'Easy Navigation'],
+        description: 'A clean, high-performance, and straightforward layout.',
+        features: ['Simple Design', 'Fast Loading', 'Intuitive UI'],
         x: 5.5,
-        color: PALETTE.purple
+        color: PALETTE.purple,
+        colorStr: '#aa00ff'
     }
 ];
 
-const ModeSelector = ({ onSelectMode }) => {
+const ModeSelector = ({ onSelectMode }) => { // Changed from export default function App()
     const mountRef = useRef(null);
-    const sceneRef = useRef(null);
-    const cameraRef = useRef(null);
-    const rendererRef = useRef(null);
-    const podiumsRef = useRef([]);
-    const hudElementsRef = useRef([]);
-    const particlesRef = useRef(null);
-    const mouseRef = useRef(new THREE.Vector2());
-    const raycasterRef = useRef(new THREE.Raycaster());
-
-    const [hoveredModule, setHoveredModule] = useState(null);
+    const [hoveredModule, setHoveredModule] = useState(MODULES[1]);
     const [selectedModule, setSelectedModule] = useState(null);
     const [activeIndex, setActiveIndex] = useState(1);
     const [isSwitching, setIsSwitching] = useState(false);
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
 
+    const stateRef = useRef({
+        activeIndex: 1,
+        isSwitching: false,
+        mouse: new THREE.Vector2(),
+        raycaster: new THREE.Raycaster(),
+        podiums: [],
+        camera: null
+    });
+
     useEffect(() => {
-        const timer = setInterval(() => {
-            setCurrentTime(new Date().toLocaleTimeString());
-        }, 1000);
+        const timer = setInterval(() => setCurrentTime(new Date().toLocaleTimeString()), 1000);
         return () => clearInterval(timer);
     }, []);
 
-    // Set initial hovered module
-    useEffect(() => {
-        setHoveredModule(MODULES[activeIndex]);
-    }, [activeIndex]);
-
-    // Keyboard navigation
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (isSwitching) return;
-
-            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
-                setActiveIndex(prev => (prev === 0 ? MODULES.length - 1 : prev - 1));
-            } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
-                setActiveIndex(prev => (prev === MODULES.length - 1 ? 0 : prev + 1));
-            } else if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                handleModuleSelect(MODULES[activeIndex].id);
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [activeIndex, isSwitching]);
-
-    // Scroll/Wheel navigation
-    useEffect(() => {
-        let scrollTimeout;
-        const handleWheel = (e) => {
-            if (isSwitching) return;
-
-            e.preventDefault();
-
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(() => {
-                if (e.deltaY > 0) {
-                    setActiveIndex(prev => (prev === MODULES.length - 1 ? 0 : prev + 1));
-                } else if (e.deltaY < 0) {
-                    setActiveIndex(prev => (prev === 0 ? MODULES.length - 1 : prev - 1));
-                }
-            }, 50);
-        };
-
-        window.addEventListener('wheel', handleWheel, { passive: false });
-        return () => window.removeEventListener('wheel', handleWheel);
-    }, [isSwitching]);
-
-    const handleModuleSelect = (modeId) => {
-        if (isSwitching || !AVAILABLE_MODES[modeId]) return;
+    const handleModuleSelect = useCallback((modeId) => {
+        if (stateRef.current.isSwitching || !AVAILABLE_MODES[modeId]) return;
 
         const moduleData = MODULES.find(m => m.id === modeId);
         setSelectedModule(moduleData);
         setIsSwitching(true);
+        stateRef.current.isSwitching = true;
 
         setTimeout(() => {
-            onSelectMode(modeId);
-        }, 1500);
-    };
+            setIsSwitching(false);
+            stateRef.current.isSwitching = false;
+            setSelectedModule(null);
+            onSelectMode(modeId); // Call onSelectMode prop
+        }, 2500);
+    }, [onSelectMode]); // Added onSelectMode to dependency array
 
     useEffect(() => {
         if (!mountRef.current) return;
 
-        // Scene setup
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x000b14, 0.05);
-        sceneRef.current = scene;
+        scene.fog = new THREE.FogExp2(PALETTE.dark, 0.04);
+        
+        const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+        const isMobile = width < 768;
+        camera.position.set(0, isMobile ? 8 : 5, isMobile ? 25 : 18);
+        stateRef.current.camera = camera;
 
-        // Camera
-        const camera = new THREE.PerspectiveCamera(
-            45,
-            window.innerWidth / window.innerHeight,
-            0.1,
-            1000
-        );
-        camera.position.set(0, 4, 15);
-        cameraRef.current = camera;
-
-        // Renderer
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         mountRef.current.appendChild(renderer.domElement);
-        rendererRef.current = renderer;
 
-        // Lighting
-        const ambient = new THREE.AmbientLight(0x404040, 1);
+        const ambient = new THREE.AmbientLight(0x404040, 1.2);
         scene.add(ambient);
+        
+        const mainLight = new THREE.SpotLight(0xffffff, 2.5);
+        mainLight.position.set(0, 20, 10);
+        mainLight.angle = Math.PI / 4;
+        mainLight.penumbra = 0.5;
+        scene.add(mainLight);
 
-        const spot = new THREE.PointLight(PALETTE.cyan, 2, 20);
-        spot.position.set(0, 10, 5);
-        scene.add(spot);
-
-        // Grid Floor
-        const grid = new THREE.GridHelper(40, 40, 0x00f2ff, 0x002233);
-        grid.position.y = -2;
+        const grid = new THREE.GridHelper(60, 60, PALETTE.cyan, PALETTE.grid);
+        grid.position.y = -3;
+        grid.material.transparent = true;
+        grid.material.opacity = 0.15;
         scene.add(grid);
 
-        // Background HUD Rings
-        for (let i = 0; i < 3; i++) {
-            const geo = new THREE.TorusGeometry(8 + i * 2, 0.02, 16, 100);
-            const mat = new THREE.MeshBasicMaterial({
-                color: PALETTE.cyan,
+        const partGeo = new THREE.BufferGeometry();
+        const partPos = new Float32Array(1500 * 3);
+        for(let i=0; i<4500; i++) partPos[i] = (Math.random() - 0.5) * 50;
+        partGeo.setAttribute('position', new THREE.BufferAttribute(partPos, 3));
+        const particles = new THREE.Points(partGeo, new THREE.PointsMaterial({ size: 0.03, color: 0x00f2ff, transparent: true, opacity: 0.3 }));
+        scene.add(particles);
+
+        // --- Custom Holographic STATIC Material Shader ---
+        const createHologramMaterial = (color) => {
+            return new THREE.ShaderMaterial({
+                uniforms: {
+                    time: { value: 0 },
+                    color: { value: new THREE.Color(color) },
+                    opacity: { value: 0.1 },
+                    hover: { value: 0.0 }
+                },
                 transparent: true,
-                opacity: 0.1
+                side: THREE.DoubleSide,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending,
+                vertexShader: `
+                    varying vec2 vUv;
+                    void main() {
+                        vUv = uv;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform float time;
+                    uniform vec3 color;
+                    uniform float opacity;
+                    uniform float hover;
+                    varying vec2 vUv;
+
+                    float random(vec2 st) {
+                        return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+                    }
+
+                    void main() {
+                        // Base Digital Grid
+                        float grid = (sin(vUv.x * 50.0) * 0.5 + 0.5) * (sin(vUv.y * 50.0) * 0.5 + 0.5);
+                        
+                        // Static Noise Pattern
+                        float n = random(vec2(vUv.y * 100.0, time * 0.5));
+                        float staticNoise = random(vUv + time * 0.01);
+                        
+                        // Scanning Static Beam
+                        float beamY = mod(time * 0.3, 1.0);
+                        float beamDist = abs(vUv.y - beamY);
+                        float beamStatic = step(beamDist, 0.05) * random(vec2(vUv.x * 20.0, time));
+                        
+                        // High Frequency Flickering
+                        float flicker = random(vec2(time, 0.0)) > 0.95 ? 1.5 : 1.0;
+                        
+                        // Edge transparency
+                        float edge = pow(1.0 - abs(vUv.x - 0.5) * 2.0, 3.0) * pow(1.0 - abs(vUv.y - 0.5) * 2.0, 3.0);
+                        
+                        float alpha = opacity;
+                        
+                        // On hover, introduce the static chaos
+                        alpha += hover * (
+                            grid * 0.1 +         // Increased from 0.05
+                            beamStatic * 1.0 +   // Increased from 0.5
+                            (staticNoise * 0.2 * flicker) // Increased from 0.1
+                        );
+                        
+                        vec3 finalColor = color;
+                        // Tint static white slightly on hover
+                        finalColor += hover * beamStatic * 0.3;
+                        
+                        gl_FragColor = vec4(finalColor, alpha * (edge + 0.1) * flicker);
+                    }
+                `
             });
-            const ring = new THREE.Mesh(geo, mat);
-            ring.position.z = -15;
-            hudElementsRef.current.push(ring);
-            scene.add(ring);
-        }
+        };
 
-        // Particles
-        const particleGeo = new THREE.BufferGeometry();
-        const positions = [];
-        for (let i = 0; i < 1000; i++) {
-            positions.push(
-                (Math.random() - 0.5) * 40,
-                (Math.random() - 0.5) * 40,
-                (Math.random() - 0.5) * 40
-            );
-        }
-        particleGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-        const particleMat = new THREE.PointsMaterial({
-            size: 0.05,
-            color: PALETTE.cyan,
-            transparent: true,
-            opacity: 0.5
-        });
-        particlesRef.current = new THREE.Points(particleGeo, particleMat);
-        scene.add(particlesRef.current);
-
-        // Create Podiums
-        MODULES.forEach((mod, i) => {
+        const podiumGroups = MODULES.map((mod, i) => {
             const group = new THREE.Group();
             group.position.x = mod.x;
+            group.position.y = -3;
 
-            // Futuristic Pedestal
-            const pedGeo = new THREE.CylinderGeometry(1.2, 1.5, 1.5, 6, 1);
-            const pedMat = new THREE.MeshPhongMaterial({
-                color: 0x111111,
+            const baseGeo = new THREE.CylinderGeometry(1.8, 2.2, 0.5, 8);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.2, metalness: 0.8 });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            group.add(base);
+
+            const bodyGeo = new THREE.CylinderGeometry(1.2, 1.6, 3, 8);
+            const bodyMat = new THREE.MeshStandardMaterial({ 
+                color: 0x0a0a0a, 
+                roughness: 0.1, 
+                metalness: 1.0,
                 emissive: mod.color,
-                emissiveIntensity: 0.1,
-                flatShading: true,
-                shininess: 100
+                emissiveIntensity: 0.02
             });
-            const pedestal = new THREE.Mesh(pedGeo, pedMat);
-            pedestal.position.y = -1.25;
-            group.add(pedestal);
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.position.y = 1.75;
+            group.add(body);
 
-            // Glowing core ring
-            const ringGeo = new THREE.TorusGeometry(1.3, 0.05, 16, 100);
-            const ringMat = new THREE.MeshBasicMaterial({ color: mod.color });
-            const ring = new THREE.Mesh(ringGeo, ringMat);
-            ring.rotation.x = Math.PI / 2;
-            ring.position.y = -0.5;
-            group.add(ring);
+            const ringGeo = new THREE.TorusGeometry(1.45, 0.05, 8, 50);
+            const ringMat = new THREE.MeshBasicMaterial({ color: mod.color, transparent: true, opacity: 0.6 });
+            
+            const ring1 = new THREE.Mesh(ringGeo, ringMat);
+            ring1.rotation.x = Math.PI/2;
+            ring1.position.y = 0.8;
+            group.add(ring1);
 
-            // Holographic Card
-            const cardGeo = new THREE.PlaneGeometry(2.5, 3.8);
-            const cardMat = new THREE.MeshBasicMaterial({
-                color: mod.color,
-                transparent: true,
-                opacity: 0.15,
-                side: THREE.DoubleSide
-            });
-            const card = new THREE.Mesh(cardGeo, cardMat);
-            card.position.y = 1.8;
+            const ring2 = ring1.clone();
+            ring2.position.y = 2.6;
+            ring2.scale.set(0.85, 0.85, 0.85);
+            group.add(ring2);
+
+            for(let j=0; j<8; j++) {
+                const stripGeo = new THREE.BoxGeometry(0.06, 2.8, 0.12);
+                const stripMat = new THREE.MeshBasicMaterial({ color: mod.color });
+                const strip = new THREE.Mesh(stripGeo, stripMat);
+                const angle = (j / 8) * Math.PI * 2;
+                strip.position.set(Math.cos(angle) * 1.35, 1.75, Math.sin(angle) * 1.35);
+                strip.lookAt(0, 1.75, 0);
+                group.add(strip);
+            }
+
+            const cardMat = createHologramMaterial(mod.color);
+            const card = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 4.8), cardMat);
+            card.position.y = 6.2;
             group.add(card);
 
-            // Data Ring on Card
-            const dataRingGeo = new THREE.RingGeometry(0.8, 0.85, 32);
-            const dataRing = new THREE.Mesh(
-                dataRingGeo,
-                new THREE.MeshBasicMaterial({
-                    color: mod.color,
-                    transparent: true,
-                    opacity: 0.5,
-                    side: THREE.DoubleSide
-                })
-            );
-            dataRing.position.set(0, 1, 0.01);
-            card.add(dataRing);
+            const scannerGeo = new THREE.TorusGeometry(1.15, 0.025, 16, 100);
+            const scanner = new THREE.Mesh(scannerGeo, new THREE.MeshBasicMaterial({ color: mod.color, transparent: true, opacity: 0.8 }));
+            scanner.position.y = 3.6;
+            scanner.rotation.x = Math.PI / 2;
+            group.add(scanner);
 
-            // Card Wireframe
-            const edges = new THREE.EdgesGeometry(cardGeo);
-            const line = new THREE.LineSegments(
-                edges,
-                new THREE.LineBasicMaterial({ color: mod.color })
-            );
-            card.add(line);
-
-            // Smaller orbiting spheres
-            const sphereGeo = new THREE.SphereGeometry(0.1, 16, 16);
-            const sphereMat = new THREE.MeshBasicMaterial({ color: mod.color });
-            const sphere = new THREE.Mesh(sphereGeo, sphereMat);
-            sphere.position.set(0, 0.5, 0.5);
-            card.add(sphere);
-
-            group.userData = {
-                id: mod.id,
-                phase: i,
-                color: mod.color,
-                ring: dataRing,
-                sphere: sphere,
-                card: card,
-                clickable: card
+            group.userData = { 
+                id: mod.id, 
+                index: i, 
+                card, 
+                scanner,
+                rings: [ring1, ring2],
+                body,
+                baseColor: mod.color 
             };
-
-            podiumsRef.current.push(group);
             scene.add(group);
+            return group;
         });
+        stateRef.current.podiums = podiumGroups;
 
-        // Mouse move handler
-        const handleMouseMove = (event) => {
-            mouseRef.current.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouseRef.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        const onMouseMove = (e) => {
+            stateRef.current.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            stateRef.current.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        };
 
-            // Raycasting for hover
-            raycasterRef.current.setFromCamera(mouseRef.current, camera);
-            const intersects = raycasterRef.current.intersectObjects(
-                podiumsRef.current.map(p => p.children[2])
-            );
-
+        const onClick = () => {
+            stateRef.current.raycaster.setFromCamera(stateRef.current.mouse, camera);
+            const targetObjects = podiumGroups.map(p => p.children[12]); 
+            const intersects = stateRef.current.raycaster.intersectObjects(targetObjects);
             if (intersects.length > 0) {
-                const hoveredGroup = intersects[0].object.parent;
-                const moduleData = MODULES.find(m => m.id === hoveredGroup.userData.id);
-                const newIndex = MODULES.findIndex(m => m.id === moduleData.id);
-                setActiveIndex(newIndex);
-                setHoveredModule(moduleData);
+                handleModuleSelect(intersects[0].object.parent.userData.id);
             }
         };
 
-        // Click handler
-        const handleClick = () => {
-            if (isSwitching) return;
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('click', onClick);
 
-            raycasterRef.current.setFromCamera(mouseRef.current, camera);
-            const intersects = raycasterRef.current.intersectObjects(
-                podiumsRef.current.map(p => p.children[2])
-            );
+        let frameId;
+        const clock = new THREE.Clock();
 
-            if (intersects.length > 0) {
-                const clickedGroup = intersects[0].object.parent;
-                const modeId = clickedGroup.userData.id;
-                handleModuleSelect(modeId);
-            } else {
-                // Click anywhere to select active module
-                handleModuleSelect(MODULES[activeIndex].id);
-            }
-        };
-
-        // Resize handler
-        const handleResize = () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        };
-
-        // Animation loop
         const animate = () => {
-            requestAnimationFrame(animate);
+            frameId = requestAnimationFrame(animate);
+            const time = clock.getElapsedTime();
 
-            const time = performance.now() * 0.001;
+            particles.rotation.y += 0.0004;
 
-            // Rotate particles
-            if (particlesRef.current) {
-                particlesRef.current.rotation.y += 0.001;
+            stateRef.current.raycaster.setFromCamera(stateRef.current.mouse, camera);
+            const targetObjects = podiumGroups.map(p => p.children[12]);
+            const intersects = stateRef.current.raycaster.intersectObjects(targetObjects);
+            
+            if (intersects.length > 0) {
+                const hoveredIdx = intersects[0].object.parent.userData.index;
+                if (stateRef.current.activeIndex !== hoveredIdx) {
+                    stateRef.current.activeIndex = hoveredIdx;
+                    setActiveIndex(hoveredIdx);
+                    setHoveredModule(MODULES[hoveredIdx]);
+                }
             }
+            grid.material.color.set(hoveredModule?.color || PALETTE.cyan);
 
-            // Animate podiums
-            podiumsRef.current.forEach((p, i) => {
-                const isActive = i === activeIndex;
-                const isSelected = selectedModule && p.userData.id === selectedModule.id;
+            podiumGroups.forEach((p, i) => {
+                const isActive = i === stateRef.current.activeIndex;
+                const data = p.userData;
+                const pulse = (Math.sin(time * 4) * 0.5 + 0.5);
+                const activePulse = isActive ? (0.8 + pulse * 0.2) : 0.2;
+                
+                data.rings.forEach((ring, ri) => {
+                    ring.rotation.z += 0.015 * (ri + 1);
+                    ring.material.opacity = THREE.MathUtils.lerp(ring.material.opacity, isActive ? 0.9 : 0.4, 0.1);
+                });
 
-                // Floating card motion
-                p.children[2].position.y = 1.8 + Math.sin(time * 2 + i) * 0.1;
+                data.scanner.rotation.z -= 0.025;
+                data.scanner.rotation.x = (Math.PI / 2) + Math.sin(time * 1.5) * 0.08;
 
-                // Rotate holographic data rings
-                p.userData.ring.rotation.z += 0.02 * (i + 1);
+                // Update Static Hologram Uniforms
+                data.card.material.uniforms.time.value = time;
+                data.card.material.uniforms.hover.value = THREE.MathUtils.lerp(
+                    data.card.material.uniforms.hover.value,
+                    isActive ? 1.0 : 0.0,
+                    0.1
+                );
+                data.card.material.uniforms.opacity.value = THREE.MathUtils.lerp(
+                    data.card.material.uniforms.opacity.value,
+                    isActive ? 0.4 : 0.08,
+                    0.08
+                );
+                
+                data.card.position.y = 6.2 + Math.sin(time * 2 + i) * 0.15;
 
-                // Orbit sphere
-                const angle = time * (i + 1);
-                p.userData.sphere.position.x = Math.cos(angle) * 1.2;
-                p.userData.sphere.position.z = Math.sin(angle) * 1.2 + 0.5;
-
-                // Scale based on active state
-                const targetScale = isActive ? 1.15 : isSelected ? 1.2 : 1.0;
-                p.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
-
-                // Opacity based on active state
-                const targetOpacity = isActive ? 0.35 : isSelected ? 0.4 : 0.15;
-                p.userData.card.material.opacity = THREE.MathUtils.lerp(
-                    p.userData.card.material.opacity,
-                    targetOpacity,
+                data.body.material.emissiveIntensity = THREE.MathUtils.lerp(
+                    data.body.material.emissiveIntensity, 
+                    isActive ? 0.3 * activePulse : 0.02, 
                     0.1
                 );
 
-                // Smooth position transition for active module
-                const targetX = MODULES[i].x + (isActive ? 0 : 0);
-                p.position.x = THREE.MathUtils.lerp(p.position.x, targetX, 0.1);
-
-                // Look at mouse (reaction)
-                p.rotation.y = THREE.MathUtils.lerp(
-                    p.rotation.y,
-                    mouseRef.current.x * 0.3,
-                    0.05
-                );
-                p.rotation.x = THREE.MathUtils.lerp(
-                    p.rotation.x,
-                    -mouseRef.current.y * 0.2,
-                    0.05
-                );
+                const targetScale = isActive ? 1.12 : 1.0;
+                p.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
             });
 
-            // Animate HUD rings
-            hudElementsRef.current.forEach((ring, i) => {
-                ring.rotation.z += 0.001 * (i + 1);
-                ring.scale.setScalar(1 + Math.sin(time + i) * 0.05);
-            });
-
-            // Dynamic camera movement
-            camera.position.x = THREE.MathUtils.lerp(
-                camera.position.x,
-                mouseRef.current.x * 1.5,
-                0.05
-            );
-            camera.lookAt(0, 1, 0);
+            const targetCamX = stateRef.current.mouse.x * (window.innerWidth < 768 ? 1.5 : 3.5);
+            const targetCamY = (window.innerWidth < 768 ? 8 : 5) + stateRef.current.mouse.y * 1.5;
+            
+            camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetCamX, 0.04);
+            camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetCamY, 0.04);
+            camera.lookAt(0, window.innerWidth < 768 ? 4 : 2.5, 0);
 
             renderer.render(scene, camera);
         };
 
         animate();
 
-        // Event listeners
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('click', handleClick);
-        window.addEventListener('resize', handleResize);
-
-        // Cleanup
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('click', handleClick);
-            window.removeEventListener('resize', handleResize);
-
-            if (mountRef.current && renderer.domElement) {
-                mountRef.current.removeChild(renderer.domElement);
-            }
-
-            renderer.dispose();
-            podiumsRef.current = [];
-            hudElementsRef.current = [];
+        const onResize = () => {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            const mobile = w < 768;
+            camera.aspect = w / h;
+            camera.position.z = mobile ? 25 : 18;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+            podiumGroups.forEach((p, i) => {
+                p.position.x = mobile ? (MODULES[i].x * 0.6) : MODULES[i].x;
+            });
         };
-    }, [onSelectMode, hoveredModule, selectedModule, isSwitching, activeIndex]);
+        window.addEventListener('resize', onResize);
+        onResize();
+
+        return () => {
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('click', onClick);
+            window.removeEventListener('resize', onResize);
+            cancelAnimationFrame(frameId);
+            renderer.dispose();
+            if (mountRef.current) mountRef.current.removeChild(renderer.domElement);
+        };
+    }, [handleModuleSelect]);
 
     return (
-        <div className="mode-selector-hud">
-            <div className="scanner-line" />
+        <div className="mode-selector-hud" style={{ '--active-color': hoveredModule?.colorStr || '#00f2ff' }}>
+            {/* <BackButton /> */} {/* Commented out */}
+            <div className="vignette" />
+            <div className="scanline" />
+            
             <div className="corner-brackets top-left" />
             <div className="corner-brackets top-right" />
             <div className="corner-brackets bottom-left" />
             <div className="corner-brackets bottom-right" />
 
             <div ref={mountRef} className="canvas-container" />
+            <CustomCursor />
 
             <div className="ui-layer">
-                <Motion.div
+                <motion.div 
                     className="header-hud"
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 }}
                 >
-                    <h1>AGRIM SIGDEL</h1>
-                    <p className="status-text">
-                        PORTFOLIO SYSTEM // SELECT_EXPERIENCE_MODE
-                    </p>
-                </Motion.div>
+                    <div className="header-glitch-wrap">
+                        <h1>AGRIM SIGDEL</h1>
+                        <div className="header-line" />
+                    </div>
+                    <div className="status-indicator">
+                        <span className="blink-dot" />
+                        <p className="status-text">SYSTEM_ACTIVE // BROADCASTING_EXPERIENCE_SIGNAL</p>
+                    </div>
+                </motion.div>
 
-                <Motion.div
-                    className="data-stream"
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 }}
-                >
-                    <div>PROJECTS: 12+</div>
-                    <div>EXPERIENCE: 3 YRS</div>
-                    <div>STATUS: AVAILABLE</div>
-                    <div>LOCATION: NEPAL</div>
-                    <div className="boot-text">&gt;&gt; READY_TO_EXPLORE...</div>
-                </Motion.div>
+                <div className="side-monitor">
+                    <div className="monitor-row">
+                        <span>CPU_LOAD</span>
+                        <div className="mini-bar"><div className="fill" style={{ width: '65%' }} /></div>
+                    </div>
+                    <div className="monitor-row">
+                        <span>NET_PULSE</span>
+                        <div className="mini-bar"><div className="fill" style={{ width: '82%' }} /></div>
+                    </div>
+                    <div className="monitor-row">
+                        <span>MEM_ALLOC</span>
+                        <div className="mini-bar"><div className="fill" style={{ width: '34%' }} /></div>
+                    </div>
+                    <div className="monitor-footer">ENCRYPT_LEVEL: OMEGA_8</div>
+                </div>
 
-                <AnimatePresence>
-                    {hoveredModule && !selectedModule && (
-                        <Motion.div
-                            className="module-info-panel"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 20 }}
-                            transition={{ duration: 0.3 }}
+                <AnimatePresence mode="wait">
+                    {hoveredModule && !isSwitching && (
+                        <motion.div 
+                            key={hoveredModule.id}
+                            className="cyber-card"
+                            initial={{ opacity: 0, rotateX: 20, y: 50, scale: 0.95 }}
+                            animate={{ opacity: 1, rotateX: 0, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -10, scale: 0.98, filter: 'blur(10px)' }}
+                            transition={{ type: 'spring', damping: 20, stiffness: 100 }}
                         >
-                            <div className="module-header">
-                                <span className="module-code">[{hoveredModule.code}]</span>
-                                <span className="module-name">{hoveredModule.name}</span>
+                            <div className="card-glitch-border" />
+                            <div className="card-header">
+                                <div className="card-id-tag">{hoveredModule.code}</div>
+                                <div className="card-category">{hoveredModule.name}</div>
                             </div>
-                            <h3 className="module-title">{hoveredModule.title}</h3>
-                            <p className="module-description">{hoveredModule.description}</p>
-                            <div className="module-features">
-                                {hoveredModule.features.map((feature, i) => (
-                                    <div key={i} className="feature-item">
-                                        <span className="feature-bullet">▸</span> {feature}
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="navigation-hints">
-                                <div className="hint-row">
-                                    <span className="hint-key">←→</span>
-                                    <span className="hint-key">SCROLL</span>
-                                    <span className="hint-text">Navigate</span>
-                                </div>
-                                <div className="hint-row">
-                                    <span className="hint-key">ENTER</span>
-                                    <span className="hint-key">CLICK</span>
-                                    <span className="hint-text">Select</span>
+                            
+                            <div className="card-body">
+                                <h2 className="card-title">{hoveredModule.title}</h2>
+                                <p className="card-desc">{hoveredModule.description}</p>
+                                
+                                <div className="feature-grid">
+                                    {hoveredModule.features.map((f, i) => (
+                                        <div key={f} className="feature-node" style={{ animationDelay: `${i * 0.1}s` }}>
+                                            <div className="node-dot" />
+                                            <span>{f}</span>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
-                        </Motion.div>
+
+                            <div className="card-footer">
+                                <div className="initialize-prompt">
+                                    <span className="prompt-arrows">&gt;&gt;</span>
+                                    INIT_DRIVE
+                                    <span className="prompt-bracket">]</span>
+                                </div>
+                                <div className="card-serial">SN_{hoveredModule.id.toUpperCase()}</div>
+                            </div>
+                        </motion.div>
                     )}
                 </AnimatePresence>
 
-                <AnimatePresence>
-                    {selectedModule && (
-                        <Motion.div
-                            className="loading-overlay"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                        >
-                            <div className="loading-content">
-                                <div className="loading-spinner" />
-                                <h2>INITIALIZING {selectedModule.name}</h2>
-                                <p>Loading module [{selectedModule.code}]...</p>
-                                <div className="progress-bar">
-                                    <div className="progress-fill" />
-                                </div>
-                            </div>
-                        </Motion.div>
-                    )}
-                </AnimatePresence>
-
-                <Motion.div
+                <motion.div 
                     className="footer-hud"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
                 >
-                    <div className="footer-info">
-                        <p>DEVELOPER & DESIGNER</p>
-                        <p>LOCAL_TIME: {currentTime}</p>
+                    <div className="coord-panel">
+                        <div className="coord-item">LAT: 27.6710° N</div>
+                        <div className="coord-item">LNG: 85.3414° E</div>
                     </div>
-                    <div className="footer-links">
-                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-                            TWITTER
-                        </a>
-                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-                            LINKEDIN
-                        </a>
-                        <a href="https://github.com" target="_blank" rel="noopener noreferrer">
-                            GITHUB
-                        </a>
+                    
+                    <div className="social-links-hud">
+                        <a href="#github" className="hud-link">GITHUB</a>
+                        <div className="link-divider" />
+                        <a href="#linkedin" className="hud-link">LINKEDIN</a>
                     </div>
-                </Motion.div>
+
+                    <div className="time-display">{currentTime}</div>
+                </motion.div>
             </div>
+
+            <AnimatePresence>
+                {isSwitching && (
+                    <motion.div 
+                        className="transition-overlay"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <div className="hex-bg" />
+                        <div className="loading-core">
+                            <div className="spinner-outer" />
+                            <div className="spinner-inner" />
+                            <h3 className="loading-text">RECONFIGURING</h3>
+                            <div className="progress-container">
+                                <div className="progress-glow" />
+                                <div className="progress-bar-fill" />
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };
