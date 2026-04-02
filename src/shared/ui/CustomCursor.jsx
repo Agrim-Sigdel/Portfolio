@@ -1,56 +1,29 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 const CustomCursor = () => {
     const [cursorText, setCursorText] = useState('');
     const [isHovering, setIsHovering] = useState(false);
-    
-    // Trail settings
-    const TRAIL_LENGTH = 20;
-    const trailRef = useRef(Array(TRAIL_LENGTH).fill({ x: -100, y: -100 }));
-    const dotsRef = useRef([]);
 
-    // Initialize cursor after "Agrim" ends
-    const initialX = typeof window !== 'undefined' ? window.innerWidth / 2 + 180 : 0;
-    const initialY = typeof window !== 'undefined' ? window.innerHeight * 0.18 : 0;
+    // Initial position
+    const initialX = typeof window !== 'undefined' ? window.innerWidth / 2 : 0;
+    const initialY = typeof window !== 'undefined' ? window.innerHeight / 2 : 0;
 
     const mouseX = useMotionValue(initialX);
     const mouseY = useMotionValue(initialY);
 
-    // Smooth springs for the main cursor dot
-    const springConfig = { damping: 25, stiffness: 700 };
-    const dotX = useSpring(mouseX, springConfig);
-    const dotY = useSpring(mouseY, springConfig);
+    // Fast spring for inner dot
+    const dotX = useSpring(mouseX, { damping: 30, stiffness: 800, mass: 0.5 });
+    const dotY = useSpring(mouseY, { damping: 30, stiffness: 800, mass: 0.5 });
+
+    // Slower spring for outer ring to create a trailing smooth effect
+    const ringX = useSpring(mouseX, { damping: 40, stiffness: 300, mass: 1 });
+    const ringY = useSpring(mouseY, { damping: 40, stiffness: 300, mass: 1 });
 
     useEffect(() => {
-        // Initialize trail positions to the starting position
-        trailRef.current = Array(TRAIL_LENGTH).fill({ x: initialX, y: initialY });
-        
         const handleMouseMove = (e) => {
-            const { clientX, clientY } = e;
-            mouseX.set(clientX);
-            mouseY.set(clientY);
-
-            // Update trail data
-            // Shift all points down and add new one at the end
-            // We want the last element to be the "head" (newest) and 0 to be tail (oldest)
-            const currentTrail = trailRef.current;
-            currentTrail.shift();
-            currentTrail.push({ x: clientX, y: clientY });
-            
-            // Update DOM directly for performance
-            dotsRef.current.forEach((dot, index) => {
-                if (dot) {
-                    const point = currentTrail[index];
-                    dot.style.left = `${point.x}px`;
-                    dot.style.top = `${point.y}px`;
-                    // Opacity decreasing for older points
-                    // index 0 is oldest (tail), index length-1 is newest (head)
-                    // We want tail to fade out.
-                    const opacity = (index + 1) / TRAIL_LENGTH; 
-                    dot.style.opacity = opacity * 0.6; // Max opacity 0.6
-                }
-            });
+            mouseX.set(e.clientX);
+            mouseY.set(e.clientY);
         };
 
         const handleMouseOver = (e) => {
@@ -68,82 +41,80 @@ const CustomCursor = () => {
         window.addEventListener('mouseover', handleMouseOver);
 
         return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseover', handleMouseOver);
+             window.removeEventListener('mousemove', handleMouseMove);
+             window.removeEventListener('mouseover', handleMouseOver);
         };
-    }, [mouseX, mouseY, initialX, initialY]);
+    }, [mouseX, mouseY]);
 
     return (
         <>
             <style>{`
-        * { cursor: none !important; }
-        @media (max-width: 768px) {
-          .custom-cursor-container { display: none; }
-          * { cursor: auto !important; }
-        }
-        .cursor-trail-dot {
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            background-color: #ff0000;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            transition: opacity 0.1s ease;
-        }
-      `}</style>
+                * { cursor: none !important; }
+                @media (max-width: 768px) {
+                    .custom-cursor-container { display: none; }
+                    * { cursor: auto !important; }
+                }
+            `}</style>
 
             <div className="custom-cursor-container" style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 9999 }}>
-                {/* Snake Trail */}
-                {Array.from({ length: TRAIL_LENGTH }).map((_, i) => (
-                    <div
-                        key={i}
-                        ref={el => dotsRef.current[i] = el}
-                        className="cursor-trail-dot"
-                        style={{
-                            left: initialX, // Initial position
-                            top: initialY,
-                            opacity: (i + 1) / TRAIL_LENGTH * 0.6,
-                             // Newer dots are smaller? Or same size? Let's make tail smaller
-                            transform: `translate(-50%, -50%) scale(${(i + 5) / (TRAIL_LENGTH + 5)})` 
-                        }}
-                    />
-                ))}
+                
+                {/* Outer Trailing Ring */}
+                <motion.div
+                    style={{
+                        position: 'absolute',
+                        left: ringX,
+                        top: ringY,
+                        x: '-50%',
+                        y: '-50%',
+                        width: isHovering ? 60 : 36,
+                        height: isHovering ? 60 : 36,
+                        border: '2px solid var(--accent-red)',
+                        borderRadius: '50%',
+                        opacity: isHovering ? 0 : 0.4,
+                        transition: 'width 0.2s ease, height 0.2s ease, opacity 0.2s ease'
+                    }}
+                />
 
-                {/* Main Dot */}
+                {/* Main Inner Dot */}
                 <motion.div
                     style={{
                         position: 'absolute',
                         left: dotX,
                         top: dotY,
-                        width: 12,
-                        height: 12,
-                        backgroundColor: '#ff0000',
+                        width: isHovering ? 4 : 8,
+                        height: isHovering ? 4 : 8,
+                        backgroundColor: 'var(--accent-red)',
                         borderRadius: '50%',
                         x: '-50%',
                         y: '-50%',
-                        boxShadow: '0 0 10px #ff0000'
+                        boxShadow: '0 0 10px var(--accent-red)',
+                        transition: 'width 0.2s ease, height 0.2s ease'
                     }}
                 />
 
                 {/* Text Label */}
                 {isHovering && (
                     <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
                         style={{
                             position: 'absolute',
                             left: dotX,
                             top: dotY,
-                            x: '-50%',
-                            y: 'calc(-50% + 20px)',
-                            fontSize: '0.7rem',
-                            fontWeight: '600',
+                            x: '15px',
+                            y: '-50%',
+                            fontSize: '0.75rem',
+                            fontWeight: '800',
                             letterSpacing: '1px',
                             textTransform: 'uppercase',
-                            color: '#ff0000',
-                            whiteSpace: 'nowrap'
+                            color: 'var(--accent-red)',
+                            whiteSpace: 'nowrap',
+                            background: 'var(--bg-black)',
+                            padding: '4px 12px',
+                            borderRadius: '12px',
+                            border: '1px solid var(--accent-red)',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
                         }}
                     >
                         {cursorText}

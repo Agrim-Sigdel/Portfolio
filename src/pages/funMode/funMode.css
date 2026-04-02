@@ -1,194 +1,186 @@
-/* Fun Mode Page Theme Styles */
+/* Fun Mode Page Theme Styles - Deep Teal & Mint Aesthetic */
 
-/* Dark mode - Project cards */
-[data-theme="dark"] .masonry-grid > div {
-  background: linear-gradient(135deg, #1a1a1a 0%, #111111 100%) !important;
-  border: 1px solid #222;
+/* Base (Dark Mode default) */
+.fun-mode-tilted-content {
+  --fun-bg: #071011;
+  --fun-surface: #0e1f20;
+  --fun-border: #143d3b;
+  --fun-accent: #00f0b5;
+  --fun-accent-soft: rgba(0, 240, 181, 0.1);
+  --fun-text: #ffffff;
+  --fun-text-muted: #84a49c;
+  
+  background-color: var(--fun-bg) !important;
+  color: var(--fun-text);
 }
 
-[data-theme="dark"] .masonry-grid > div:hover {
-  border-color: #ff4c2b;
-  box-shadow: 0 10px 40px rgba(255, 76, 43, 0.2);
+/* Light Mode Overrides */
+[data-theme="light"] .fun-mode-tilted-content {
+  --fun-bg: #f4fbf9;
+  --fun-surface: #ffffff;
+  --fun-border: #c8e0da;
+  --fun-accent: #0b665c;
+  --fun-accent-soft: rgba(11, 102, 92, 0.1);
+  --fun-text: #071011;
+  --fun-text-muted: #4f7972;
 }
 
-/* Light mode - Project cards */
-[data-theme="light"] .masonry-grid > div {
-  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%) !important;
-  border: 2px solid #e5e5e5;
-  color: #1a1a1a;
+/* Overriding App-level variables locally */
+.fun-mode-tilted-content {
+  --bg-black: var(--fun-bg);
+  --bg-panel: var(--fun-surface);
+  --accent-red: var(--fun-accent);
+  --text-cream: var(--fun-text);
+  --text-muted: var(--fun-text-muted);
 }
 
-[data-theme="light"] .masonry-grid > div:hover {
-  border-color: #dc2626;
-  box-shadow: 0 10px 40px rgba(220, 38, 38, 0.15);
+/* Project cards */
+.fun-mode-tilted-content .masonry-grid > div {
+  background: linear-gradient(135deg, var(--fun-surface) 0%, var(--fun-bg) 100%) !important;
+  border: 1px solid var(--fun-border);
+  border-radius: 16px;
 }
 
-[data-theme="light"] .masonry-grid > div h3 {
-  color: #1a1a1a;
+.fun-mode-tilted-content .masonry-grid > div:hover {
+  border-color: var(--fun-accent);
+  box-shadow: 0 10px 40px var(--fun-accent-soft);
 }
 
-[data-theme="light"] .masonry-grid > div p {
-  color: #333333;
+.fun-mode-tilted-content .hero-section {
+  background: transparent;
 }
 
-/* Light mode - Hero section */
-[data-theme="light"] .hero-section {
-  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+.fun-mode-tilted-content .hero-section h1 {
+  color: var(--fun-text);
 }
 
-[data-theme="light"] .hero-section h1 {
-  color: #1a1a1a;
+.fun-mode-tilted-content .text-accent {
+  color: var(--fun-accent) !important;
 }
 
-[data-theme="light"] .hero-section .text-accent {
-  color: #dc2626;
+/* Process section overrides */
+.fun-mode-tilted-content .process-grid > div {
+  border-top: 1px solid var(--fun-border);
 }
 
-/* Light mode - Process section */
-[data-theme="light"] .process-grid > div {
-  border-top: 1px solid #e5e5e5;
+.fun-mode-tilted-content .process-grid > div h3 {
+  color: var(--fun-text);
 }
 
-[data-theme="light"] .process-grid > div h3 {
-  color: #1a1a1a;
+.fun-mode-tilted-content .process-grid > div p {
+  color: var(--fun-text-muted);
 }
 
-[data-theme="light"] .process-grid > div p {
-  color: #333333;
+/* About section overrides */
+.fun-mode-tilted-content .about-grid h2 {
+  color: var(--fun-text);
 }
 
-/* Light mode - About section */
-[data-theme="light"] .about-grid {
-  color: #1a1a1a;
+.fun-mode-tilted-content .about-grid p {
+  color: var(--fun-text-muted);
 }
 
-[data-theme="light"] .about-grid h2 {
-  color: #1a1a1a;
+/* Skill badges */
+.fun-mode-tilted-content .skill-badge {
+  background-color: var(--fun-accent-soft);
+  border: 1px solid var(--fun-border);
+  color: var(--fun-accent);
+  border-radius: 20px;
 }
 
-[data-theme="light"] .about-grid p {
-  color: #333333;
+/* Ticker section */
+.fun-mode-tilted-content .ticker-section {
+  background: linear-gradient(135deg, var(--fun-surface) 0%, var(--fun-bg) 100%);
+  border-top: 1px solid var(--fun-border);
+  border-bottom: 1px solid var(--fun-border);
 }
 
-[data-theme="light"] .about-grid .text-accent {
-  color: #dc2626;
+.fun-mode-tilted-content .ticker-line {
+  color: var(--fun-accent);
 }
 
-/* Light mode - Skill badges */
-[data-theme="light"] .skill-badge {
-  background-color: rgba(220, 38, 38, 0.1);
-  border: 1px solid rgba(220, 38, 38, 0.3);
-  color: #dc2626;
+/* Footer overrides */
+.fun-mode-tilted-content footer h2 {
+  color: var(--fun-text);
 }
 
-/* Light mode - Ticker section */
-[data-theme="light"] .ticker-section {
-  background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+.fun-mode-tilted-content footer button {
+  background-color: var(--fun-accent);
+  color: var(--fun-bg);
+  border: 2px solid var(--fun-accent);
+  font-weight: 800;
+  border-radius: 8px;
 }
 
-[data-theme="light"] .ticker-line {
-  color: #1a1a1a;
+.fun-mode-tilted-content footer button:hover {
+  background-color: transparent;
+  color: var(--fun-accent);
+  box-shadow: 0 15px 40px var(--fun-accent-soft);
 }
 
-[data-theme="light"] footer h2 {
-  color: #1a1a1a;
-}
-
-[data-theme="light"] footer button {
-  background-color: #dc2626;
-  color: #ffffff;
-  border: 2px solid #dc2626;
-}
-
-[data-theme="light"] footer button:hover {
-  background-color: #b91c1c;
-  border-color: #b91c1c;
-  box-shadow: 0 15px 40px rgba(220, 38, 38, 0.3);
-}
-
-/* Navbar styling - white text in both modes */
+/* Navbar styling */
 .Navbar-wrapper {
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
+  background: rgba(7, 16, 17, 0.2);
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid var(--fun-border);
+}
+
+[data-theme="light"] .Navbar-wrapper {
+  background: rgba(255, 255, 255, 0.4);
 }
 
 .navbar-link {
-  color: white !important;
+  color: var(--fun-text) !important;
 }
 
 .navbar-link:hover {
-  color: var(--accent-red) !important;
+  color: var(--fun-accent) !important;
 }
 
-/* Light mode - Navbar */
-[data-theme="light"] .Navbar-wrapper {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-}
-
-[data-theme="light"] .Navbar-wrapper nav {
-  border-bottom: 1px solid #e5e5e5;
-}
-
-[data-theme="light"] .navbar-link {
-  color: white !important;
-}
-
-[data-theme="light"] .navbar-link:hover {
-  color: var(--accent-red) !important;
-}
-
-/* Light mode - Grid backgrounds */
-[data-theme="light"] [style*="backgroundImage"] {
+/* Grid backgrounds */
+.fun-mode-tilted-content [style*="backgroundImage"] {
   background-image:
-    linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px) !important;
+    linear-gradient(var(--fun-accent-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--fun-accent-soft) 1px, transparent 1px) !important;
 }
 
-/* Light mode - Borders */
-[data-theme="light"] section {
-  border-top-color: #e5e5e5;
+/* Borders */
+.fun-mode-tilted-content section {
+  border-top-color: var(--fun-border);
 }
 
-[data-theme="light"] .normal-section {
-  border-bottom-color: #e5e5e5;
+.fun-mode-tilted-content .normal-section {
+  border-bottom-color: var(--fun-border);
 }
 
-/* Light mode - Custom Cursor adjustments */
-[data-theme="light"] .custom-cursor-container {
+/* Custom Cursor adjustments */
+.fun-mode-tilted-content .custom-cursor-container {
+  filter: none;
+}
+
+[data-theme="light"] .fun-mode-tilted-content .custom-cursor-container {
   filter: invert(1);
 }
 
-/* Light mode - Squiggle SVG */
-[data-theme="light"] .squiggle {
-  stroke: rgba(220, 38, 38, 0.5);
+/* Squiggle SVG */
+.fun-mode-tilted-content .squiggle {
+  stroke: var(--fun-accent);
 }
 
-/* Light mode - Text utilities */
-[data-theme="light"] .text-muted {
-  color: #666666;
+/* Text utilities */
+.fun-mode-tilted-content .text-muted {
+  color: var(--fun-text-muted);
 }
 
-[data-theme="light"] .text-cream {
-  color: #1a1a1a;
+.fun-mode-tilted-content .text-cream {
+  color: var(--fun-text);
 }
 
-[data-theme="light"] .uppercase {
-  color: #666666;
+.fun-mode-tilted-content .uppercase {
+  color: var(--fun-accent);
 }
 
-/* Smooth theme transitions */
-html,
-body,
-* {
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease,
-    border-color 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-/* Preserve animation states during theme switch */
-[class*="animate"] {
-  transition-property: background-color, color, border-color, box-shadow;
+/* Ensure smooth theme transitions */
+html, body, * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
