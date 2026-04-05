@@ -19,6 +19,11 @@ export default function ModeSelector({ onSelectMode }) {
       <header className="ms-header">
          <h1>AGRIM SIGDEL</h1>
          <p>SELECT AN EXPERIENCE</p>
+         <div className="ms-construction-badge">
+           <span className="ms-construction-icon">🚧</span>
+           <span className="ms-construction-text">WEBSITE UNDER CONSTRUCTION</span>
+           <span className="ms-construction-icon">🚧</span>
+         </div>
       </header>
 
       {/* Main 3D Container using CSS transforms */}
