@@ -30,7 +30,7 @@ const NormalModeLayout = ({ onResetMode }) => {
       <div className="flat-scroll-container">
         
         {/* HEADER BAR (Like top piece in the image) */}
-        <FloatingCard className="flat-header-bar" delay="0s">
+        <FloatingCard className="flat-header-bar overflow-hidden" delay="0s">
           <div className="flat-header-inner">
              <div className="flat-circle"></div>
              <div className="flat-search-bar">
@@ -48,9 +48,9 @@ const NormalModeLayout = ({ onResetMode }) => {
             <div className="flat-sidebar">
               <div className="flat-sidebar-top-box">
                  {/* Decorative elements from image */}
-                 <div className="flat-dots">
+                 {/* <div className="flat-dots">
                    <span></span><span></span><span></span><span></span>
-                 </div>
+                 </div> */}
                  <div className="flat-image-placeholder">
                     <h2>ABOUT</h2>
                  </div>
@@ -80,9 +80,9 @@ const NormalModeLayout = ({ onResetMode }) => {
               {/* EXPERIENCE BLOCK */}
               <div className="flat-content-box">
                  <div className="flat-box-header">
-                   <div className="flat-toggle"><div className="flat-toggle-knob"></div></div>
-                   <div className="flat-big-dots"><span></span><span></span><span></span></div>
-                   <div className="flat-small-dots"><span></span><span></span><span></span></div>
+                   {/* <div className="flat-toggle"><div className="flat-toggle-knob"></div></div> */}
+                   {/* <div className="flat-big-dots"><span></span><span></span><span></span></div>
+                   <div className="flat-small-dots"><span></span><span></span><span></span></div> */}
                  </div>
                  <h2 className="flat-section-title">EXPERIENCE</h2>
                  
@@ -100,9 +100,9 @@ const NormalModeLayout = ({ onResetMode }) => {
               {/* PROJECTS BLOCK */}
               <div className="flat-content-box">
                  <div className="flat-box-header">
-                   <div className="flat-toggle"><div className="flat-toggle-knob"></div></div>
+                   {/* <div className="flat-toggle"><div className="flat-toggle-knob"></div></div>
                    <div className="flat-big-dots"><span></span><span></span><span></span></div>
-                   <div className="flat-small-dots"><span></span><span></span><span></span></div>
+                   <div className="flat-small-dots"><span></span><span></span><span></span></div> */}
                  </div>
                  <h2 className="flat-section-title">PROJECTS</h2>
 

@@ -34,12 +34,12 @@ export default function ModeSelector({ onSelectMode }) {
           animate={{ y: 0, opacity: 1, rotateX: 5, rotateY: -10 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          {/* Decorative Window Controls */}
+          {/* Decorative Window Controls
           <div className="ms-controls">
             <span className="ms-dot white" />
             <span className="ms-dot purple" />
             <span className="ms-dot purple" />
-          </div>
+          </div> */}
 
           <div className="ms-cards-grid">
             
@@ -51,9 +51,9 @@ export default function ModeSelector({ onSelectMode }) {
               whileTap={{ scale: 0.95 }}
               onClick={() => handleSelect('normal')}
             >
-               <div className="ms-card-top-dots">
+               {/* <div className="ms-card-top-dots">
                  <div className="ms-dot orange" /><div className="ms-dot orange" />
-               </div>
+               </div> */}
                
                <div className="ms-icon-ab-container">
                  <div className="ms-ab-circle"></div>
@@ -79,9 +79,9 @@ export default function ModeSelector({ onSelectMode }) {
               whileTap={{ scale: 0.95 }}
               onClick={() => handleSelect('fun')}
             >
-               <div className="ms-card-top-dots">
+               {/* <div className="ms-card-top-dots">
                  <div className="ms-dot orange" /><div className="ms-dot orange" />
-               </div>
+               </div> */}
 
                <div className="ms-pie-row">
                  <div className="ms-pie-chart">
@@ -108,9 +108,9 @@ export default function ModeSelector({ onSelectMode }) {
               whileTap={{ scale: 0.95 }}
               onClick={() => handleSelect('work')}
             >
-               <div className="ms-card-top-dots">
+               {/* <div className="ms-card-top-dots">
                  <div className="ms-dot orange" /><div className="ms-dot orange" />
-               </div>
+               </div> */}
 
                <div className="ms-question-mark">?</div>
 

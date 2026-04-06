@@ -28,7 +28,7 @@ const ReturnToStartButton = ({ onResetMode }) => {
                 letterSpacing: '0.1em'
             }}
         >
-            ↩ Back
+            Back
         </button>
     );
 };
