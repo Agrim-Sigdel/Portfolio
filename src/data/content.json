@@ -3,8 +3,8 @@
     "personal": {
       "name": "Agrim Sigdel",
       "firstName": "Agrim",
-      "tagline": "FULL-STACK DEVELOPER | AI ENTHUSIAST",
-      "summary": "Versatile Full-Stack Developer with a strong foundation in modern AI, currently working using React/TypeScript and Python. I bridge the gap between complex AI models and user-centric applications, delivering production-ready code. Creative problem solver with experience leading cross-functional teams in high-impact environments.",
+      "tagline": "FULL-STACK DEVELOPER | AI RESEARCHER",
+      "summary": "Versatile Full-Stack Developer with a strong foundation in modern AI, engineering production-ready applications using React/TypeScript and Python/Django. Adept at building scalable REST APIs, optimizing relational databases, and implementing clean architecture across web, mobile, and open-source platforms. I bridge the gap between complex AI models and user-centric applications.",
       "areasOfExpertise": [
         "TypeScript / React",
         "Python / Django",
@@ -13,84 +13,185 @@
         "Next.js / Tailwind",
         "REST API Design",
         "PostgreSQL / MySQL",
-        "Docker / Git",
-        "Creative Leadership"
+        "Docker / CI-CD",
+        "Open Source"
       ],
-      "shortSummary": "Full-Stack Developer focused on AI and building production-ready applications with React, TypeScript, and Python."
+      "shortSummary": "Full-Stack Developer & AI Researcher building production-ready applications with React, TypeScript, and Python/Django - and shipping open-source tools."
     },
     "contact": {
       "email": "sigdelagrim35@gmail.com",
       "phone": "+977 9869081558",
       "location": "Kathmandu, Nepal",
       "website": "agrimsigdel.com.np",
-      "github": "github.com/Agrim-Sigdel"
+      "github": "github.com/Agrim-Sigdel",
+      "githubUrl": "https://github.com/Agrim-Sigdel",
+      "linkedin": "linkedin.com/in/agrimsigdel",
+      "linkedinUrl": "https://www.linkedin.com/in/agrimsigdel"
     },
     "education": [
       {
         "degree": "BSc. Computer Science and Information Technology (CSIT)",
-        "school": "Prime College | Kathmandu, Nepal",
+        "school": "Prime College, Tribhuvan University | Kathmandu, Nepal",
         "year": "2022 – 2026"
       }
     ],
     "experience": [
       {
-        "role": "Freelance and Projects",
-        "company": "Design and Development",
-        "period": "2022 – Present",
+        "role": "SOFTWARE DEVELOPER (FULL-STACK)",
+        "company": "Contractor Ops AI | Remote",
+        "period": "Apr 2026 – Present",
         "description": [
-          "Delivered comprehensive design and full-stack development solutions independently."
-        ]
+          "Engineer a high-performance mobile application using React Native and TypeScript, with strict adherence to component state-management best practices.",
+          "Refactor and optimize backend REST APIs for seamless compatibility, efficient serialization, and low-latency payloads between server and client.",
+          "Debug and resolve full-stack integration bottlenecks, improving database query handling and streamlining endpoints for real-time features."
+        ],
+        "links": []
       },
       {
         "role": "FULL-STACK DEVELOPER",
         "company": "Kingsoft Tech | On-site, Kathmandu",
         "period": "Oct 2025 – Present",
         "description": [
-          "Currently contributing to full-stack development projects using modern web technologies.",
-          "Collaborating with on-site teams to deliver robust software solutions and production-ready applications."
-        ]
+          "Spearheaded full-stack development, optimization, and deployment for Feriaau and its multi-tenant CRM platform.",
+          "Owned the complete lifecycle - modular Python/Django backend services, robust REST APIs, and dynamic React.js/TypeScript interfaces.",
+          "Configured secure production servers and automated CI/CD pipelines, ensuring high availability and seamless code delivery.",
+          "Optimized PostgreSQL/MySQL schemas and queries to maximize application speed and multi-tenant isolation."
+        ],
+        "links": []
       },
       {
         "role": "CREATIVE LEAD",
         "company": "Prime College Graduation Committee | Kathmandu",
-        "period": "2025",
+        "period": "May 2024 – Sep 2024",
         "description": [
-          "Led creative direction and brand guidelines for 625+ attendees.",
-          "Managed cross-functional teams for visual and marketing materials, coordinating event planning and execution."
+          "Led creative direction and brand guidelines for 625+ attendees, coordinating event planning and execution.",
+          "Managed cross-functional teams for visual and marketing materials, practicing agile task delegation."
+        ],
+        "links": []
+      }
+    ],
+    "research": [
+      {
+        "role": "Lead Researcher & First Author",
+        "period": "2024 – 2025",
+        "status": "Submitted for peer review",
+        "citation": "Sigdel, A., Thapa, S., Thapa Magar, B., & Gajurel, R.K. \"Cascaded AI Task Decomposition: A Generalizable Framework for Multi-Stage Computer Vision Pipelines Validated on Automated Number Plate Recognition for Nepali License Plates.\"",
+        "title": "Cascaded AI Task Decomposition (CATD)",
+        "summary": "A generalizable design pattern for multi-stage computer vision pipelines, validated on bi-scriptual Nepali license-plate recognition.",
+        "highlights": [
+          "Formalized the CATD framework as a generalizable design pattern for multi-stage CV pipelines with applications beyond ANPR.",
+          "Achieved 97.9% mAP50 plate localization and 98.9% mAP50 character recognition using custom-trained YOLOv11n and RT-DETR Base on 61-class bi-scriptual Nepali plates.",
+          "Built a two-dimensional cross-domain training strategy (1,380 Nepali + 1,127 Indian plates) enabling compositional zero-shot transfer (+24.5 pp improvement).",
+          "Engineered a three-stage cascaded pipeline (YOLOv8n → YOLOv11n → RT-DETR) reaching 90.4% end-to-end precision with 61%–73% compute reduction via intelligent vehicle gating.",
+          "Integrated the system as the computer-vision backbone of a smart-parking platform handling automated billing and real-time traffic analytics."
+        ],
+        "links": [
+          { "label": "GitHub", "url": "https://github.com/Agrim-Sigdel/CATD" },
+          { "label": "View Paper", "url": "/CATD-Submission.pdf" },
+          { "label": "Download Paper", "url": "/CATD-Submission.pdf", "download": true }
         ]
       }
     ],
     "projects": [
       {
         "id": 1,
-        "title": "ANPR System",
-        "category": "AI & Full-Stack",
-        "description": "Highly optimized YOLOv8 backend with a modern React/TypeScript frontend for Nepali plate recognition.",
-        "outcome": "Achieved 30 FPS live processing with custom recognition logic."
+        "title": "Feriaau",
+        "category": "Full-Stack · Web Platform",
+        "description": "Lead full-stack engineer for Feriaau - a production web platform built on a modular Python/Django backend with a dynamic React.js/TypeScript frontend, deployed on secure servers with automated CI/CD.",
+        "outcome": "Shipped and maintained in production with high availability and a streamlined release pipeline.",
+        "links": [
+          { "label": "Live Site", "url": "https://feriaau.com" }
+        ],
+        "color": "#141414"
       },
       {
         "id": 2,
-        "title": "Parking Management System",
-        "category": "Automation",
-        "description": "End-to-end automatic parking system utilizing custom ANPR for real-time verification and access control.",
-        "outcome": "Significantly reduced manual verification time."
+        "title": "Feriaau CRM",
+        "category": "Full-Stack · Multi-Tenant SaaS",
+        "description": "Multi-tenant CRM platform powering Feriaau's operations - robust REST APIs, optimized PostgreSQL/MySQL schemas, and strict tenant isolation across the data layer.",
+        "outcome": "Maximized application speed and secure multi-tenant isolation for concurrent organizations.",
+        "links": [
+          { "label": "Live Site", "url": "https://crm.feriaau.com" }
+        ],
+        "color": "#0f0f0f"
       },
       {
         "id": 3,
+        "title": "Feriaau App",
+        "category": "Mobile · Flutter",
+        "description": "Contributor to the Feriaau mobile app - a cross-platform Flutter application for Feriaau users, sharing backend services and REST APIs with the web platform.",
+        "outcome": "Published on the Google Play Store and Apple App Store for iOS and Android.",
+        "links": [
+          { "label": "Play Store", "url": "https://play.google.com/store/apps/details?id=com.kingsoft.feriaau&pcampaignid=web_share" },
+          { "label": "App Store", "url": "https://apps.apple.com/np/app/feriaau/id6764230718" }
+        ],
+        "color": "#161616"
+      },
+      {
+        "id": 4,
+        "title": "ContractorOps AI App",
+        "category": "Mobile · AI · React Native",
+        "status": "In Development",
+        "description": "High-performance mobile application built with React Native and TypeScript for Contractor Ops AI, with refactored low-latency backend REST APIs and strict component state-management practices.",
+        "outcome": "Currently building the app: streamlining real-time application features and resolving full-stack integration bottlenecks across the stack.",
+        "links": [],
+        "color": "#101010"
+      },
+      {
+        "id": 5,
+        "title": "ANPR + Smart Parking System",
+        "category": "AI · Computer Vision",
+        "description": "Three-stage cascaded computer-vision pipeline (YOLOv8n → YOLOv11n → RT-DETR) for bi-scriptual Nepali plate recognition, serving as the backbone of an automated smart-parking platform.",
+        "outcome": "90.4% end-to-end precision with 61%–73% compute reduction; powers automated billing and real-time traffic analytics.",
+        "links": [
+          { "label": "GitHub", "url": "https://github.com/Agrim-Sigdel/ANPR-Parking/" },
+          { "label": "Test the Workflow", "url": "https://app.roboflow.com/workflows/embed/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ3b3JrZmxvd0lkIjoiTzZkaGFoSDIxTE83d0pwd0NqYmUiLCJ3b3Jrc3BhY2VJZCI6Im5UNzFtMmtJRzZXSFYxc3BMUlhKM2t3WmRRMTIiLCJ1c2VySWQiOiJuVDcxbTJrSUc2V0hWMXNwTFJYSjNrd1pkUTEyIiwiaWF0IjoxNzgxNjAyOTU1fQ.fqIJd1S66XN4rD7W6cV62nW8MTFP3Eugefpgr9JQtgc" }
+        ],
+        "color": "#151515"
+      },
+      {
+        "id": 6,
         "title": "Reddit Sentiment Analysis",
-        "category": "NLP",
-        "description": "Deep NLP pipeline using fine-tuned BERT for nuanced emotion classification on large-scale Reddit data.",
-        "outcome": "Practiced advanced prompt engineering and LLM-based interfaces."
+        "category": "NLP · Deep Learning",
+        "description": "Deep NLP pipeline using fine-tuned BERT for nuanced emotion classification on large-scale Reddit data, integrated with LLM-based frontend interfaces.",
+        "outcome": "Nuanced multi-class emotion classification with advanced prompt-engineering integration.",
+        "links": [
+          { "label": "GitHub", "url": "https://github.com/Agrim-Sigdel/Sentiment-Analysis" }
+        ],
+        "color": "#0d0d0d"
+      },
+      {
+        "id": 7,
+        "title": "easy-3dkit",
+        "category": "Open Source · NPM Package",
+        "description": "Creator and maintainer of an open-source library of interactive 3D components for React, built natively on Three.js, React Three Fiber (R3F), and GSAP.",
+        "outcome": "Drop-in scroll-reactive surfaces, particle fields, instanced layouts, and post-processing - lightweight and production-ready.",
+        "links": [
+          { "label": "NPM", "url": "https://www.npmjs.com/package/easy-3dkit" },
+          { "label": "Live Docs", "url": "https://3d-kit.netlify.app" }
+        ],
+        "color": "#111"
       }
     ],
     "skills": {
       "categories": [
         {
-          "name": "Core",
+          "name": "Frontend",
           "items": [
-            "TypeScript / React",
-            "Python / Django",
-            "Next.js / Tailwind",
+            "React.js",
+            "React Native",
+            "TypeScript",
+            "Next.js",
+            "Tailwind CSS",
+            "Framer Motion"
+          ]
+        },
+        {
+          "name": "Backend",
+          "items": [
+            "Python",
+            "Django",
+            "Django REST (DRF)",
             "REST API Design"
           ]
         },
@@ -98,38 +199,40 @@
           "name": "AI & CV",
           "items": [
             "Computer Vision",
+            "YOLO / RT-DETR",
             "NLP / Transformers",
             "PyTorch",
-            "YOLOv8"
+            "BERT"
           ]
         },
         {
-          "name": "Data & Infra",
+          "name": "Data & DevOps",
           "items": [
             "PostgreSQL / MySQL",
             "Docker",
-            "Git"
-          ]
-        },
-        {
-          "name": "Leadership",
-          "items": [
-            "Creative Leadership",
-            "Cross-functional Collaboration"
+            "CI/CD Pipelines",
+            "Git / GitHub / GitLab",
+            "Server Configuration"
           ]
         }
       ],
       "flatList": [
         "TypeScript",
         "React",
+        "React Native",
+        "Next.js",
+        "Tailwind",
         "Python",
         "Django",
+        "DRF",
         "Computer Vision",
-        "NLP",
+        "YOLO / RT-DETR",
+        "NLP / BERT",
         "PyTorch",
-        "YOLOv8",
         "PostgreSQL",
+        "MySQL",
         "Docker",
+        "CI/CD",
         "Git"
       ]
     }
@@ -159,6 +262,7 @@
         "  start             Return to mode selection screen",
         "",
         "  about             View professional summary",
+        "  research          View research & publications",
         "  projects          View project portfolio",
         "  experience        View work experience",
         "  skills            View technical skills",

@@ -4,13 +4,15 @@ import Navbar from '../../widgets/header/Navbar';
 import Hero from './sections/Hero';
 import About from './sections/About';
 import WorkGrid from './sections/WorkGrid';
+import Experience from './sections/Experience';
+import Research from './sections/Research';
 import Process from './sections/Process';
 import Footer from './sections/Footer';
 import TickerSection from './sections/TickerSection';
 import CustomCursor from '../../shared/ui/CustomCursor';
 import SnakeBackground from '../../shared/ui/SnakeBackground';
 import ReturnToStartButton from '../../shared/ui/ReturnToStartButton';
-import ThemeToggle from '../../shared/ui/ThemeToggle';
+import { ScrollContainerContext } from './ScrollContainerContext';
 import './funMode.css'; // Add a CSS file reference if needed, assuming it's loaded globally usually
 
 // A component that wraps its children in a mouse-responsive 3D tilt
@@ -72,7 +74,9 @@ const TiltPresentationWrapper = ({ children }) => {
                 }}
                 className="fun-mode-tilted-content"
             >
-                {children}
+                <ScrollContainerContext.Provider value={containerRef}>
+                    {children}
+                </ScrollContainerContext.Provider>
             </motion.div>
         </div>
     );
@@ -103,6 +107,8 @@ const FunModePage = ({ onResetMode, onSwitchMode }) => {
                         <About />
                         <TickerSection />
                         <WorkGrid />
+                        <Experience />
+                        <Research />
                         <Process />
                         <Footer onResetMode={onResetMode} />
                     </motion.div>

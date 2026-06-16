@@ -1,51 +1,28 @@
-// Portfolio data entity - contains domain business logic and constants
-export const projectsData = [
-  {
-    id: 1,
-    title: "ANPR System",
-    category: "AI & Full-Stack",
-    pitch:
-      "Highly optimized YOLOv8 backend with a modern React/TypeScript frontend for Nepali plate recognition.",
-    outcome: "30 FPS live processing with custom Devanagari recognition logic.",
-    color: "#111",
-  },
-  {
-    id: 2,
-    title: "Parking Management",
-    category: "Automation & Backend",
-    pitch:
-      "End-to-end automatic parking system utilizing custom ANPR for real-time verification and access control.",
-    outcome:
-      "Automated gate entry/exit reducing manual verification significantly.",
-    color: "#151515",
-  },
-  {
-    id: 3,
-    title: "Reddit Sentiment Analysis",
-    category: "NLP / Deep Learning",
-    pitch:
-      "Deep NLP pipeline using fine-tuned BERT for nuanced emotion classification on large-scale Reddit data.",
-    outcome: "Practiced advanced prompt engineering and LLM-based interfaces.",
-    color: "#0d0d0d",
-  },
-];
+// Portfolio data entity - derived from the single source of truth (content.json).
+// Do NOT hardcode portfolio facts here; edit src/data/content.json instead.
+import content from "../../../data/content.json";
 
-export const skillsData = [
-  "TypeScript",
-  "React",
-  "Next.js",
-  "TailwindCSS",
-  "Python",
-  "PyTorch",
-  "YOLOv8",
-  "RT-DETR",
-  "BERT",
-  "MySQL",
-  "REST APIs",
-  "Git/GitHub",
-  "Figma",
-];
+const { common } = content;
 
+// Map canonical projects to the shape the fun-mode WorkGrid expects.
+export const projectsData = common.projects.map((p) => ({
+  id: p.id,
+  title: p.title,
+  category: p.category,
+  status: p.status || null,
+  pitch: p.description,
+  outcome: p.outcome,
+  links: p.links || [],
+  color: p.color || "#111",
+}));
+
+// Research entries (CATD framework, publications).
+export const researchData = common.research || [];
+
+// Flat skills list for compact displays.
+export const skillsData = common.skills.flatList;
+
+// "Method" / process steps - presentation copy, not CV facts, so it lives here.
 export const processSteps = [
   {
     id: 1,
@@ -56,7 +33,7 @@ export const processSteps = [
   {
     id: 2,
     title: "Execute",
-    desc: "Fast iterations and clean code/design. I focus on building robust foundations that can scale and adapt.",
+    desc: "Fast iterations and clean code. I focus on building robust foundations that can scale and adapt.",
     icon: "02",
   },
   {

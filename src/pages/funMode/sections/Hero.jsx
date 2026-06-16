@@ -2,12 +2,15 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import Squiggle from '../../../shared/ui/Squiggle';
 import content from '../../../data/content.json';
+import { useScrollContainerRef } from '../ScrollContainerContext';
 
 const Hero = () => {
     const sectionRef = useRef(null);
+    const scrollContainer = useScrollContainerRef();
     const { hero, common } = { hero: content.funMode.hero, common: content.common };
     const { scrollYProgress } = useScroll({
         target: sectionRef,
+        container: scrollContainer || undefined,
         offset: ["start start", "end start"]
     });
 

@@ -1,11 +1,14 @@
 import React, { useRef } from 'react';
 import { useScroll, useTransform } from 'framer-motion';
 import Ticker from '../../../widgets/header/Ticker';
+import { useScrollContainerRef } from '../ScrollContainerContext';
 
 const TickerSection = () => {
     const containerRef = useRef(null);
+    const scrollContainer = useScrollContainerRef();
     const { scrollYProgress } = useScroll({
         target: containerRef,
+        container: scrollContainer || undefined,
         offset: ["start end", "end start"]
     });
 

@@ -209,3 +209,16 @@ section {
 .logo {
   flex-shrink: 0;
 }
+
+/* Download button spinner + busy state */
+@keyframes db-spin {
+  to { transform: rotate(360deg); }
+}
+.db-spin {
+  animation: db-spin 0.8s linear infinite;
+}
+.is-busy {
+  pointer-events: none;
+  opacity: 0.85;
+  cursor: default;
+}

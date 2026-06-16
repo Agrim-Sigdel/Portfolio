@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 import './ModeSelector.css';
 
 export default function ModeSelector({ onSelectMode }) {
-  const [selectedModule, setSelectedModule] = useState(null);
-
   const handleSelect = (mode) => {
-    setSelectedModule(mode);
     setTimeout(() => {
       onSelectMode(mode);
     }, 800);
@@ -19,11 +16,6 @@ export default function ModeSelector({ onSelectMode }) {
       <header className="ms-header">
          <h1>AGRIM SIGDEL</h1>
          <p>SELECT AN EXPERIENCE</p>
-         <div className="ms-construction-badge">
-           <span className="ms-construction-icon">🚧</span>
-           <span className="ms-construction-text">WEBSITE UNDER CONSTRUCTION</span>
-           <span className="ms-construction-icon">🚧</span>
-         </div>
       </header>
 
       {/* Main 3D Container using CSS transforms */}
@@ -67,7 +59,7 @@ export default function ModeSelector({ onSelectMode }) {
                  <div className="ms-shoulders"></div>
                </div>
 
-               <div className="ms-label">NORMAL MODE</div>
+               <div className="ms-label">SEE CV</div>
             </motion.div>
 
             {/* FUN MODE CARD */}
@@ -97,7 +89,7 @@ export default function ModeSelector({ onSelectMode }) {
                  <div className="ms-play-triangle">▶</div>
                </div>
 
-               <div className="ms-label">FUN MODE</div>
+               <div className="ms-label">SMOOTH</div>
             </motion.div>
 
             {/* WORK MODE CARD */}
@@ -114,31 +106,12 @@ export default function ModeSelector({ onSelectMode }) {
 
                <div className="ms-question-mark">?</div>
 
-               <div className="ms-label">WORK MODE</div>
+               <div className="ms-label">FOR DEVELOPERS</div>
             </motion.div>
 
           </div>
         </motion.div>
       </div>
-
-      <AnimatePresence>
-        {selectedModule && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="ms-transition-overlay"
-          >
-            <motion.div
-               initial={{ scale: 0.8, opacity: 0 }}
-               animate={{ scale: 1, opacity: 1 }}
-               className="ms-transition-text"
-            >
-               INITIALIZING {selectedModule.toUpperCase()}...
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
     </div>
   );

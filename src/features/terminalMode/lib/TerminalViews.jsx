@@ -1,73 +1,207 @@
 import content from '../../../data/content.json';
+import { COMMANDS } from './CommandParser';
 
 const { common, terminalMode } = content;
+const DIVIDER = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
 
-// Terminal view content generators
-export const getWelcomeView = () => {
-  return `
+/*
+ * The "filesystem" exposed by `ls` / `cat` / `tree`.
+ * key = lookup token (also the bare filename minus extension)
+ *   name    = how it appears in `ls`
+ *   label   = dimmed description column
+ *   section = which view `cat`/`cd` opens
+ */
+export const FILES = {
+  about:      { name: 'about.md',       label: 'professional summary',  section: 'about' },
+  research:   { name: 'research.pdf',   label: 'publications',          section: 'research' },
+  projects:   { name: 'projects/',      label: 'portfolio of work',     section: 'projects' },
+  experience: { name: 'experience.log', label: 'career history',        section: 'experience' },
+  skills:     { name: 'skills.json',    label: 'technical toolkit',     section: 'skills' },
+  contact:    { name: 'contact.vcf',    label: 'get in touch',          section: 'contact' },
+};
+
+// Simple word-wrap so long lines stay inside the terminal frame.
+const wrap = (text, width = 66, indent = '    ') => {
+  const words = String(text).split(/\s+/);
+  const lines = [];
+  let line = '';
+  for (const word of words) {
+    if ((line + word).length > width) {
+      lines.push(line.trimEnd());
+      line = '';
+    }
+    line += word + ' ';
+  }
+  if (line.trim()) lines.push(line.trimEnd());
+  return lines.map((l) => indent + l).join('\n');
+};
+
+// Terminal view content generators - all derived from content.json.
+export const getWelcomeView = () => `
 ${terminalMode.welcome.border.replace('{name}', common.personal.name)}
 
 ${common.personal.tagline}
 
-${terminalMode.welcome.helpHint}
+Type 'help' for commands, 'ls' to list sections, or a number 1-6 to jump in.
 
 `;
-};
 
+/* ─── Help (Claude-CLI style, generated from the command registry) ─── */
 export const getHelpView = () => {
-  return `
-${terminalMode.help.header}
+  const GROUP_ORDER = ['Navigation', 'Portfolio', 'System', 'Mode'];
+  const grouped = {};
+  for (const cmd of COMMANDS) {
+    if (!cmd.group) continue; // hidden commands (e.g. sudo)
+    (grouped[cmd.group] ||= []).push(cmd);
+  }
 
-${terminalMode.help.commands.join('\n')}
-  
-${terminalMode.help.modeSwitching.join('\n')}
-  
-${terminalMode.help.footer}
+  // Build the "name <args>" usage column and pad everything to align descriptions.
+  const usage = (c) => `${c.name}${c.args ? ' ' + c.args : ''}`;
+  const pad = Math.max(
+    ...COMMANDS.filter((c) => c.group).map((c) => usage(c).length)
+  ) + 4;
+
+  const body = GROUP_ORDER
+    .filter((g) => grouped[g])
+    .map((g) => {
+      const rows = grouped[g]
+        .map((c) => `  ${usage(c).padEnd(pad)}${c.description}`)
+        .join('\n');
+      return `${g}\n${rows}`;
+    })
+    .join('\n\n');
+
+  return `
+Agrim's Portfolio Terminal — interactive CV
+
+Usage:  <command> [args]    ·    type a section name or its number (1-6)
+
+${body}
+
+${DIVIDER}
+Tips:  Tab to autocomplete  ·  ↑ ↓ for history  ·  Ctrl+L to clear  ·  'man <cmd>' for details
 
 `;
 };
 
-export const getMenuView = () => {
+/* ─── Tree view of the fake filesystem ───────────────────────────── */
+export const getTreeView = () => {
+  const entries = Object.values(FILES);
+  const lines = entries
+    .map((f, i) => `${i === entries.length - 1 ? '└──' : '├──'} ${f.name}`)
+    .join('\n');
   return `
+~/portfolio
+${lines}
+
+${entries.length} entries — type 'cat <file>' to read one.
+
+`;
+};
+
+/* ─── man <command> ──────────────────────────────────────────────── */
+export const getManView = (cmd) => `
+NAME
+    ${cmd.name} — ${cmd.description}
+
+SYNOPSIS
+    ${cmd.name}${cmd.args ? ' ' + cmd.args : ''}
+
+${cmd.aliases.length ? `ALIASES\n    ${cmd.aliases.join(', ')}\n` : ''}
+Type 'help' for the full command list.
+
+`;
+
+/* ─── neofetch / whoami ──────────────────────────────────────────── */
+export const getNeofetchView = ({ short = false } = {}) => {
+  const c = common.contact;
+  const info = [
+    `${common.personal.name}@portfolio`,
+    DIVIDER.slice(0, 28),
+    `Role:      ${common.personal.tagline}`,
+    `Location:  ${c.location}`,
+    `Email:     ${c.email}`,
+    `GitHub:    ${c.github}`,
+    `Web:       ${c.website}`,
+    `Shell:     zsh · WORK MODE`,
+    `Stack:     React · TypeScript · Python/Django`,
+  ];
+  if (short) {
+    return `\nagrim\n${wrap(common.personal.shortSummary, 60, '')}\n`;
+  }
+  const art = [
+    '      _____      ',
+    '     /     \\     ',
+    '    | () () |    ',
+    '     \\  ^  /     ',
+    '      |||||      ',
+    '      |||||      ',
+    '                 ',
+    '                 ',
+    '                 ',
+  ];
+  const rows = art.map((a, i) => `${a}  ${info[i] || ''}`).join('\n');
+  return `\n${rows}\n`;
+};
+
+export const getMenuView = () => `
 Main Menu:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${DIVIDER}
 
   [1] About Me          Professional summary and education
-  [2] Projects          Portfolio of work and achievements
-  [3] Experience        Career history and roles
-  [4] Skills            Technical toolkit and expertise
-  [5] Contact           Get in touch
+  [2] Research          Publications and the CATD framework
+  [3] Projects          Portfolio of work and achievements
+  [4] Experience        Career history and roles
+  [5] Skills            Technical toolkit and expertise
+  [6] Contact           Get in touch
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${DIVIDER}
 
 Type the number or section name to navigate.
 Example: '1' or 'about'
 
 `;
-};
 
-export const getAboutView = () => {
-  return `
+export const getAboutView = () => `
 [1] ABOUT ME
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${DIVIDER}
 
 Professional Summary:
-${common.personal.summary}
+${wrap(common.personal.summary, 66, '')}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${DIVIDER}
 
 Education:
-  ${common.education[0].degree} — ${common.education[0].school}
+  ${common.education[0].degree}
+  ${common.education[0].school}
   ${common.education[0].year}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${DIVIDER}
 
-Experience:
-  ${common.experience[0].role} — ${common.experience[0].company}
-  ${common.experience[0].description[0]}
-  ${common.experience[0].description[1]}
+Type 'menu' to return to main menu.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`;
+
+export const getResearchView = () => {
+  const blocks = common.research
+    .map((r) => {
+      const highlights = r.highlights.map((h) => `  • ${h}`).join('\n');
+      return `${r.title} - ${r.role}  (${r.period})
+Status: ${r.status}
+
+${wrap(r.citation, 66, '')}
+
+${highlights}`;
+    })
+    .join(`\n\n${DIVIDER}\n\n`);
+
+  return `
+[2] RESEARCH & PUBLICATIONS
+${DIVIDER}
+
+${blocks}
+
+${DIVIDER}
 
 Type 'menu' to return to main menu.
 
@@ -75,42 +209,28 @@ Type 'menu' to return to main menu.
 };
 
 export const getProjectsView = () => {
+  const blocks = common.projects
+    .map((p, i) => {
+      const links = (p.links || []).length
+        ? `\n    Links: ${p.links.map((l) => `${l.label} → ${l.url}`).join('  |  ')}`
+        : '';
+      return `[${i + 1}] ${p.title}
+    Category: ${p.category}
+
+${wrap(p.description)}
+
+    Outcome:
+${wrap(p.outcome)}${links}`;
+    })
+    .join(`\n\n${DIVIDER}\n\n`);
+
   return `
-[2] PROJECTS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[3] PROJECTS
+${DIVIDER}
 
-[1] ANPR System
-    Category: AI & Full-Stack
-    
-    Highly optimized YOLOv8 backend with a modern React/TypeScript 
-    frontend for Nepali plate recognition.
-    
-    Outcome: 30 FPS live processing with custom Devanagari 
-    recognition logic.
+${blocks}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-[2] Parking Management System
-    Category: Automation & Backend
-    
-    End-to-end automatic parking system utilizing custom ANPR for 
-    real-time verification and access control.
-    
-    Outcome: Automated gate entry/exit reducing manual verification 
-    significantly.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-[3] Reddit Sentiment Analysis
-    Category: NLP / Deep Learning
-    
-    Deep NLP pipeline using fine-tuned BERT for nuanced emotion 
-    classification on large-scale Reddit data.
-    
-    Outcome: Practiced advanced prompt engineering and LLM-based 
-    interfaces.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${DIVIDER}
 
 Type 'menu' to return to main menu.
 
@@ -118,31 +238,27 @@ Type 'menu' to return to main menu.
 };
 
 export const getExperienceView = () => {
+  const blocks = common.experience
+    .map((e) => {
+      const bullets = e.description.map((d) => wrap(`• ${d}`, 66, '  ')).join('\n');
+      const links = (e.links || []).length
+        ? `\n\n  Links: ${e.links.map((l) => l.url).join('  |  ')}`
+        : '';
+      return `${e.role}
+${e.company}
+${e.period}
+
+${bullets}${links}`;
+    })
+    .join(`\n\n${DIVIDER}\n\n`);
+
   return `
-[3] EXPERIENCE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[4] EXPERIENCE
+${DIVIDER}
 
-Creative Lead
-Prime College Graduation Committee
-2024 - 2026
+${blocks}
 
-• Led creative direction and brand guidelines for 625+ attendees
-• Managed cross-functional teams for visual and marketing materials
-• Coordinated event planning and execution
-• Developed comprehensive branding strategy
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Full-Stack Developer & AI Engineer
-Freelance / Personal Projects
-2022 - Present
-
-• Developed production-ready AI applications
-• Built modern web applications with React/TypeScript
-• Implemented Computer Vision and NLP solutions
-• Delivered scalable backend systems
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${DIVIDER}
 
 Type 'menu' to return to main menu.
 
@@ -150,33 +266,20 @@ Type 'menu' to return to main menu.
 };
 
 export const getSkillsView = () => {
+  const blocks = common.skills.categories
+    .map((c) => {
+      const items = c.items.map((i) => `  • ${i}`).join('\n');
+      return `${c.name}:\n${items}`;
+    })
+    .join(`\n\n${DIVIDER}\n\n`);
+
   return `
-[4] SKILLS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[5] SKILLS
+${DIVIDER}
 
-Frontend Development:
-  • TypeScript      • React          • Next.js
-  • TailwindCSS     • Framer Motion  • Vite
+${blocks}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Backend Development:
-  • Python          • Django         • Flask
-  • REST APIs       • MySQL          • PostgreSQL
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-AI & Machine Learning:
-  • PyTorch         • YOLOv8         • RT-DETR
-  • BERT            • TensorFlow     • OpenCV
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Tools & Technologies:
-  • Git/GitHub      • Figma          • Docker
-  • VS Code         • Postman        • Linux
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${DIVIDER}
 
 Type 'menu' to return to main menu.
 
@@ -184,26 +287,23 @@ Type 'menu' to return to main menu.
 };
 
 export const getContactView = () => {
+  const c = common.contact;
   return `
-[5] CONTACT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[6] CONTACT
+${DIVIDER}
 
 Let's connect! I'm always open to discussing new projects,
-creative ideas, or opportunities to be part of your vision.
+research, or opportunities to be part of your vision.
 
-Email:
-  agrim.sigdel@example.com
+Email:     ${c.email}
+Phone:     ${c.phone}
+Location:  ${c.location}
 
-LinkedIn:
-  linkedin.com/in/agrimsigdel
+GitHub:    ${c.github}
+LinkedIn:  ${c.linkedin}
+Portfolio: ${c.website}
 
-GitHub:
-  github.com/agrimsigdel
-
-Portfolio:
-  agrimsigdel.com.np
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${DIVIDER}
 
 Type 'menu' to return to main menu.
 

@@ -1,0 +1,69 @@
+Agrim Sigdel
+Full-Stack Developer | AI Enthusiast
+Kathmandu, Nepal | agrimsigdel.com.np | sigdelagrim35@gmail.com | +977 9869081558
+PROFESSIONAL SUMMARY
+Versatile Full-Stack Developer with a strong foundation in modern AI, engineering production-ready appli-
+cations using React/TypeScript and Python/Django. Adept at building scalable REST APIs, optimizing relational
+databases, and implementing clean architecture principles across web, mobile, and open-source platforms.
+TECHNICAL SKILLS
+• Frontend: React.js, React Native, JavaScript, TypeScript, Next.js, HTML, CSS, Tailwind CSS
+• Backend: Python, Django, Django REST Framework (DRF), REST API Design
+• Database: PostgreSQL, MySQL
+• Tools & DevOps: Git, GitHub, GitLab, Docker, CI/CD Pipelines, Server Configuration, Postman
+• Specialized: Computer Vision (YOLO, RT-DETR), NLP/Transformers, Open-Source Development, Creative Lead-
+ership
+WORK EXPERIENCE
+Software Developer (Full-Stack) Apr 2026 – Present
+Contractor Ops AI | Remote
+• Engineer a high-performance mobile application using React Native and TypeScript, ensuring strict adher-
+ence to component state-management best practices.
+• Refactor and optimize backend REST APIs to ensure seamless compatibility, efficient data serialization, and
+low-latency payloads between server-side systems and client applications.
+• Debug and resolve integration bottlenecks across the full stack, improving database query handling and
+streamlining API endpoints for real-time application features.
+Full-Stack Developer Oct 2025 – Present
+Kingsoft Tech | On-site, Kathmandu
+• Spearheaded full-stack development, optimization, and deployment for Feriaau and its corresponding multi-
+tenant CRM platform (crm.feriaau.com).
+• Owned the complete development lifecycle, engineering modular Python/Django backend services, design-
+ing robust REST APIs, and building dynamic React.js/TypeScript user interfaces.
+• Configured secure production server environments and established automated CI/CD deployment pipelines,
+ensuring high availability, streamlined version control, and seamless code delivery.
+• Optimized relational database schemas and queries in PostgreSQL/MySQL to maximize application speed
+and multi-tenant isolation.
+Creative Lead May 2024 – Sep 2024
+Prime College Graduation Committee | Kathmandu
+• Led creative direction and brand guidelines for 625+ attendees, coordinating event planning and execution.
+• Managed cross-functional teams for visual and marketing materials, practicing agile task delegation.
+RESEARCH & PUBLICATIONS
+Lead Researcher & First Author 2024 – 2025
+Publication: Sigdel, A., Thapa, S., Thapa Magar, B., & Gajurel, R.K. “Cascaded AI Task Decomposition: A Generalizable
+Framework for Multi-Stage Computer Vision Pipelines Validated on Automated Number Plate Recognition for Nepali
+License Plates.” (Submitted for peer review)
+• Formalized the Cascaded AI Task Decomposition (CATD) framework as a generalizable design pattern for
+multi-stage computer vision pipelines with applications beyond ANPR.
+• Achieved 97.9% mAP50 plate localization and 98.9% mAP50 character recognition using custom-trained YOLOv11n
+and RT-DETR Base models on 61-class bi-scriptual Nepali plates.
+• Developed a two-dimensional cross-domain training strategy combining 1,380 Nepali traditional plates with
+1,127 Indian embossed plates to enable compositional zero-shot transfer (+24.5 pp improvement).
+• Built a three-stage cascaded pipeline (YOLOv8n → YOLOv11n → RT-DETR) achieving 90.4% end-to-end preci-
+sion with 61%− 73% compute reduction through intelligent vehicle gating.
+• Integrated the system as the computer vision backbone of a smart parking platform handling automated
+billing and real-time traffic analytics.
+PROJECTS & OPEN SOURCE
+easy-3dkit (NPM Package & Documentation) NPM Link | Live Docs
+• Creator and maintainer of an open-source library providing interactive 3D components for React, built na-
+tively on Three.js, React Three Fiber (R3F), and GSAP.
+• Engineered modular, production-ready assets allowing developers to seamlessly drop scroll-reactive sur-
+faces, particle fields, instanced layouts, and post-processing into any React site or web application.
+• Implemented strict clean code architecture and mathematical optimizations to ensure the package is lightweight,
+highly performant, and developer-friendly.
+Reddit Sentiment Analysis (NLP)
+• Engineered a deep NLP pipeline using fine-tuned BERT for nuanced emotion classification on large-scale
+Reddit data.
+• Practiced advanced prompt engineering and integrated LLM-based interfaces with frontend applications.
+EDUCATION
+BSc. Computer Science and Information Technology (CSIT) Prime College, Tribhuvan University | Kathmandu, Nepal
+REFERENCES
+2022 – April 2026
+Available upon request.

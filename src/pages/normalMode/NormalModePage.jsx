@@ -8,7 +8,7 @@ const NormalModePage = ({ onResetMode }) => {
     return (
         <>
             <SEO
-                title={`${common.personal.name} — Normal Mode`}
+                title={`${common.personal.name} - Normal Mode`}
                 description={common.personal.shortSummary || common.personal.summary}
                 url={`https://agrimsigdel.com.np/normal`}
             />

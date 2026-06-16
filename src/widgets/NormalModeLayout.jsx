@@ -1,20 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { FiArrowLeft, FiExternalLink } from 'react-icons/fi';
 import content from '../data/content.json';
+import DownloadButton from '../shared/ui/DownloadButton';
 import '../styles/normal-mode.css';
-
-const FloatingCard = ({ children, className = '', delay = '0s' }) => {
-  return (
-    <div 
-      className={`flat-floating-card ${className}`} 
-      style={{ animationDelay: delay }}
-    >
-      {children}
-    </div>
-  );
-};
 
 const NormalModeLayout = ({ onResetMode }) => {
   const { common } = content;
+  const { personal, contact, education, experience, research, projects, skills } = common;
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -22,107 +14,174 @@ const NormalModeLayout = ({ onResetMode }) => {
   }, []);
 
   return (
-    <div className={`flat-normal-mode ${mounted ? 'visible' : ''}`}>
-      <button className="flat-return-button" onClick={onResetMode}>
-        ← Back to Start
+    <div className={`cv-mode ${mounted ? 'visible' : ''}`}>
+      <button className="cv-return-button" onClick={onResetMode}>
+        <FiArrowLeft aria-hidden="true" /> Back to Start
       </button>
+      <DownloadButton
+        className="cv-download-button"
+        href="/AgrimSigdel-Resume.pdf"
+        filename="AgrimSigdel-Resume.pdf"
+        idleLabel="Download PDF"
+        loadingLabel="Downloading…"
+        doneLabel="Downloaded"
+      />
 
-      <div className="flat-scroll-container">
-        
-        {/* HEADER BAR (Like top piece in the image) */}
-        <FloatingCard className="flat-header-bar overflow-hidden" delay="0s">
-          <div className="flat-header-inner">
-             <div className="flat-circle"></div>
-             <div className="flat-search-bar">
-               <span style={{fontWeight: 800, color: '#4b5563', letterSpacing: '2px'}}>{common.personal.name.toUpperCase()}</span>
-             </div>
-             <div className="flat-orange-pill">{common.personal.tagline}</div>
+      <article className="cv-paper">
+        {/* ---------- Header ---------- */}
+        <header className="cv-header">
+          <h1 className="cv-name">{personal.name}</h1>
+          <p className="cv-title">{personal.tagline}</p>
+          <div className="cv-contact">
+            <span>{contact.location}</span>
+            <span className="sep">·</span>
+            <a href={`mailto:${contact.email}`}>{contact.email}</a>
+            <span className="sep">·</span>
+            <a href={`tel:${contact.phone.replace(/\s/g, '')}`}>{contact.phone}</a>
+            <span className="sep">·</span>
+            <a href={`https://${contact.website}`} target="_blank" rel="noopener noreferrer">{contact.website}</a>
+            <span className="sep">·</span>
+            <a href={contact.githubUrl} target="_blank" rel="noopener noreferrer">{contact.github}</a>
           </div>
-        </FloatingCard>
+        </header>
 
-        {/* MAIN BODY (Like the bottom large piece in the image) */}
-        <FloatingCard className="flat-main-body" delay="0.2s">
-          <div className="flat-grid-layout">
-            
-            {/* LEFT SIDEBAR (Skills & Contact) */}
-            <div className="flat-sidebar">
-              <div className="flat-sidebar-top-box">
-                 {/* Decorative elements from image */}
-                 {/* <div className="flat-dots">
-                   <span></span><span></span><span></span><span></span>
-                 </div> */}
-                 <div className="flat-image-placeholder">
-                    <h2>ABOUT</h2>
-                 </div>
+        {/* ---------- Summary ---------- */}
+        <section className="cv-section">
+          <h2 className="cv-section-title">Professional Summary</h2>
+          <p className="cv-summary">{personal.summary}</p>
+        </section>
+
+        {/* ---------- Technical Skills ---------- */}
+        <section className="cv-section">
+          <h2 className="cv-section-title">Technical Skills</h2>
+          <div className="cv-skills-grid">
+            {skills.categories.map((cat) => (
+              <div key={cat.name} className="cv-skill-row">
+                <span className="cv-skill-cat">{cat.name}: </span>
+                <span className="cv-skill-items">{cat.items.join(', ')}</span>
               </div>
-
-              <div className="flat-sidebar-btm-box">
-                 <p style={{fontSize: '0.85rem', color: '#4b5563', lineHeight: '1.6'}}>{common.personal.summary}</p>
-                 <div className="flat-sliders">
-                   <div className="flat-slider-track"><div className="flat-slider-thumb"></div></div>
-                   <div className="flat-slider-track"><div className="flat-slider-thumb" style={{left: '70%'}}></div></div>
-                 </div>
-              </div>
-
-              {/* Skills Tags structured like UI blocks */}
-              <div className="flat-sidebar-btm-box" style={{marginTop: '12px'}}>
-                 <div style={{display: 'flex', flexWrap: 'wrap', gap: '6px'}}>
-                    {common.personal.areasOfExpertise.slice(0,6).map(skill => (
-                      <div key={skill} className="flat-skill-pill">{skill}</div>
-                    ))}
-                 </div>
-              </div>
-            </div>
-
-            {/* RIGHT MAIN AREA (Experience & Projects) */}
-            <div className="flat-content">
-              
-              {/* EXPERIENCE BLOCK */}
-              <div className="flat-content-box">
-                 <div className="flat-box-header">
-                   {/* <div className="flat-toggle"><div className="flat-toggle-knob"></div></div> */}
-                   {/* <div className="flat-big-dots"><span></span><span></span><span></span></div>
-                   <div className="flat-small-dots"><span></span><span></span><span></span></div> */}
-                 </div>
-                 <h2 className="flat-section-title">EXPERIENCE</h2>
-                 
-                 {common.experience.map((exp, i) => (
-                   <div key={i} className="flat-list-item">
-                     <div className="flat-orange-block">{exp.role}</div>
-                     <div className="flat-lines-container">
-                       <div className="flat-thick-line">{exp.company}</div>
-                       <div className="flat-thin-line">{exp.period}</div>
-                     </div>
-                   </div>
-                 ))}
-              </div>
-
-              {/* PROJECTS BLOCK */}
-              <div className="flat-content-box">
-                 <div className="flat-box-header">
-                   {/* <div className="flat-toggle"><div className="flat-toggle-knob"></div></div>
-                   <div className="flat-big-dots"><span></span><span></span><span></span></div>
-                   <div className="flat-small-dots"><span></span><span></span><span></span></div> */}
-                 </div>
-                 <h2 className="flat-section-title">PROJECTS</h2>
-
-                 {common.projects.map((proj, i) => (
-                   <div key={i} className="flat-list-item">
-                     <div className="flat-orange-block">{proj.title}</div>
-                     <div className="flat-lines-container">
-                       <div className="flat-thick-line">{proj.category}</div>
-                       <div className="flat-thin-line">{proj.description}</div>
-                     </div>
-                   </div>
-                 ))}
-              </div>
-
-            </div>
-
+            ))}
           </div>
-        </FloatingCard>
+        </section>
 
-      </div>
+        {/* ---------- Experience ---------- */}
+        <section className="cv-section">
+          <h2 className="cv-section-title">Work Experience</h2>
+          {experience.map((exp, i) => (
+            <div key={i} className="cv-entry">
+              <div className="cv-entry-head">
+                <h3 className="cv-entry-role">{exp.role}</h3>
+                <span className="cv-entry-period">{exp.period}</span>
+              </div>
+              <p className="cv-entry-company">{exp.company}</p>
+              <ul className="cv-bullets">
+                {exp.description.map((d, di) => (
+                  <li key={di}>{d}</li>
+                ))}
+              </ul>
+              {exp.links && exp.links.length > 0 && (
+                <div className="cv-entry-links">
+                  {exp.links.map((link, li) => (
+                    <a key={li} href={link.url} target="_blank" rel="noopener noreferrer">
+                      {link.label} <FiExternalLink aria-hidden="true" />
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </section>
+
+        {/* ---------- Research & Publications ---------- */}
+        {research && research.length > 0 && (
+          <section className="cv-section">
+            <h2 className="cv-section-title">Research &amp; Publications</h2>
+            {research.map((r, i) => (
+              <div key={i} className="cv-entry">
+                <div className="cv-entry-head">
+                  <h3 className="cv-entry-role">{r.title}</h3>
+                  <span className="cv-pill">{r.status}</span>
+                </div>
+                <p className="cv-entry-company">{r.role} · {r.period}</p>
+                <p className="cv-citation">{r.citation}</p>
+                <ul className="cv-bullets">
+                  {r.highlights.map((h, hi) => (
+                    <li key={hi}>{h}</li>
+                  ))}
+                </ul>
+                {r.links && r.links.length > 0 && (
+                  <div className="cv-entry-links">
+                    {r.links.map((link, li) =>
+                      link.download ? (
+                        <DownloadButton
+                          key={li}
+                          href={link.url}
+                          filename={link.url.split('/').pop()}
+                          idleLabel={link.label}
+                          loadingLabel="Downloading…"
+                          doneLabel="Downloaded"
+                        />
+                      ) : (
+                        <a
+                          key={li}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {link.label} <FiExternalLink aria-hidden="true" />
+                        </a>
+                      )
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </section>
+        )}
+
+        {/* ---------- Projects ---------- */}
+        <section className="cv-section">
+          <h2 className="cv-section-title">Projects &amp; Open Source</h2>
+          {projects.map((proj, i) => (
+            <div key={i} className="cv-entry">
+              <div className="cv-entry-head">
+                <h3 className="cv-entry-role">
+                  {proj.title}
+                  {proj.status && <span className="cv-pill" style={{ marginLeft: '10px' }}>{proj.status}</span>}
+                </h3>
+                <span className="cv-entry-period">{proj.category}</span>
+              </div>
+              <ul className="cv-bullets">
+                <li>{proj.description}</li>
+                <li>{proj.outcome}</li>
+              </ul>
+              {proj.links && proj.links.length > 0 && (
+                <div className="cv-entry-links">
+                  {proj.links.map((link, li) => (
+                    <a key={li} href={link.url} target="_blank" rel="noopener noreferrer">
+                      {link.label} <FiExternalLink aria-hidden="true" />
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </section>
+
+        {/* ---------- Education ---------- */}
+        <section className="cv-section">
+          <h2 className="cv-section-title">Education</h2>
+          {education.map((edu, i) => (
+            <div key={i} className="cv-entry">
+              <div className="cv-entry-head">
+                <p className="cv-edu-degree">{edu.degree}</p>
+                <span className="cv-entry-period">{edu.year}</span>
+              </div>
+              <p className="cv-edu-meta">{edu.school}</p>
+            </div>
+          ))}
+        </section>
+      </article>
     </div>
   );
 };

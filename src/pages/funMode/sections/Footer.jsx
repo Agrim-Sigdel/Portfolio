@@ -33,7 +33,8 @@ const Footer = ({ onResetMode }) => {
                             marginBottom: '4rem',
                             lineHeight: 1.1,
                             maxWidth: '900px',
-                            margin: '0 auto 4rem'
+                            margin: '0 auto 4rem',
+                            color: '#f5f0e8'
                         }}
                     >
                         Have a project in mind? <br /> <span className="text-accent" style={{ fontStyle: 'italic' }}>Let's make it happen.</span>
@@ -68,7 +69,7 @@ const Footer = ({ onResetMode }) => {
                 </button>
 
                 <div style={{ marginTop: '4rem', paddingTop: '4rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
-                    <p style={{ opacity: 0.5, fontSize: '0.9rem' }}>
+                    <p style={{ opacity: 0.5, fontSize: '0.9rem', color: '#f5f0e8' }}>
                         © 2026 Agrim Sigdel. All rights reserved.
                     </p>
                 </div>

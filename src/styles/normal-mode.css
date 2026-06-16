@@ -1,230 +1,302 @@
-/* Flat UI Floating Styling (Image Match) */
-.flat-normal-mode {
+/* ===========================================================
+   Normal Mode - Clean document résumé ("SEE CV")
+   Paper-like, recruiter-friendly, print-ready.
+   =========================================================== */
+
+.cv-mode {
   width: 100vw;
   min-height: 100vh;
-  background-color: #838383; /* Matching dark grey background */
+  background: #e9e9ec;
   overflow-y: auto;
   overflow-x: hidden;
   position: absolute;
   top: 0;
   left: 0;
   font-family: 'Inter', system-ui, sans-serif;
+  color: #1a1a1a;
   opacity: 0;
   transition: opacity 0.4s ease;
-  padding: 80px 20px;
+  padding: 80px 20px 60px;
   display: flex;
   justify-content: center;
 }
 
-.flat-normal-mode.visible {
+.cv-mode.visible {
   opacity: 1;
 }
 
-.flat-return-button {
+/* Floating top-left back button */
+.cv-return-button {
   position: fixed;
   top: 24px;
   left: 24px;
-  padding: 12px 24px;
-  background: #c3c3c3;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 20px;
+  background: #1a1a1a;
   border: none;
-  border-radius: 12px;
-  font-weight: 700;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
   cursor: pointer;
   z-index: 1000;
-  color: #374151;
-  transition: transform 0.2s;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  color: #fff;
+  transition: transform 0.2s ease, background 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
 }
-
-.flat-return-button:hover {
+.cv-return-button:hover {
   transform: translateY(-2px);
+  background: #000;
 }
 
-.flat-scroll-container {
-  max-width: 900px;
+.cv-download-button {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 22px;
+  background: #1a1a1a;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  z-index: 1000;
+  color: #fff;
+  text-decoration: none;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+.cv-download-button:hover {
+  transform: translateY(-2px);
+  background: #000;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+/* The "paper" sheet */
+.cv-paper {
+  background: #fff;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  max-width: 820px;
+  border-radius: 6px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+  padding: 60px 64px;
 }
 
-/* Base floating card */
-.flat-floating-card {
-  background: #c3c3c3; /* Light matte grey */
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 16px 40px rgba(0,0,0,0.15); /* Strong drop shadow for float effect */
-  animation: float-anim 6s ease-in-out infinite;
+/* ---------- Header ---------- */
+.cv-header {
+  text-align: center;
+  padding-bottom: 22px;
+  border-bottom: 2px solid #1a1a1a;
+  margin-bottom: 28px;
 }
-
-@keyframes float-anim {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
-}
-
-/* Header Bar Area */
-.flat-header-bar {
-  border-radius: 24px;
-}
-.flat-header-inner {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-.flat-circle {
-  width: 32px;
-  height: 32px;
-  background: #a3a3a3;
-  border-radius: 50%;
-}
-.flat-search-bar {
-  flex-grow: 1;
-  background: #a3a3a3;
-  border-radius: 12px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-}
-.flat-orange-pill {
-  background: #db6b42;
-  color: white;
+.cv-name {
+  font-size: 2.4rem;
   font-weight: 800;
-  border-radius: 12px;
-  padding: 12px 24px;
+  letter-spacing: -0.02em;
+  margin: 0;
+  line-height: 1.05;
+}
+.cv-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #db5a34;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin: 10px 0 14px;
+}
+.cv-contact {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  font-size: 0.82rem;
+  color: #444;
+}
+.cv-contact a {
+  color: #444;
+  text-decoration: none;
+}
+.cv-contact a:hover {
+  color: #db5a34;
+  text-decoration: underline;
+}
+.cv-contact .sep {
+  color: #bbb;
+}
+
+/* ---------- Sections ----------
+   Note: a global `section { padding: 8rem 0 }` exists in index.css.
+   We reset it here so the CV stays a tight document. */
+.cv-section {
+  padding: 0;
+  margin-top: 28px;
+}
+.cv-section-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #1a1a1a;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #d8d8d8;
+  margin: 0 0 16px;
+}
+
+.cv-summary {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: #333;
+  margin: 0;
+}
+
+/* Entry (experience / research / project) */
+.cv-entry {
+  margin-bottom: 22px;
+}
+.cv-entry:last-child {
+  margin-bottom: 0;
+}
+.cv-entry-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.cv-entry-role {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+}
+.cv-entry-period {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #888;
   white-space: nowrap;
 }
-
-/* Main Body Area */
-.flat-main-body {
-  border-radius: 24px;
+.cv-entry-company {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #db5a34;
+  margin: 2px 0 8px;
+}
+.cv-bullets {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+.cv-bullets li {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: #333;
+  margin-bottom: 5px;
+}
+.cv-entry-links {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.cv-entry-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #db5a34;
+  text-decoration: none;
+}
+.cv-entry-links a:hover {
+  text-decoration: underline;
 }
 
-.flat-grid-layout {
+/* Status pill (research) */
+.cv-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #db5a34;
+  border: 1px solid rgba(219, 90, 52, 0.4);
+  border-radius: 999px;
+  padding: 2px 10px;
+  white-space: nowrap;
+}
+.cv-citation {
+  font-size: 0.82rem;
+  font-style: italic;
+  color: #666;
+  line-height: 1.5;
+  margin: 8px 0;
+}
+
+/* ---------- Skills ---------- */
+.cv-skills-grid {
   display: grid;
-  grid-template-columns: 3fr 7fr;
-  gap: 20px;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 32px;
+}
+.cv-skill-row {
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+.cv-skill-cat {
+  font-weight: 700;
+  color: #1a1a1a;
+}
+.cv-skill-items {
+  color: #444;
 }
 
-@media (max-width: 768px) {
-  .flat-grid-layout {
+/* ---------- Education ---------- */
+.cv-edu-degree {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0;
+}
+.cv-edu-meta {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 3px 0 0;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 680px) {
+  .cv-mode {
+    padding: 72px 12px 40px;
+  }
+  .cv-paper {
+    padding: 36px 24px;
+  }
+  .cv-name {
+    font-size: 1.8rem;
+  }
+  .cv-skills-grid {
     grid-template-columns: 1fr;
+  }
+  .cv-download-button,
+  .cv-return-button {
+    padding: 8px 14px;
+    font-size: 0.78rem;
   }
 }
 
-/* Subtle inner grey boxes */
-.flat-sidebar-top-box, .flat-sidebar-btm-box, .flat-content-box {
-  background: #a3a3a3; /* darker embedded grey */
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-.flat-content-box { margin-bottom: 20px; }
-.flat-content-box:last-child { margin-bottom: 0; }
-
-.flat-dots {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-.flat-dots span {
-  display: block;
-  width: 12px; height: 12px;
-  background: #8b8b8b;
-  border-radius: 4px;
-}
-
-.flat-image-placeholder {
-  background: #8b8b8b;
-  height: 120px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.flat-image-placeholder h2 {
-  color: #c3c3c3;
-  font-size: 1.2rem;
-  letter-spacing: 2px;
-}
-
-/* Sliders from image */
-.flat-sliders { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
-.flat-slider-track { height: 12px; background: #8b8b8b; border-radius: 6px; position: relative; }
-.flat-slider-thumb { position: absolute; width: 24px; height: 18px; background: #c3c3c3; top: -3px; left: 10%; border-radius: 4px; }
-
-/* Content Headers */
-.flat-box-header { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; }
-.flat-toggle { width: 50px; height: 24px; background: #8b8b8b; border-radius: 12px; position: relative; }
-.flat-toggle-knob { width: 16px; height: 16px; background: #c3c3c3; position: absolute; top: 4px; right: 4px; border-radius: 50%; }
-
-.flat-big-dots { display: flex; gap: 8px; }
-.flat-big-dots span { width: 16px; height: 16px; background: #c3c3c3; border-radius: 50%; }
-
-.flat-small-dots { display: flex; gap: 4px; margin-left: auto; }
-.flat-small-dots span { width: 8px; height: 8px; background: #8b8b8b; border-radius: 2px; }
-
-/* Customizing Lists */
-.flat-section-title {
-  font-size: 0.9rem;
-  color: #db6b42;
-  font-weight: 800;
-  letter-spacing: 1px;
-  margin-bottom: 20px;
-}
-
-.flat-list-item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.flat-orange-block {
-  background: #db6b42;
-  color: white;
-  font-size: 0.75rem;
-  font-weight: 800;
-  padding: 12px;
-  border-radius: 8px;
-  width: 120px;
-  text-align: center;
-}
-
-.flat-lines-container {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.flat-thick-line {
-  background: #8b8b8b;
-  color: #e5e5e5;
-  font-weight: 700;
-  font-size: 0.9rem;
-  padding: 8px 12px;
-  border-radius: 6px;
-  width: 90%;
-}
-
-.flat-thin-line {
-  background: transparent;
-  border: 2px solid #8b8b8b;
-  color: #4b5563;
-  font-size: 0.85rem;
-  padding: 6px 12px;
-  border-radius: 6px;
-  width: 100%;
-}
-
-.flat-skill-pill {
-  background: #c3c3c3;
-  color: #374151;
-  font-size: 0.75rem;
-  font-weight: 800;
-  padding: 6px 10px;
-  border-radius: 8px;
+/* ---------- Print ---------- */
+@media print {
+  .cv-return-button,
+  .cv-download-button {
+    display: none;
+  }
+  .cv-mode {
+    background: #fff;
+    padding: 0;
+  }
+  .cv-paper {
+    box-shadow: none;
+    max-width: 100%;
+    padding: 0;
+  }
 }
