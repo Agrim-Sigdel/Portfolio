@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useTheme } from './shared/lib/ThemeContext';
 import ModeSelector from './features/modeSelection/ui/ModeSelector';
-import Preloader from './shared/ui/Preloader';
 import Terminal from './features/terminalMode/ui/Terminal';
 import FunModePage from './pages/funMode/FunModePage';
 import NormalModePage from './pages/normalMode/NormalModePage';
@@ -12,13 +11,11 @@ import './App.css';
 function App() {
   const { theme } = useTheme();
   const [selectedMode, setSelectedMode] = useState(null); // null, 'fun', 'work', or 'normal'
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPreloader, setShowPreloader] = useState(false);
 
-  // Handle Theme Application based on Mode
+  // Apply the theme for the active mode.
   useEffect(() => {
     const root = document.documentElement;
-    
+
     if (selectedMode === 'fun') {
       // Fun mode respects user preference (light/dark)
       root.setAttribute('data-theme', theme);
@@ -29,49 +26,25 @@ function App() {
       // Normal mode is always light
       root.setAttribute('data-theme', 'light');
     } else {
-      // Start page (null) defaults to light
-      root.setAttribute('data-theme', 'light');
+      // Start page (null) defaults to dark deep-space
+      root.setAttribute('data-theme', 'dark');
     }
   }, [selectedMode, theme]);
 
   useEffect(() => {
-    // Prevent scrolling during loading or mode selection
-    if (isLoading || selectedMode === null) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
-  }, [isLoading, selectedMode]);
+    // Lock scrolling while the mode selector is up.
+    document.body.style.overflow = selectedMode === null ? 'hidden' : 'auto';
+  }, [selectedMode]);
 
   const handleModeSelection = (mode) => {
+    // The ModeSelector plays its own glide-through-portal transition before
+    // calling this, so we go straight to the page.
     setSelectedMode(mode);
-    setShowPreloader(true);
-    setIsLoading(true);
   };
 
-  const handleSwitchToFun = () => {
-    setIsLoading(true);
-    setShowPreloader(true);
-    setTimeout(() => {
-      setSelectedMode('fun');
-      setIsLoading(false);
-    }, 2000);
-  };
-
-  const handleSwitchToNormal = () => {
-    setIsLoading(true);
-    setShowPreloader(true);
-    setTimeout(() => {
-      setSelectedMode('normal');
-      setIsLoading(false);
-    }, 2000);
-  };
-
-  const handleResetMode = () => {
-    setSelectedMode(null);
-    setShowPreloader(false);
-    setIsLoading(false);
-  };
+  const handleSwitchToFun = () => setSelectedMode('fun');
+  const handleSwitchToNormal = () => setSelectedMode('normal');
+  const handleResetMode = () => setSelectedMode(null);
 
   return (
     <div className="App">
@@ -82,15 +55,8 @@ function App() {
         )}
       </AnimatePresence>
 
-      {/* Show preloader after mode selection */}
-      <AnimatePresence mode="wait">
-        {showPreloader && isLoading && (
-          <Preloader onComplete={() => setIsLoading(false)} />
-        )}
-      </AnimatePresence>
-
       {/* Render content based on selected mode */}
-      {selectedMode && !isLoading && (
+      {selectedMode && (
         <>
           {/* FUN MODE - Modern interactive website */}
           {selectedMode === 'fun' && (
