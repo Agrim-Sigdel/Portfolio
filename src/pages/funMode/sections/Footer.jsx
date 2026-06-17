@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import Squiggle from '../../../shared/ui/Squiggle';
-import ContactForm from '../../../shared/ui/ContactForm';
+import ContactModal from '../../../shared/ui/ContactModal';
 import './ContactForm.css';
 
 const Footer = ({ onResetMode }) => {
+    const [contactOpen, setContactOpen] = useState(false);
+
     return (
         <footer
             id="contact"
@@ -44,7 +47,13 @@ const Footer = ({ onResetMode }) => {
                     </h2>
                 </div>
 
-                <ContactForm variant="fun" />
+                <button
+                    type="button"
+                    className="cf-cta"
+                    onClick={() => setContactOpen(true)}
+                >
+                    Get in touch
+                </button>
 
                 <div style={{ marginTop: '4rem', paddingTop: '4rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
                     <p style={{ opacity: 0.5, fontSize: '0.9rem', color: '#f5f0e8' }}>
@@ -52,6 +61,8 @@ const Footer = ({ onResetMode }) => {
                     </p>
                 </div>
             </div>
+
+            <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} variant="fun" />
         </footer>
     );
 };

@@ -4,6 +4,10 @@ import { COMMANDS } from './CommandParser';
 const { common, terminalMode } = content;
 const DIVIDER = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
 
+// Sentinel line in the contact view. The terminal UI swaps this exact line for a
+// clickable button that opens the shared contact modal.
+export const CONTACT_ACTION = '@@OPEN_CONTACT_FORM@@';
+
 /*
  * The "filesystem" exposed by `ls` / `cat` / `tree`.
  * key = lookup token (also the bare filename minus extension)
@@ -303,6 +307,10 @@ LinkedIn:  ${c.linkedin}
 Portfolio: ${c.website}
 
 ${DIVIDER}
+
+Prefer to write something now? Open the message form:
+
+${CONTACT_ACTION}
 
 Type 'menu' to return to main menu.
 

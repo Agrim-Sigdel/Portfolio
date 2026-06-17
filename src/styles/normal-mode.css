@@ -329,8 +329,39 @@
   transition: background 0.2s ease, transform 0.2s ease;
 }
 .cv-contactform-submit:hover { background: #000; transform: translateY(-1px); }
+.cv-contactform-input--error,
+.cv-contactform-input--error:focus {
+  border-color: #d33;
+  box-shadow: 0 0 0 3px rgba(221, 51, 51, 0.15);
+}
+.cv-contactform-optional {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  color: #aaa;
+}
+.cv-contactform-error {
+  font-size: 0.78rem;
+  color: #c0392b;
+}
 .cv-contactform-sent { font-size: 0.85rem; color: #666; }
 .cv-contactform-sent a { color: #db5a34; }
+
+/* CTA button that opens the shared contact modal (cv mode). */
+.cv-contact-cta {
+  margin-top: 1.25rem;
+  background: #1a1a1a;
+  border: 1px solid #1a1a1a;
+  color: #fff;
+  padding: 0.75rem 1.8rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: inherit;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.cv-contact-cta:hover { background: #000; transform: translateY(-1px); }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 680px) {

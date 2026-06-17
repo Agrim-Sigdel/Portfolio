@@ -604,6 +604,39 @@
   transform: translateY(-3px);
 }
 
+.ms-social-divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 4px 2px;
+  background: rgba(150, 160, 210, 0.22);
+}
+.ms-contact-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(124, 108, 255, 0.45);
+  background: rgba(124, 108, 255, 0.12);
+  color: #cdd4ff;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.25s ease, background 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+}
+.ms-contact-btn svg { font-size: 0.95rem; }
+.ms-contact-btn:hover {
+  color: #fff;
+  background: rgba(124, 108, 255, 0.28);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(124, 108, 255, 0.35);
+}
+
 /* ===========================================================================
    Launch transition
    =========================================================================== */

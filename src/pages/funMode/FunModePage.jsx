@@ -9,7 +9,6 @@ import Research from './sections/Research';
 import Process from './sections/Process';
 import Footer from './sections/Footer';
 import TickerSection from './sections/TickerSection';
-import CustomCursor from '../../shared/ui/CustomCursor';
 import ReturnToStartButton from '../../shared/ui/ReturnToStartButton';
 import { ScrollContainerContext } from './ScrollContainerContext';
 import './funMode.css'; // Add a CSS file reference if needed, assuming it's loaded globally usually
@@ -84,7 +83,6 @@ const TiltPresentationWrapper = ({ children }) => {
 const FunModePage = ({ onResetMode }) => {
     return (
         <>
-            <CustomCursor />
             <ReturnToStartButton onResetMode={onResetMode} />
             
             <TiltPresentationWrapper>

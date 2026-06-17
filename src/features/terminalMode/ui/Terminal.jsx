@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { parseCommand, complete } from '../lib/CommandParser';
-import { getWelcomeView } from '../lib/TerminalViews';
+import { getWelcomeView, CONTACT_ACTION } from '../lib/TerminalViews';
+import ContactModal from '../../../shared/ui/ContactModal';
 
 // Lazy-loaded so the Three.js/R3F backdrop only ships when Work mode mounts.
 const StarryNight = lazy(() => import('./StarryNight'));
@@ -89,15 +90,39 @@ const HighlightedLine = ({ text }) => {
     return <span style={{ color: C.text }}>{text}</span>;
 };
 
+/* ─── Clickable "open contact form" action line ──────────────────────── */
+const ContactActionLine = ({ onOpen }) => (
+    <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onOpen(); }}
+        style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8, margin: '2px 0',
+            padding: '6px 14px', cursor: 'pointer',
+            background: 'rgba(57,211,83,0.08)', border: `1px solid ${C.accent}`,
+            borderRadius: 7, color: C.accent,
+            fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem', fontWeight: 600,
+            transition: 'background .15s ease, color .15s ease',
+        }}
+        onMouseOver={(e) => { e.currentTarget.style.background = C.accent; e.currentTarget.style.color = C.bg; }}
+        onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(57,211,83,0.08)'; e.currentTarget.style.color = C.accent; }}
+    >
+        <span>❯</span> open contact form
+    </button>
+);
+
 /* ─── Render a full pre-formatted output block ───────────────────────── */
-const OutputBlock = ({ content }) => {
+const OutputBlock = ({ content, onOpenContact }) => {
     if (!content) return null;
     const lines = content.split('\n');
     return (
         <div style={{ lineHeight: '1.6', fontFamily: "'JetBrains Mono', 'Courier New', monospace", fontSize: '0.875rem' }}>
-            {lines.map((line, i) => (
-                <div key={i}><HighlightedLine text={line} /></div>
-            ))}
+            {lines.map((line, i) =>
+                line.trim() === CONTACT_ACTION ? (
+                    <div key={i}><ContactActionLine onOpen={onOpenContact} /></div>
+                ) : (
+                    <div key={i}><HighlightedLine text={line} /></div>
+                )
+            )}
         </div>
     );
 };
@@ -257,6 +282,7 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
     const [showMenu, setShowMenu] = useState(false);
     const [windowState, setWindowState] = useState('open'); // 'open' | 'minimized' | 'closed'
     const [maximized, setMaximized] = useState(false);
+    const [contactOpen, setContactOpen] = useState(false);
 
     const inputRef = useRef(null);
     const scrollRef = useRef(null);
@@ -507,7 +533,7 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
                                 <div style={{ paddingLeft: 2, color: line.type === 'error' ? C.error : undefined }}>
                                     {line.type === 'error'
                                         ? <pre style={{ margin: 0, fontFamily: 'inherit', fontSize: '0.875rem', color: C.error, whiteSpace: 'pre-wrap' }}>{line.content}</pre>
-                                        : <OutputBlock content={line.content} />}
+                                        : <OutputBlock content={line.content} onOpenContact={() => setContactOpen(true)} />}
                                 </div>
                             )}
                         </div>
@@ -680,6 +706,9 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
                     ]} />
                 )}
             </AnimatePresence>
+
+            {/* Shared contact modal — terminal-themed. */}
+            <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} variant="terminal" />
         </div>
     );
 };

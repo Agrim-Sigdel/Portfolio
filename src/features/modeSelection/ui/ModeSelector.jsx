@@ -9,8 +9,10 @@ import {
   FiLinkedin,
   FiMail,
   FiGlobe,
+  FiSend,
 } from 'react-icons/fi';
 import content from '../../../data/content.json';
+import ContactModal from '../../../shared/ui/ContactModal';
 import CssCosmicField from './CssCosmicField';
 import CssPortal from './CssPortal';
 import ChargeRing from './ChargeRing';
@@ -97,6 +99,7 @@ export default function ModeSelector({ onSelectMode }) {
   const [charging, setCharging] = useState(null);
   const [progress, setProgress] = useState(0);
   const [muted, setMutedState] = useState(() => isMuted());
+  const [contactOpen, setContactOpen] = useState(false);
 
   const { visited, markVisited } = useVisitedModes();
 
@@ -480,7 +483,22 @@ export default function ModeSelector({ onSelectMode }) {
             <Icon aria-hidden="true" />
           </a>
         ))}
+
+        <span className="ms-social-divider" aria-hidden="true" />
+
+        <button
+          type="button"
+          className="ms-contact-btn"
+          onClick={() => setContactOpen(true)}
+          title="Send a message"
+        >
+          <FiSend aria-hidden="true" />
+          <span>Contact</span>
+        </button>
       </motion.nav>
+
+      {/* Shared contact modal — terminal/arcade-themed to match the HUD. */}
+      <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} variant="terminal" />
 
       {/* ---- launch transition: WebGL warp, or a CSS flash in lite mode ---- */}
       <AnimatePresence>

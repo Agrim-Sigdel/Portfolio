@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { FiArrowLeft, FiExternalLink } from 'react-icons/fi';
 import content from '../data/content.json';
 import DownloadButton from '../shared/ui/DownloadButton';
-import ContactForm from '../shared/ui/ContactForm';
+import ContactModal from '../shared/ui/ContactModal';
 import '../styles/normal-mode.css';
 
 const NormalModeLayout = ({ onResetMode }) => {
   const { common } = content;
   const { personal, contact, education, experience, research, projects, skills } = common;
   const [mounted, setMounted] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -187,9 +188,17 @@ const NormalModeLayout = ({ onResetMode }) => {
           <p className="cv-summary">
             Have a role, project, or research idea in mind? Send a message and I'll get back to you.
           </p>
-          <ContactForm variant="cv" />
+          <button
+            type="button"
+            className="cv-contact-cta"
+            onClick={() => setContactOpen(true)}
+          >
+            Send a message
+          </button>
         </section>
       </article>
+
+      <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} variant="cv" />
     </div>
   );
 };
