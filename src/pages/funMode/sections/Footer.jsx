@@ -1,8 +1,11 @@
 import Squiggle from '../../../shared/ui/Squiggle';
+import ContactForm from '../../../shared/ui/ContactForm';
+import './ContactForm.css';
 
 const Footer = ({ onResetMode }) => {
     return (
         <footer
+            id="contact"
             style={{
                 marginTop: '8rem',
                 padding: '6rem 5vw',
@@ -41,32 +44,7 @@ const Footer = ({ onResetMode }) => {
                     </h2>
                 </div>
 
-                <button
-                    className="bg-accent-red"
-                    data-cursor="Let's Talk"
-                    style={{
-                        backgroundColor: 'var(--accent-red)',
-                        border: '2px solid var(--accent-red)',
-                        color: '#fff',
-                        padding: '1.2rem 3rem',
-                        fontSize: '1.1rem',
-                        fontWeight: '700',
-                        borderRadius: '3rem',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-                        boxShadow: '0 10px 30px rgba(255, 76, 43, 0.3)'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.target.style.transform = 'scale(1.05)';
-                        e.target.style.boxShadow = '0 15px 40px rgba(255, 76, 43, 0.5)';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.target.style.transform = 'scale(1)';
-                        e.target.style.boxShadow = '0 10px 30px rgba(255, 76, 43, 0.3)';
-                    }}
-                >
-                    Get In Touch
-                </button>
+                <ContactForm variant="fun" />
 
                 <div style={{ marginTop: '4rem', paddingTop: '4rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
                     <p style={{ opacity: 0.5, fontSize: '0.9rem', color: '#f5f0e8' }}>

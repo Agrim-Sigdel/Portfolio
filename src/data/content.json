@@ -20,13 +20,12 @@
     },
     "contact": {
       "email": "sigdelagrim35@gmail.com",
-      "phone": "+977 9869081558",
       "location": "Kathmandu, Nepal",
       "website": "agrimsigdel.com.np",
       "github": "github.com/Agrim-Sigdel",
       "githubUrl": "https://github.com/Agrim-Sigdel",
-      "linkedin": "linkedin.com/in/agrimsigdel",
-      "linkedinUrl": "https://www.linkedin.com/in/agrimsigdel"
+      "linkedin": "https://www.linkedin.com/in/agrim-sigdel-34b532151/",
+      "linkedinUrl": "https://www.linkedin.com/in/agrim-sigdel-34b532151/"
     },
     "education": [
       {
@@ -66,6 +65,17 @@
         "description": [
           "Led creative direction and brand guidelines for 625+ attendees, coordinating event planning and execution.",
           "Managed cross-functional teams for visual and marketing materials, practicing agile task delegation."
+        ],
+        "links": []
+      },
+      {
+        "role": "FREELANCE DEVELOPER",
+        "company": "Self-Employed | Remote",
+        "period": "2023 – Present",
+        "description": [
+          "Designed, built, and shipped a range of client projects end-to-end - from responsive marketing websites to full-stack web applications.",
+          "Worked directly with clients to scope requirements, translate them into clean designs, and deliver production-ready code on schedule.",
+          "Handled the full delivery pipeline including frontend, backend, deployment, and post-launch maintenance across varied tech stacks."
         ],
         "links": []
       }

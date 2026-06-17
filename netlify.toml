@@ -4,3 +4,11 @@
 
 [dev]
   command = "npm run dev"
+
+# SPA fallback: client-side routes like /cv, /normal, /terminal have no file on
+# disk, so serve index.html for any unmatched path and let React Router resolve
+# it. Without this, refreshing or deep-linking a route 404s.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FiArrowLeft, FiExternalLink } from 'react-icons/fi';
 import content from '../data/content.json';
 import DownloadButton from '../shared/ui/DownloadButton';
+import ContactForm from '../shared/ui/ContactForm';
 import '../styles/normal-mode.css';
 
 const NormalModeLayout = ({ onResetMode }) => {
@@ -36,8 +37,6 @@ const NormalModeLayout = ({ onResetMode }) => {
             <span>{contact.location}</span>
             <span className="sep">·</span>
             <a href={`mailto:${contact.email}`}>{contact.email}</a>
-            <span className="sep">·</span>
-            <a href={`tel:${contact.phone.replace(/\s/g, '')}`}>{contact.phone}</a>
             <span className="sep">·</span>
             <a href={`https://${contact.website}`} target="_blank" rel="noopener noreferrer">{contact.website}</a>
             <span className="sep">·</span>
@@ -180,6 +179,15 @@ const NormalModeLayout = ({ onResetMode }) => {
               <p className="cv-edu-meta">{edu.school}</p>
             </div>
           ))}
+        </section>
+
+        {/* ---------- Contact ---------- */}
+        <section className="cv-section" id="contact">
+          <h2 className="cv-section-title">Get in Touch</h2>
+          <p className="cv-summary">
+            Have a role, project, or research idea in mind? Send a message and I'll get back to you.
+          </p>
+          <ContactForm variant="cv" />
         </section>
       </article>
     </div>

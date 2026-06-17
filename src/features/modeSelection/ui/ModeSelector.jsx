@@ -1,141 +1,488 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import BioluminescentField from './BioluminescentField';
-import ModePortal from './ModePortal';
-import PortalWarp from './PortalWarp';
+import {
+  FiVolume2,
+  FiVolumeX,
+  FiChevronLeft,
+  FiChevronRight,
+  FiGithub,
+  FiLinkedin,
+  FiMail,
+  FiGlobe,
+} from 'react-icons/fi';
+import content from '../../../data/content.json';
+import CssCosmicField from './CssCosmicField';
+import CssPortal from './CssPortal';
+import ChargeRing from './ChargeRing';
+// Three.js-backed visuals are split into their own chunk and only fetched when
+// WebGL is available — no-WebGL visitors never download three/r3f at all.
+const BioluminescentField = lazy(() => import('./BioluminescentField'));
+const ModePortal = lazy(() => import('./ModePortal'));
+const PortalWarp = lazy(() => import('./PortalWarp'));
+import useVisitedModes from './useVisitedModes';
+import useWebGL from './useWebGL';
+import {
+  isMuted,
+  toggleMuted,
+  playHover,
+  playChargeTick,
+  playLaunch,
+  playUnlock,
+} from './arcadeSound';
 import './ModeSelector.css';
 
 /*
- * ModeSelector: deep-space entry screen.
+ * ModeSelector: an arcade-style "SELECT MODE" screen.
  *
- * A full-screen voronoi backdrop (BioluminescentField) with three glass cards
- * floating on top. Each card holds an interactive 3D PortalRing (ModePortal)
- * that opens and spins faster on hover. Picking a mode plays a glide-through-
- * the-portal transition (PortalWarp) before handing off to the page.
+ * The screen is framed as a game-select HUD. All three modes live in a selector
+ * strip; the highlighted one blows up into a single large "preview" panel with
+ * its portal, tagline, tags and a CLEARED/NEW badge. You move with the arrows
+ * (or 1-3), and HOLD enter (or hover) to charge a ring that launches you through
+ * a hyperspace warp into the chosen page.
  *
- * Aurora palette: one indigo family graded from seafoam through periwinkle to
- * violet, so the three modes read as a designed set rather than primary colors.
+ * Resilience: every visual that needs three.js (backdrop, portal, warp) is gated
+ * on useWebGL(). With no WebGL we render a CSS-only "cosmic-lite" build — same
+ * layout, same mechanics, just lighter visuals — so the menu is never a black
+ * void.
+ *
+ * Game feel: keyboard nav, hold-to-charge launch, synthesized arcade sound
+ * (muted by default, opt-in), and persisted "visited" tracking with an unlock
+ * intro.
  */
 
-/*
- * Each mode is its own little world:
- *   normal -> teal "orbits"   (structured, formal)
- *   fun    -> amber "galaxy"   (playful, alive)
- *   work   -> green "data-net" (technical)
- *
- * `color` is a clean solid hex used by both the 3D portal (three.js needs a
- * valid color, not an 8-digit alpha hex) and the card glow via color-mix().
- */
 const MODES = [
   {
     id: 'normal',
-    label: 'Curriculum',
+    label: 'CV',
     sub: 'The professional record',
     color: '#23d3c0',
+    tags: ['résumé', 'structured', 'formal'],
   },
   {
     id: 'fun',
-    label: 'Immerse',
-    sub: 'The interactive experience',
+    label: 'Normal',
+    sub: 'Fluid dynamics',
     color: '#f0a040',
+    tags: ['interactive', 'motion', 'playful'],
   },
   {
     id: 'work',
     label: 'Terminal',
     sub: 'Built for developers',
-    color: '#37c463',
+    // brighter emerald — the old #046824 read muddy against the dark HUD
+    color: '#2bd46a',
+    tags: ['technical', 'cli', 'data'],
   },
 ];
 
-export default function ModeSelector({ onSelectMode }) {
-  const [hovered, setHovered] = useState(null);
-  const [selecting, setSelecting] = useState(null);
+// how long a card must stay charged before it launches (ms)
+const CHARGE_MS = 700;
 
-  const handleSelect = (mode) => {
-    if (selecting) return;
-    setSelecting(mode);
-    // let the glide-through-portal transition play before the page mounts.
-    // matches the ~1.4s ease in PortalWarp; a touch of extra time lets the
-    // white flash peak before we hand off so the cut is invisible.
-    setTimeout(() => onSelectMode(mode), 1500);
+// identity + social links, pulled from the shared content so the landing page
+// stays consistent with the rest of the site (same name, tagline, URLs).
+const { personal, contact } = content.common;
+const SOCIALS = [
+  { id: 'github', label: 'GitHub', href: contact.githubUrl, Icon: FiGithub },
+  { id: 'linkedin', label: 'LinkedIn', href: contact.linkedinUrl, Icon: FiLinkedin },
+  { id: 'email', label: 'Email', href: `mailto:${contact.email}`, Icon: FiMail },
+  { id: 'website', label: 'Website', href: `https://${contact.website}`, Icon: FiGlobe },
+].filter((s) => s.href);
+
+export default function ModeSelector({ onSelectMode }) {
+  const webgl = useWebGL(); // null = probing, true/false once known
+
+  // `active` is the focused mode index (default 0 so the preview is never empty)
+  const [active, setActive] = useState(0);
+  const [selecting, setSelecting] = useState(null);
+  const [charging, setCharging] = useState(null);
+  const [progress, setProgress] = useState(0);
+  const [muted, setMutedState] = useState(() => isMuted());
+
+  const { visited, markVisited } = useVisitedModes();
+
+  // sequential "unlock" intro — cards reveal locked→unlocked one by one
+  const [unlocked, setUnlocked] = useState(() => MODES.map(() => false));
+
+  const rafRef = useRef(null);
+  const chargeStartRef = useRef(0);
+  const lastTickRef = useRef(0);
+
+  /* ---- unlock intro ---- */
+  useEffect(() => {
+    const timers = MODES.map((_, i) =>
+      setTimeout(() => {
+        setUnlocked((prev) => {
+          const next = [...prev];
+          next[i] = true;
+          return next;
+        });
+        playUnlock();
+      }, 700 + i * 280)
+    );
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  /* ---- charge helpers ---- */
+  const stopCharge = useCallback(() => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
+    setCharging(null);
+    setProgress(0);
+  }, []);
+
+  const launch = useCallback(
+    (index) => {
+      const mode = MODES[index];
+      if (!mode || selecting) return;
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+      setCharging(null);
+      setProgress(0);
+      setSelecting(mode.id);
+      markVisited(mode.id);
+      playLaunch();
+      setTimeout(() => onSelectMode(mode.id), 1500);
+    },
+    [selecting, markVisited, onSelectMode]
+  );
+
+  const beginCharge = useCallback(
+    (index) => {
+      if (selecting || index == null || !unlocked[index]) return;
+      if (charging === index) return;
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+
+      setCharging(index);
+      chargeStartRef.current = performance.now();
+      lastTickRef.current = 0;
+
+      const stepCharge = (now) => {
+        const p = Math.min(1, (now - chargeStartRef.current) / CHARGE_MS);
+        setProgress(p);
+        if (now - lastTickRef.current > 90) {
+          lastTickRef.current = now;
+          playChargeTick(p);
+        }
+        if (p >= 1) {
+          rafRef.current = null;
+          launch(index);
+          return;
+        }
+        rafRef.current = requestAnimationFrame(stepCharge);
+      };
+      rafRef.current = requestAnimationFrame(stepCharge);
+    },
+    [selecting, unlocked, charging, launch]
+  );
+
+  /* ---- focus a mode (shared by strip clicks + keyboard) ---- */
+  const focusMode = useCallback(
+    (index, { silent = false } = {}) => {
+      if (selecting) return;
+      stopCharge();
+      setActive((cur) => {
+        if (cur !== index && !silent) playHover();
+        return index;
+      });
+    },
+    [selecting, stopCharge]
+  );
+
+  /* ---- keyboard navigation ---- */
+  useEffect(() => {
+    const onKey = (e) => {
+      if (selecting) return;
+
+      if (e.key >= '1' && e.key <= String(MODES.length)) {
+        const idx = Number(e.key) - 1;
+        focusMode(idx);
+        beginCharge(idx);
+        return;
+      }
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        focusMode((active + 1) % MODES.length);
+        return;
+      }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        focusMode((active - 1 + MODES.length) % MODES.length);
+        return;
+      }
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        beginCharge(active);
+        return;
+      }
+      if (e.key === 'Escape') stopCharge();
+    };
+    const onKeyUp = (e) => {
+      if ((e.key === 'Enter' || e.key === ' ') && progress < 1) stopCharge();
+    };
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('keyup', onKeyUp);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('keyup', onKeyUp);
+    };
+  }, [selecting, active, progress, focusMode, beginCharge, stopCharge]);
+
+  useEffect(() => () => rafRef.current && cancelAnimationFrame(rafRef.current), []);
+
+  const handleMuteToggle = () => {
+    const nowMuted = toggleMuted();
+    setMutedState(nowMuted);
+    if (!nowMuted) playUnlock();
   };
 
+  const current = MODES[active];
   const selected = MODES.find((m) => m.id === selecting);
+  const isCurrentUnlocked = unlocked[active];
+  const isCurrentVisited = visited.has(current.id);
+
+  // hold gestures on the big preview / enter button
+  const holdStart = () => beginCharge(active);
+  const holdEnd = () => progress < 1 && stopCharge();
 
   return (
     <motion.div
-      className="ms-root"
+      className={`ms-root ms-arcade ${webgl === false ? 'is-lite' : ''}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <BioluminescentField />
+      {/* Backdrop: three.js when available, CSS cosmic-lite otherwise. While the
+          WebGL probe is pending (null) we show the CSS field to avoid a flash. */}
+      {webgl ? (
+        <Suspense fallback={<CssCosmicField />}>
+          <BioluminescentField />
+        </Suspense>
+      ) : (
+        <CssCosmicField />
+      )}
 
-      {/* Title */}
-      <header className="ms-title">
-        <motion.h1
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.8 }}
-        >
-          Welcome 
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.8 }}
-        >
-          Pick how you want to look around
-        </motion.p>
-      </header>
+      {/* HUD frame — fades out once a mode is chosen so only the transition
+          shows over the nebula */}
+      <motion.div
+        className="ms-hud"
+        animate={{ opacity: selecting ? 0 : 1, scale: selecting ? 0.96 : 1 }}
+        transition={{ duration: 0.4, ease: 'easeInOut' }}
+        style={{ pointerEvents: selecting ? 'none' : 'auto' }}
+      >
+        {/* ---- top bar ---- */}
+        <header className="ms-hud-top">
+          <div className="ms-hud-title">
+            <span className="ms-hud-bracket">[</span>
+            SELECT&nbsp;MODE
+            <span className="ms-hud-bracket">]</span>
+          </div>
 
-      {/* Mode portals */}
-      <motion.div className="ms-cards">
-        {MODES.map((m, i) => {
-          const isChosen = selecting === m.id;
-          // While selecting: the chosen card scales up and fades as we "dive
-          // into" it; the others gently drop away. Otherwise normal idle state.
-          const exitAnim = selecting
-            ? isChosen
-              ? { opacity: 0, scale: 1.6, filter: 'blur(8px)' }
-              : { opacity: 0, y: 30, scale: 0.92 }
-            : { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' };
-          return (
-          <motion.button
-            key={m.id}
-            className={`ms-card ${hovered === i ? 'is-hot' : ''}`}
-            style={{ '--mode-color': m.color }}
-            onMouseEnter={() => !selecting && setHovered(i)}
-            onMouseLeave={() => setHovered(null)}
-            onFocus={() => !selecting && setHovered(i)}
-            onBlur={() => setHovered(null)}
-            onClick={() => handleSelect(m.id)}
-            initial={{ opacity: 0, y: 40 }}
-            animate={selecting ? exitAnim : { opacity: 1, y: 0 }}
-            transition={
-              selecting
-                ? { duration: isChosen ? 0.7 : 0.4, ease: [0.22, 1, 0.36, 1] }
-                : { delay: 0.7 + i * 0.15, duration: 0.6, ease: 'backOut' }
-            }
-            whileHover={selecting ? undefined : { y: -10 }}
-            whileTap={selecting ? undefined : { scale: 0.97 }}
+          <button
+            type="button"
+            className="ms-sound-toggle"
+            onClick={handleMuteToggle}
+            aria-pressed={!muted}
+            aria-label={muted ? 'Turn on sound' : 'Mute sound'}
+            title={muted ? 'Turn on sound for the full experience' : 'Mute'}
           >
-            <span className="ms-card-index">0{i + 1}</span>
+            {muted ? <FiVolumeX aria-hidden="true" /> : <FiVolume2 aria-hidden="true" />}
+            {muted && <span className="ms-sound-pulse-dot" />}
+          </button>
+        </header>
 
-            <div className="ms-portal-holder">
-              <ModePortal variant={m.id} color={m.color} hot={hovered === i} />
+        {/* ---- identity ---- */}
+        <div className="ms-identity">
+          <h1 className="ms-identity-name">{personal.name}</h1>
+          <p className="ms-identity-tagline">{personal.tagline}</p>
+
+        </div>
+
+        {/* ---- selector strip ---- */}
+        <div className="ms-strip" role="tablist" aria-label="Choose a mode">
+          <button
+            type="button"
+            className="ms-strip-arrow"
+            aria-label="Previous mode"
+            onClick={() => focusMode((active - 1 + MODES.length) % MODES.length)}
+          >
+            <FiChevronLeft aria-hidden="true" />
+          </button>
+
+          <div className="ms-strip-tabs">
+            {MODES.map((m, i) => (
+              <button
+                key={m.id}
+                type="button"
+                role="tab"
+                aria-selected={active === i}
+                className={`ms-strip-tab ${active === i ? 'is-active' : ''} ${unlocked[i] ? '' : 'is-locked'}`}
+                style={{ '--mode-color': m.color }}
+                onMouseEnter={() => focusMode(i)}
+                onFocus={() => focusMode(i)}
+                onClick={() => focusMode(i)}
+              >
+                <span className="ms-strip-tab-idx">0{i + 1}</span>
+                <span className="ms-strip-tab-label">{m.label}</span>
+              </button>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            className="ms-strip-arrow"
+            aria-label="Next mode"
+            onClick={() => focusMode((active + 1) % MODES.length)}
+          >
+            <FiChevronRight aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="ms-strip-counter">
+          {String(active + 1).padStart(2, '0')} / {String(MODES.length).padStart(2, '0')}
+        </div>
+
+        {/* ---- focused preview ---- */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={current.id}
+            className="ms-preview"
+            style={{ '--mode-color': current.color }}
+            initial={{ opacity: 0, y: 24, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -24, scale: 0.96 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="ms-preview-badges">
+              {isCurrentVisited ? (
+                <span className="ms-badge ms-badge--cleared">✓ Cleared</span>
+              ) : (
+                <span className="ms-badge ms-badge--new">★ New</span>
+              )}
+              {!webgl && <span className="ms-badge ms-badge--lite">Lite</span>}
             </div>
 
-            <span className="ms-card-name">{m.label}</span>
-            <span className="ms-card-sub">{m.sub}</span>
-            <span className="ms-card-enter">Enter</span>
-          </motion.button>
-          );
-        })}
+            <div
+              className="ms-preview-portal"
+              onMouseDown={holdStart}
+              onMouseUp={holdEnd}
+              onMouseLeave={holdEnd}
+              onTouchStart={holdStart}
+              onTouchEnd={holdEnd}
+            >
+              {webgl ? (
+                <Suspense
+                  fallback={
+                    <div className="ms-portal-canvas" style={{ width: '100%', height: '100%' }}>
+                      <CssPortal
+                        variant={current.id}
+                        color={current.color}
+                        hot
+                        charge={charging === active ? progress : 0}
+                      />
+                    </div>
+                  }
+                >
+                  <ModePortal
+                    variant={current.id}
+                    color={current.color}
+                    hot
+                    charge={charging === active ? progress : 0}
+                    webgl
+                  />
+                </Suspense>
+              ) : (
+                <div className="ms-portal-canvas" style={{ width: '100%', height: '100%' }}>
+                  <CssPortal
+                    variant={current.id}
+                    color={current.color}
+                    hot
+                    charge={charging === active ? progress : 0}
+                  />
+                </div>
+              )}
+              {charging === active && (
+                <div className="ms-charge-ring-wrap">
+                  <ChargeRing progress={progress} color={current.color} />
+                </div>
+              )}
+            </div>
+
+            <h2 className="ms-preview-name">{current.label}</h2>
+            <p className="ms-preview-sub">{current.sub}</p>
+
+            <div className="ms-preview-tags">
+              {current.tags.map((t) => (
+                <span key={t} className="ms-tag">{t}</span>
+              ))}
+            </div>
+
+            {/* hold-to-enter bar */}
+            <button
+              type="button"
+              className="ms-enter-btn"
+              disabled={!isCurrentUnlocked}
+              onMouseDown={holdStart}
+              onMouseUp={holdEnd}
+              onMouseLeave={holdEnd}
+              onTouchStart={holdStart}
+              onTouchEnd={holdEnd}
+              onClick={() => launch(active)}
+            >
+              <span
+                className="ms-enter-fill"
+                style={{ width: `${(charging === active ? progress : 0) * 100}%` }}
+              />
+              <span className="ms-enter-label">
+                {isCurrentUnlocked ? 'Hold to enter' : 'Locked'}
+              </span>
+            </button>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* ---- controls legend ---- */}
+        <footer className="ms-hud-legend">
+          <span><kbd>←</kbd><kbd>→</kbd> move</span>
+          <span className="ms-legend-dot">·</span>
+          <span><kbd>1</kbd>–<kbd>3</kbd> jump</span>
+          <span className="ms-legend-dot">·</span>
+          <span>hold <kbd>⏎</kbd> launch</span>
+          {muted && (
+            <>
+              <span className="ms-legend-dot">·</span>
+              <button type="button" className="ms-legend-sound" onClick={handleMuteToggle}>
+                turn on sound for the full experience
+              </button>
+            </>
+          )}
+        </footer>
       </motion.div>
 
-      {/* Glide-through-portal transition */}
+      {/* ---- floating social links — also fade out during the transition ---- */}
+      <motion.nav
+        className="ms-socials"
+        aria-label="Social links"
+        initial={{ opacity: 0, y: 16 }}
+        animate={selecting ? { opacity: 0, y: 16 } : { opacity: 1, y: 0 }}
+        transition={selecting ? { duration: 0.4, ease: 'easeInOut' } : { delay: 1.1, duration: 0.7 }}
+        style={{ pointerEvents: selecting ? 'none' : 'auto' }}
+      >
+        {SOCIALS.map(({ id, label, href, Icon }) => (
+          <a
+            key={id}
+            href={href}
+            target={id === 'email' ? undefined : '_blank'}
+            rel="noopener noreferrer"
+            className="ms-social"
+            aria-label={label}
+            title={label}
+          >
+            <Icon aria-hidden="true" />
+          </a>
+        ))}
+      </motion.nav>
+
+      {/* ---- launch transition: WebGL warp, or a CSS flash in lite mode ---- */}
       <AnimatePresence>
         {selecting && (
           <motion.div
@@ -148,7 +495,16 @@ export default function ModeSelector({ onSelectMode }) {
               background: `radial-gradient(circle at center, color-mix(in srgb, ${selected?.color} 18%, transparent), #000000 68%)`,
             }}
           >
-            <PortalWarp color={selected?.color || '#7c6cff'} />
+            {webgl ? (
+              <Suspense fallback={null}>
+                <PortalWarp variant={selecting} color={selected?.color || '#7c6cff'} />
+              </Suspense>
+            ) : (
+              <div
+                className={`ms-warp-lite ms-warp-lite--${selecting}`}
+                style={{ '--mode-color': selected?.color || '#7c6cff' }}
+              />
+            )}
           </motion.div>
         )}
       </AnimatePresence>

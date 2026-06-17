@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion, useMotionValue, useSpring, useTransform, useScroll } from 'framer-motion';
 import Navbar from '../../widgets/header/Navbar';
 import Hero from './sections/Hero';
@@ -10,7 +10,6 @@ import Process from './sections/Process';
 import Footer from './sections/Footer';
 import TickerSection from './sections/TickerSection';
 import CustomCursor from '../../shared/ui/CustomCursor';
-import SnakeBackground from '../../shared/ui/SnakeBackground';
 import ReturnToStartButton from '../../shared/ui/ReturnToStartButton';
 import { ScrollContainerContext } from './ScrollContainerContext';
 import './funMode.css'; // Add a CSS file reference if needed, assuming it's loaded globally usually
@@ -82,7 +81,7 @@ const TiltPresentationWrapper = ({ children }) => {
     );
 };
 
-const FunModePage = ({ onResetMode, onSwitchMode }) => {
+const FunModePage = ({ onResetMode }) => {
     return (
         <>
             <CustomCursor />
@@ -92,26 +91,27 @@ const FunModePage = ({ onResetMode, onSwitchMode }) => {
                 {/* <SnakeBackground /> // Optional: might lag in 3D transform, disabled for cleaner 3D */}
                 
                 <motion.div
-                    animate={{ y: [-12, 12, -12], rotateZ: [-0.5, 0.5, -0.5] }}
-                    transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                    style={{ transformStyle: 'preserve-3d' }}
+                    initial={{ y: 100, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 1.2, ease: [0.77, 0, 0.175, 1], delay: 0.2 }}
+                    style={{ transform: 'translateZ(40px)' }} // Drops a deep physical shadow onto the back pane
                 >
+                    <Navbar />
+                    {/* Floating left-to-right drift applies to the hero only */}
                     <motion.div
-                        initial={{ y: 100, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ duration: 1.2, ease: [0.77, 0, 0.175, 1], delay: 0.2 }}
-                        style={{ transform: 'translateZ(40px)' }} // Drops a deep physical shadow onto the back pane
+                        animate={{ y: [-12, 12, -12], rotateZ: [-0.5, 0.5, -0.5] }}
+                        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                        style={{ transformStyle: 'preserve-3d' }}
                     >
-                        <Navbar />
                         <Hero />
-                        <About />
-                        <TickerSection />
-                        <WorkGrid />
-                        <Experience />
-                        <Research />
-                        <Process />
-                        <Footer onResetMode={onResetMode} />
                     </motion.div>
+                    <About />
+                    <TickerSection />
+                    <WorkGrid />
+                    <Experience />
+                    <Research />
+                    <Process />
+                    <Footer onResetMode={onResetMode} />
                 </motion.div>
             </TiltPresentationWrapper>
         </>

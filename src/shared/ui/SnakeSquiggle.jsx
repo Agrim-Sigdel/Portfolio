@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 
-const SnakeSquiggle = ({ index }) => {
+const SnakeSquiggle = () => {
     const randomDelay = Math.random() * 2;
     const randomDuration = 8 + Math.random() * 6;
     const randomSize = 100 + Math.random() * 150;

@@ -1,38 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import SnakeSquiggle from './SnakeSquiggle';
 
 const SnakeBackground = () => {
     const containerRef = useRef(null);
-
-    useEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
-
-        const generateRandomSquiggles = () => {
-            const squiggles = [];
-            const numSquiggles = 15;
-
-            for (let i = 0; i < numSquiggles; i++) {
-                const randomDelay = Math.random() * 2;
-                const randomDuration = 8 + Math.random() * 6;
-                const randomSize = 100 + Math.random() * 150;
-
-                squiggles.push({
-                    id: i,
-                    delay: randomDelay,
-                    duration: randomDuration,
-                    size: randomSize
-                });
-            }
-            return squiggles;
-        };
-
-        const squiggles = generateRandomSquiggles();
-
-        return () => {
-            // Cleanup
-        };
-    }, []);
 
     return (
         <div
@@ -49,7 +19,7 @@ const SnakeBackground = () => {
             }}
         >
             {[...Array(15)].map((_, i) => (
-                <SnakeSquiggle key={i} index={i} />
+                <SnakeSquiggle key={i} />
             ))}
         </div>
     );

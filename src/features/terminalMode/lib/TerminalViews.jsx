@@ -296,7 +296,6 @@ Let's connect! I'm always open to discussing new projects,
 research, or opportunities to be part of your vision.
 
 Email:     ${c.email}
-Phone:     ${c.phone}
 Location:  ${c.location}
 
 GitHub:    ${c.github}

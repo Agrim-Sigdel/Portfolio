@@ -17,10 +17,11 @@ const SEO = ({ title, description, url, image }) => {
     if (title) document.title = title;
 
     const descEl = setMeta('meta', 'name', 'description', description);
-    const ogTitle = setMeta('meta', 'property', 'og:title', title);
-    const ogDesc = setMeta('meta', 'property', 'og:description', description);
-    const ogUrl = setMeta('meta', 'property', 'og:url', url);
-    const ogImage = setMeta('meta', 'property', 'og:image', image);
+    // og:* tags are created/updated for their side effect; we don't keep refs.
+    setMeta('meta', 'property', 'og:title', title);
+    setMeta('meta', 'property', 'og:description', description);
+    setMeta('meta', 'property', 'og:url', url);
+    setMeta('meta', 'property', 'og:image', image);
 
     let canonical = document.head.querySelector('link[rel="canonical"]');
     let createdCanonical = false;

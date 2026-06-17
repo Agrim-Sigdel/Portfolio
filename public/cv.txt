@@ -1,6 +1,6 @@
 Agrim Sigdel
 Full-Stack Developer | AI Enthusiast
-Kathmandu, Nepal | agrimsigdel.com.np | sigdelagrim35@gmail.com | +977 9869081558
+Kathmandu, Nepal | agrimsigdel.com.np | sigdelagrim35@gmail.com 
 PROFESSIONAL SUMMARY
 Versatile Full-Stack Developer with a strong foundation in modern AI, engineering production-ready appli-
 cations using React/TypeScript and Python/Django. Adept at building scalable REST APIs, optimizing relational

@@ -65,6 +65,18 @@
   </head>
 
   <body>
+    <!--
+      Netlify Forms detection stub. This is a Vite SPA, so the real contact form
+      is rendered by React at runtime and Netlify's build-time crawler can't see
+      it. This hidden static form (matching name + fields) lets Netlify register
+      the "contact" form at deploy time; the React ContactForm then POSTs to it.
+    -->
+    <form name="contact" netlify netlify-honeypot="bot-field" hidden>
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <textarea name="message"></textarea>
+      <input type="text" name="bot-field" />
+    </form>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
