@@ -65,10 +65,17 @@ export default function ContactModal({ open, onClose, variant = 'fun' }) {
       role="dialog"
       aria-modal="true"
       aria-label="Contact form"
+      // React portals bubble events through the React tree, not the DOM. Without
+      // this, clicks/keys inside the modal reach the parent mode's handlers (e.g.
+      // the terminal refocusing its hidden input, or the selector's 1-3 launch),
+      // stealing focus and hijacking keystrokes. Stop them at the overlay.
       onMouseDown={(e) => {
         // Close only when the backdrop itself is clicked, not the panel.
         if (e.target === e.currentTarget) onClose();
+        e.stopPropagation();
       }}
+      onClick={(e) => e.stopPropagation()}
+      onKeyDown={(e) => e.stopPropagation()}
     >
       <div className="cm-panel" ref={panelRef}>
         <button type="button" className="cm-close" onClick={onClose} aria-label="Close">
