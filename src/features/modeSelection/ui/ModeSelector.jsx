@@ -195,6 +195,11 @@ export default function ModeSelector({ onSelectMode }) {
   useEffect(() => {
     const onKey = (e) => {
       if (selecting) return;
+      // Don't hijack keys while the visitor is typing in the contact modal
+      // (or any form field) — otherwise 1-3 would launch a mode mid-typing.
+      if (contactOpen) return;
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
 
       if (e.key >= '1' && e.key <= String(MODES.length)) {
         const idx = Number(e.key) - 1;
@@ -228,7 +233,7 @@ export default function ModeSelector({ onSelectMode }) {
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('keyup', onKeyUp);
     };
-  }, [selecting, active, progress, focusMode, beginCharge, stopCharge]);
+  }, [selecting, active, progress, contactOpen, focusMode, beginCharge, stopCharge]);
 
   useEffect(() => () => rafRef.current && cancelAnimationFrame(rafRef.current), []);
 
