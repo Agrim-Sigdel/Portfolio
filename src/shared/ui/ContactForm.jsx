@@ -2,19 +2,24 @@ import React, { useState } from 'react';
 import content from '../../data/content.json';
 
 /*
- * ContactForm: contact form backed by Netlify Forms.
+ * ContactForm: contact form backed by Netlify Forms, gated through a
+ * serverless function (netlify/functions/contact-submit.mts).
  *
- * Submissions are POSTed (URL-encoded) to Netlify, which stores them in the
- * site's Forms dashboard and (once configured there) emails a notification per
- * submission. Netlify detects the form at build time via the hidden static
- * <form name="contact"> stub in index.html — this React form just has to POST
- * with a matching `form-name` field. A hidden `bot-field` honeypot catches bots.
+ * The form still POSTs its fields, but to our own function instead of
+ * straight to Netlify's form endpoint. The function re-validates everything
+ * server-side, rejects submissions that don't look human (honeypot filled,
+ * submitted faster than a person could type), rate-limits by IP (Netlify
+ * Blobs), and only then forwards the submission on to Netlify Forms — which
+ * still stores it in the Forms dashboard and fires whatever notifications are
+ * configured there. Netlify detects the form shape at build time via the
+ * hidden static <form name="contact"> stub in index.html.
  *
- * Validation runs client-side before submit (and per-field on blur once a field
- * has been touched): name + message required, email required and well-formed,
- * phone optional but validated if provided.
+ * Validation also runs client-side before submit (and per-field on blur once
+ * a field has been touched) purely for instant feedback — it is not the
+ * security boundary, the function is.
  *
- * If the POST fails (e.g. running locally without Netlify), we fall back to a
+ * If the POST fails (e.g. running locally without Netlify, or the function
+ * rejects it for a reason other than rate-limiting), we fall back to a
  * mailto: link so the visitor can still reach out.
  *
  * `variant` ("fun" | "cv" | "terminal") only switches the class namespace so
@@ -22,11 +27,6 @@ import content from '../../data/content.json';
  */
 
 const NAMESPACES = { cv: 'cv-contactform', terminal: 'tcf', fun: 'cf' };
-
-const encode = (data) =>
-  Object.keys(data)
-    .map((k) => `${encodeURIComponent(k)}=${encodeURIComponent(data[k])}`)
-    .join('&');
 
 // Pragmatic email check — not RFC-perfect, but rejects the common mistakes.
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -61,7 +61,9 @@ export default function ContactForm({ variant = 'fun', className = '', onSent })
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
-  const [status, setStatus] = useState('idle'); // idle | sending | sent | error
+  const [status, setStatus] = useState('idle'); // idle | sending | sent | error | limited
+  // Fixed at mount so the function can tell "filled in 0.2s" (bot) from a real visit.
+  const [mountedAt] = useState(() => Date.now());
 
   const ns = NAMESPACES[variant] || NAMESPACES.fun;
 
@@ -95,12 +97,16 @@ export default function ContactForm({ variant = 'fun', className = '', onSent })
 
     setStatus('sending');
     try {
-      const res = await fetch('/', {
+      const res = await fetch('/.netlify/functions/contact-submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: encode({ 'form-name': 'contact', 'bot-field': '', ...form }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, 'bot-field': honeypot || '', startedAt: mountedAt }),
       });
-      if (!res.ok) throw new Error(`Netlify responded ${res.status}`);
+      if (res.status === 429) {
+        setStatus('limited');
+        return;
+      }
+      if (!res.ok) throw new Error(`Contact function responded ${res.status}`);
       setStatus('sent');
       setForm(EMPTY);
       setTouched({});
@@ -213,6 +219,11 @@ export default function ContactForm({ variant = 'fun', className = '', onSent })
         {status === 'sent' && (
           <span className={`${ns}-sent`} role="status">
             Thanks — your message is on its way. I’ll get back to you soon.
+          </span>
+        )}
+        {status === 'limited' && (
+          <span className={`${ns}-sent`} role="status">
+            You’ve sent a few messages already — please wait a bit before sending another.
           </span>
         )}
         {status === 'error' && (
