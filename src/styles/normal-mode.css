@@ -345,6 +345,11 @@
   font-size: 0.78rem;
   color: #c0392b;
 }
+.cv-contactform-counter {
+  align-self: flex-end;
+  font-size: 0.72rem;
+  color: #999;
+}
 .cv-contactform-sent { font-size: 0.85rem; color: #666; }
 .cv-contactform-sent a { color: #c14a24; }
 

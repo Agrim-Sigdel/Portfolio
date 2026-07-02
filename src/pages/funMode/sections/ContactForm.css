@@ -97,6 +97,12 @@
   font-size: 0.78rem;
   color: #ff7a6b;
 }
+.cf-counter {
+  align-self: flex-end;
+  font-size: 0.72rem;
+  color: var(--text-muted, #888);
+  opacity: 0.8;
+}
 
 .cf-sent {
   font-size: 0.9rem;

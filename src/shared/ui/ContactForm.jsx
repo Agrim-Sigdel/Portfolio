@@ -33,9 +33,15 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Phone: optional. Allow digits, spaces, dashes, parens, leading +; 7–15 digits.
 const PHONE_RE = /^\+?[\d\s().-]{7,20}$/;
 
+// Max characters per field. `maxLength` on the inputs hard-caps typing/paste;
+// validate() double-checks so the error surfaces if a limit is ever bypassed.
+const MAX_LENGTHS = { name: 80, email: 120, phone: 20, message: 1000 };
+
 const validate = (form) => {
   const errors = {};
   if (!form.name.trim()) errors.name = 'Please enter your name.';
+  else if (form.name.trim().length > MAX_LENGTHS.name)
+    errors.name = `Name is too long (max ${MAX_LENGTHS.name} characters).`;
   if (!form.email.trim()) errors.email = 'Please enter your email.';
   else if (!EMAIL_RE.test(form.email.trim())) errors.email = 'Please enter a valid email address.';
   if (form.phone.trim() && !PHONE_RE.test(form.phone.trim()))
@@ -43,6 +49,8 @@ const validate = (form) => {
   if (!form.message.trim()) errors.message = 'Please enter a message.';
   else if (form.message.trim().length < 10)
     errors.message = 'Message is a little short, add a few more details.';
+  else if (form.message.length > MAX_LENGTHS.message)
+    errors.message = `Message is too long (max ${MAX_LENGTHS.message} characters).`;
   return errors;
 };
 
@@ -123,6 +131,7 @@ export default function ContactForm({ variant = 'fun', className = '', onSent })
         <input
           type={type}
           name={name}
+          maxLength={MAX_LENGTHS[name]}
           autoComplete={autoComplete}
           value={form[name]}
           onChange={update(name)}
@@ -180,6 +189,7 @@ export default function ContactForm({ variant = 'fun', className = '', onSent })
         <textarea
           name="message"
           rows={5}
+          maxLength={MAX_LENGTHS.message}
           value={form.message}
           onChange={update('message')}
           onBlur={handleBlur('message')}
@@ -190,6 +200,9 @@ export default function ContactForm({ variant = 'fun', className = '', onSent })
           aria-invalid={messageErr ? 'true' : undefined}
           aria-describedby={messageErr ? `${ns}-err-message` : undefined}
         />
+        <span className={`${ns}-counter`} aria-live="polite">
+          {form.message.length}/{MAX_LENGTHS.message}
+        </span>
         {messageErr && <span id={`${ns}-err-message`} className={`${ns}-error`} role="alert">{messageErr}</span>}
       </label>
 

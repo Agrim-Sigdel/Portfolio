@@ -197,6 +197,7 @@
   color: #f85149;
 }
 .tcf-error::before { content: '! '; }
+.tcf-counter { align-self: flex-end; font-size: 0.7rem; color: #6e7681; }
 .tcf-textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
 .tcf-actions {
   display: flex;
