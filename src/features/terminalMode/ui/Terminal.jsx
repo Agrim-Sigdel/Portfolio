@@ -414,6 +414,14 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
     const [maximized, setMaximized] = useState(false);
     const [contactOpen, setContactOpen] = useState(false);
 
+    // Touch devices navigate the terminal through the command palette, so we
+    // never auto-focus the hidden input there — doing so would pop the on-screen
+    // keyboard with nothing to type into. The contact form is a separate modal
+    // that focuses its own fields, so the keyboard still opens when it's needed.
+    const [isTouch] = useState(
+        () => typeof window !== 'undefined' && !!window.matchMedia?.('(hover: none)').matches,
+    );
+
     const inputRef = useRef(null);
     const scrollRef = useRef(null);
 
@@ -448,8 +456,8 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
     }, [outputLines]);
 
     useEffect(() => {
-        if (!showMenu && windowState === 'open') inputRef.current?.focus();
-    }, [showMenu, windowState]);
+        if (!isTouch && !showMenu && windowState === 'open') inputRef.current?.focus();
+    }, [isTouch, showMenu, windowState]);
 
     // Esc restores a maximized window.
     useEffect(() => {
@@ -459,7 +467,7 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
     }, [maximized]);
 
     const handleTerminalClick = () => {
-        if (!showMenu && windowState === 'open') inputRef.current?.focus();
+        if (!isTouch && !showMenu && windowState === 'open') inputRef.current?.focus();
     };
 
     const handleSubmit = (e, manualValue) => {
@@ -692,7 +700,7 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
                                 }}
                             />
                         </div>
-                        <span className="term-touch-hint">tap to type · try “help”</span>
+                        <span className="term-touch-hint">tap ❯_ below to explore</span>
                     </form>
                 </div>
 

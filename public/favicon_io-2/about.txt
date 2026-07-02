@@ -1,6 +1,6 @@
 This favicon was generated using the following font:
 
-- Font Title: Lakki Reddy
+- Font Title: Kenia
 - Font Author: undefined
-- Font Source: https://fonts.gstatic.com/s/lakkireddy/v24/S6u5w49MUSzD9jlCPmvLZQfox9k97-xZ.ttf
+- Font Source: https://fonts.gstatic.com/s/kenia/v29/jizURE5PuHQH9qCONUGswfGM.ttf
 - Font License: undefined)
