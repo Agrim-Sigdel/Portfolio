@@ -1,8 +1,8 @@
 import React, { useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
 import { useTheme } from './shared/lib/ThemeContext';
-import ModeSelector from './features/modeSelection/ui/ModeSelector';
+import ModeTriptych from './features/modeSelection/ui/ModeTriptych';
+import ErrorBoundary from './shared/ui/ErrorBoundary';
 import './pages/funMode/funMode.css';
 import './App.css';
 
@@ -25,6 +25,34 @@ const MODE_TO_SLUG = { normal: 'cv', fun: 'normal', work: 'terminal' };
 // data-theme applied per mode (matches the previous behaviour).
 const MODE_THEME = { fun: null, work: 'dark', normal: 'light' }; // null = respect user theme
 
+/* Shown while a lazy mode chunk downloads — replaces the old blank screen. */
+function ModeLoader() {
+  return (
+    <div
+      role="status"
+      aria-label="Loading"
+      style={{
+        minHeight: '100dvh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#0b0b0b',
+      }}
+    >
+      <span
+        className="db-spin"
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: '50%',
+          border: '3px solid rgba(245,245,245,0.2)',
+          borderTopColor: '#ff4c2b',
+        }}
+      />
+    </div>
+  );
+}
+
 function App() {
   return (
     <Routes>
@@ -38,9 +66,7 @@ function App() {
 
 /* ----------------------------------------------------- mode selector ('/') */
 function SelectorRoute() {
-  const navigate = useNavigate();
-
-  // Start page defaults to dark deep-space; lock scroll while it's up.
+  // Start page defaults to dark; lock scroll while it's up.
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', 'dark');
     document.body.style.overflow = 'hidden';
@@ -49,14 +75,10 @@ function SelectorRoute() {
     };
   }, []);
 
-  // ModeSelector plays its own warp transition, then calls this with the mode id.
-  const handleModeSelection = (mode) => navigate(`/${MODE_TO_SLUG[mode]}`);
-
+  // The triptych's doors are real router links, so it navigates itself.
   return (
     <div className="App">
-      <AnimatePresence mode="wait">
-        <ModeSelector onSelectMode={handleModeSelection} />
-      </AnimatePresence>
+      <ModeTriptych />
     </div>
   );
 }
@@ -92,22 +114,24 @@ function ModeRoute() {
 
   return (
     <div className="App">
-      <Suspense fallback={null}>
-        {/* FUN MODE - Modern interactive website */}
-        {mode === 'fun' && <FunModePage onResetMode={goToStart} />}
+      <ErrorBoundary>
+        <Suspense fallback={<ModeLoader />}>
+          {/* FUN MODE - Modern interactive website */}
+          {mode === 'fun' && <FunModePage onResetMode={goToStart} />}
 
-        {/* WORK MODE - Terminal interface */}
-        {mode === 'work' && (
-          <Terminal
-            onSwitchToFun={() => goToMode('fun')}
-            onSwitchToNormal={() => goToMode('normal')}
-            onResetMode={goToStart}
-          />
-        )}
+          {/* WORK MODE - Terminal interface */}
+          {mode === 'work' && (
+            <Terminal
+              onSwitchToFun={() => goToMode('fun')}
+              onSwitchToNormal={() => goToMode('normal')}
+              onResetMode={goToStart}
+            />
+          )}
 
-        {/* NORMAL MODE - Clean simple HTML */}
-        {mode === 'normal' && <NormalModePage onResetMode={goToStart} />}
-      </Suspense>
+          {/* NORMAL MODE - Clean simple HTML */}
+          {mode === 'normal' && <NormalModePage onResetMode={goToStart} />}
+        </Suspense>
+      </ErrorBoundary>
     </div>
   );
 }

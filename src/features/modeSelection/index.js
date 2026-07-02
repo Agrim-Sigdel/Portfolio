@@ -1,1 +1,1 @@
-export { default as ModeSelector } from "./ui/ModeSelector";
+export { default as ModeTriptych } from "./ui/ModeTriptych";

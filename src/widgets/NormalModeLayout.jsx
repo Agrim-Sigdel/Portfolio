@@ -29,7 +29,7 @@ const NormalModeLayout = ({ onResetMode }) => {
         doneLabel="Downloaded"
       />
 
-      <article className="cv-paper">
+      <main className="cv-paper">
         {/* ---------- Header ---------- */}
         <header className="cv-header">
           <h1 className="cv-name">{personal.name}</h1>
@@ -196,7 +196,7 @@ const NormalModeLayout = ({ onResetMode }) => {
             Send a message
           </button>
         </section>
-      </article>
+      </main>
 
       <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} variant="cv" />
     </div>

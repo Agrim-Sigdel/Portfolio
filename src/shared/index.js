@@ -1,8 +1,1 @@
-export {
-  CustomCursor,
-  Preloader,
-  ReturnToStartButton,
-  Squiggle,
-  SnakeBackground,
-  SnakeSquiggle,
-} from "./ui";
+export { ReturnToStartButton, Squiggle } from "./ui";

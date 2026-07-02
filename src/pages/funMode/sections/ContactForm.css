@@ -43,7 +43,7 @@
   outline: none;
   transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
 }
-.cf-input::placeholder { color: rgba(245, 245, 245, 0.35); }
+.cf-input::placeholder { color: rgba(245, 245, 245, 0.55); }
 .cf-input:focus {
   border-color: var(--accent-red, #ff4c2b);
   background: rgba(255, 255, 255, 0.06);

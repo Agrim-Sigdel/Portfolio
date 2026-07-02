@@ -1,18 +1,12 @@
 import {
-    getWelcomeView,
-    getHelpView,
-    getMenuView,
-    getAboutView,
-    getResearchView,
-    getProjectsView,
-    getExperienceView,
-    getSkillsView,
-    getContactView,
-    getTreeView,
-    getNeofetchView,
-    getManView,
-    FILES,
-} from './TerminalViews';
+    CONTACT_ACTION,
+    HOME,
+    resolvePath,
+    getNode,
+    childNames,
+    displayName,
+} from './vfs';
+import { getMenuView, getNeofetchView, getWhoamiView, MENU } from './TerminalViews';
 
 /*
  * Single source of truth for every terminal command.
@@ -20,167 +14,313 @@ import {
  * Each entry:
  *   name        canonical command name
  *   aliases     alternate spellings that resolve to this command
- *   group       help section it appears under (null = hidden from help)
- *   args        short usage hint shown in help/man (optional)
+ *   group       help section ('filesystem' | 'terminal' | 'site'; null = hidden)
+ *   args        usage hint shown in help/man (optional)
  *   description one-liner for help + man
- *   handler     (ctx) => result, where ctx = { args, currentView, navigationHistory, commandHistory }
+ *   manual      longer text for `man` (optional)
+ *   handler     (ctx) => result, ctx = { args, rawArgs, cwd, commandHistory }
  *
- * A result may contain: { output, view, error, clearScreen, resetMode,
- *                         switchToFun, switchToNormal, toggleFullscreen, isBack }
+ * A result may contain: { output, error, cwd, clearScreen, isMenu,
+ *   openContact, openUrl, resetMode, switchToFun, switchToNormal, toggleFullscreen }
  */
 
-const sectionViews = {
-    about: getAboutView,
-    research: getResearchView,
-    projects: getProjectsView,
-    experience: getExperienceView,
-    skills: getSkillsView,
-    contact: getContactView,
-    menu: getMenuView,
-    help: getHelpView,
-    welcome: getWelcomeView,
+const err = (output) => ({ output, error: true });
+
+/* ─── output formatting helpers ──────────────────────────────────── */
+
+// Lay names out in ls-style columns.
+const columns = (names, width = 64) => {
+    if (!names.length) return '';
+    const colw = Math.max(...names.map((n) => n.length)) + 2;
+    const per = Math.max(1, Math.floor(width / colw));
+    const rows = [];
+    for (let i = 0; i < names.length; i += per) {
+        rows.push(
+            names
+                .slice(i, i + per)
+                .map((n, j, row) => (j === row.length - 1 ? n : n.padEnd(colw)))
+                .join('')
+        );
+    }
+    return rows.join('\n');
 };
 
-// Open a portfolio section (used by name, number, `cd`, and `cat`).
-const openSection = (name) => ({ output: sectionViews[name](), view: name });
+const longRow = (node) => {
+    const isDir = node.type === 'dir';
+    const perms = isDir ? 'drwxr-xr-x' : '-rw-r--r--';
+    const size = isDir
+        ? 64 + 32 * Object.keys(node.children).length
+        : node.binary ? node.size : node.content.length;
+    return `${perms}  agrim  ${String(size).padStart(7)}  ${displayName(node)}`;
+};
+
+// Recursive box-drawing tree of a directory node.
+const treeLines = (node, prefix = '') => {
+    const names = childNames(node);
+    return names.flatMap((name, i) => {
+        const child = node.children[name];
+        const last = i === names.length - 1;
+        const line = `${prefix}${last ? '└── ' : '├── '}${displayName(child)}`;
+        return child.type === 'dir'
+            ? [line, ...treeLines(child, prefix + (last ? '    ' : '│   '))]
+            : [line];
+    });
+};
+
+const treeCounts = (node) => {
+    let dirs = 0, files = 0;
+    for (const name of childNames(node)) {
+        const child = node.children[name];
+        if (child.type === 'dir') {
+            dirs += 1;
+            const sub = treeCounts(child);
+            dirs += sub.dirs;
+            files += sub.files;
+        } else files += 1;
+    }
+    return { dirs, files };
+};
+
+// Shared path→node lookup with a per-command error prefix.
+const lookup = (cmd, target, cwd) => {
+    const path = resolvePath(cwd, target);
+    const node = getNode(path);
+    if (!node) return { error: err(`${cmd}: ${target}: no such file or directory`) };
+    return { node, path };
+};
+
+/* ─── command registry ───────────────────────────────────────────── */
 
 export const COMMANDS = [
-    /* ─── Navigation ─────────────────────────────────────────────── */
+    /* ── filesystem ── */
     {
-        name: 'ls', aliases: ['dir', 'll'], group: 'Navigation',
-        description: 'list portfolio sections',
-        handler: () => ({
-            output: `\ntotal ${Object.keys(FILES).length}\n${Object.values(FILES)
-                .map((f) => `  ${f.name.padEnd(18)}${f.label}`)
-                .join('\n')}\n`,
-            view: 'ls',
-        }),
-    },
-    {
-        name: 'cd', aliases: [], group: 'Navigation', args: '<section>',
-        description: 'open a section  (cd .. = back, cd ~ = home)',
-        handler: ({ args, navigationHistory }) => {
-            const target = (args[0] || '~').toLowerCase().replace(/\.(md|json|vcf|pdf|log)$/, '');
-            if (target === '~' || target === '/' || target === 'home') return openSection('welcome');
-            if (target === '..' || target === '-') return runByName('back', { navigationHistory });
-            if (sectionViews[target]) return openSection(target);
-            return notFound(`cd: no such section: ${args[0] || ''}`);
+        name: 'ls', aliases: ['ll', 'dir'], group: 'filesystem', args: '[path]',
+        description: 'list directory contents',
+        manual: "Lists the contents of a directory (default: the current one). Directories are shown with a trailing '/'. Use 'ls -l' for a long listing with sizes.",
+        handler: ({ args, cwd }) => {
+            const long = args.some((a) => /^-l/.test(a) || a === '-al' || a === '-la');
+            const target = args.find((a) => !a.startsWith('-'));
+            const { node, error } = lookup('ls', target ?? '.', cwd);
+            if (error) return error;
+            if (node.type === 'file') return { output: long ? longRow(node) : node.name };
+            const kids = childNames(node).map((n) => node.children[n]);
+            if (!kids.length) return { output: '' };
+            return {
+                output: long
+                    ? kids.map(longRow).join('\n')
+                    : columns(kids.map(displayName)),
+            };
         },
     },
     {
-        name: 'cat', aliases: [], group: 'Navigation', args: '<file>',
-        description: 'print a section to the screen',
-        handler: ({ args }) => {
-            if (!args[0]) return notFound('cat: missing file operand');
-            const key = args[0].toLowerCase().replace(/\.(md|json|vcf|pdf|log)$/, '');
-            const file = FILES[key];
-            if (file) return openSection(file.section);
-            return notFound(`cat: ${args[0]}: No such file or directory`);
+        name: 'cd', aliases: [], group: 'filesystem', args: '<path>',
+        description: 'change directory',
+        manual: "Moves into a directory. Supports relative paths, '..', '.', '~' and '/'. Bare 'cd' returns home.",
+        handler: ({ args, cwd }) => {
+            const target = args[0];
+            if (!target) return { output: '', cwd: HOME };
+            const path = resolvePath(cwd, target);
+            const node = getNode(path);
+            if (!node) return err(`cd: no such file or directory: ${target}`);
+            if (node.type !== 'dir') return err(`cd: not a directory: ${target}`);
+            return { output: '', cwd: path };
         },
     },
     {
-        name: 'pwd', aliases: [], group: 'Navigation',
+        name: 'cat', aliases: [], group: 'filesystem', args: '<file>',
+        description: 'print a file',
+        manual: "Prints a text file to the terminal. Binary files (like resume.pdf) can't be printed — use 'open' for those.",
+        handler: ({ args, cwd }) => {
+            if (!args[0]) return err('cat: missing operand');
+            const { node, error } = lookup('cat', args[0], cwd);
+            if (error) return error;
+            if (node.type === 'dir') return err(`cat: ${args[0]}: is a directory`);
+            if (node.binary) return err(`cat: ${node.name}: binary file (use 'open ${node.name}')`);
+            return { output: node.content };
+        },
+    },
+    {
+        name: 'head', aliases: [], group: 'filesystem', args: '<file>',
+        description: 'first 10 lines of a file',
+        handler: ({ args, cwd }) => {
+            if (!args[0]) return err('head: missing operand');
+            const { node, error } = lookup('head', args[0], cwd);
+            if (error) return error;
+            if (node.type === 'dir') return err(`head: ${args[0]}: is a directory`);
+            if (node.binary) return err(`head: ${node.name}: binary file`);
+            return { output: node.content.split('\n').slice(0, 10).join('\n') };
+        },
+    },
+    {
+        name: 'open', aliases: [], group: 'filesystem', args: '<file>',
+        description: 'open a file (PDFs open in a new tab)',
+        manual: 'Opens a file. PDFs (resume.pdf, research/catd-paper.pdf) open in a new browser tab; text files are printed like cat.',
+        handler: ({ args, cwd }) => {
+            if (!args[0]) return err('open: missing operand');
+            const { node, error } = lookup('open', args[0], cwd);
+            if (error) return error;
+            if (node.type === 'dir') return err(`open: ${args[0]}: is a directory`);
+            if (node.binary && node.href) return { output: `opening ${node.name}…`, openUrl: node.href };
+            return { output: node.content };
+        },
+    },
+    {
+        name: 'grep', aliases: [], group: 'filesystem', args: '<term> [path]',
+        description: 'search file contents',
+        manual: 'Case-insensitive substring search across all text files under a path (default: the current directory). Prints up to 20 matching lines.',
+        handler: ({ args, cwd }) => {
+            const [term, target] = args;
+            if (!term) return err('usage: grep <term> [path]');
+            const { node, error } = lookup('grep', target ?? '.', cwd);
+            if (error) return error;
+            const MAX = 20;
+            const results = [];
+            const visit = (n, rel) => {
+                if (results.length > MAX) return;
+                if (n.type === 'dir') {
+                    for (const name of childNames(n)) visit(n.children[name], rel ? `${rel}/${name}` : name);
+                } else if (!n.binary) {
+                    for (const line of n.content.split('\n')) {
+                        if (results.length > MAX) return;
+                        if (line.trim() === CONTACT_ACTION) continue;
+                        if (line.toLowerCase().includes(term.toLowerCase())) {
+                            results.push(`${rel || n.name}: ${line.trim()}`);
+                        }
+                    }
+                }
+            };
+            visit(node, node.type === 'dir' ? '' : (target || node.name));
+            if (!results.length) return { output: `grep: no matches for '${term}'` };
+            const truncated = results.length > MAX;
+            return {
+                output: results.slice(0, MAX).join('\n') + (truncated ? `\n… (showing first ${MAX} matches)` : ''),
+            };
+        },
+    },
+    {
+        name: 'tree', aliases: [], group: 'filesystem', args: '[path]',
+        description: 'directory tree',
+        handler: ({ args, cwd }) => {
+            const { node, path, error } = lookup('tree', args[0] ?? '.', cwd);
+            if (error) return error;
+            if (node.type === 'file') return { output: node.name };
+            const { dirs, files } = treeCounts(node);
+            return { output: [path, ...treeLines(node), '', `${dirs} directories, ${files} files`].join('\n') };
+        },
+    },
+    {
+        name: 'pwd', aliases: [], group: 'filesystem',
         description: 'print working directory',
-        handler: ({ currentView }) => ({
-            output: `\n/home/agrim/portfolio${currentView === 'welcome' ? '' : '/' + currentView}\n`,
-            view: currentView,
-        }),
-    },
-    {
-        name: 'tree', aliases: [], group: 'Navigation',
-        description: 'show the portfolio as a directory tree',
-        handler: () => ({ output: getTreeView(), view: 'tree' }),
-    },
-    {
-        name: 'back', aliases: ['b'], group: 'Navigation',
-        description: 'return to the previous view',
-        handler: ({ navigationHistory }) => {
-            if (navigationHistory.length > 0) {
-                const prev = navigationHistory[navigationHistory.length - 1];
-                return { output: (sectionViews[prev] || getMenuView)(), view: prev, isBack: true };
-            }
-            return { output: "\nAlready at home. Type 'menu' to see options.\n", view: 'welcome' };
-        },
+        handler: ({ cwd }) => ({ output: `/home/agrim${cwd.slice(1)}` }),
     },
 
-    /* ─── Portfolio ──────────────────────────────────────────────── */
-    { name: 'about', aliases: [], group: 'Portfolio', description: 'professional summary & education', handler: () => openSection('about') },
-    { name: 'research', aliases: [], group: 'Portfolio', description: 'publications & the CATD framework', handler: () => openSection('research') },
-    { name: 'projects', aliases: [], group: 'Portfolio', description: 'portfolio of work & achievements', handler: () => openSection('projects') },
-    { name: 'experience', aliases: ['exp'], group: 'Portfolio', description: 'career history & roles', handler: () => openSection('experience') },
-    { name: 'skills', aliases: [], group: 'Portfolio', description: 'technical toolkit & expertise', handler: () => openSection('skills') },
-    { name: 'contact', aliases: [], group: 'Portfolio', description: 'get in touch', handler: () => openSection('contact') },
-    { name: 'menu', aliases: [], group: 'Portfolio', description: 'show the main menu of sections', handler: () => openSection('menu') },
-
-    /* ─── System ─────────────────────────────────────────────────── */
+    /* ── terminal ── */
     {
-        name: 'help', aliases: ['?', '--help', '-h'], group: 'System',
-        description: 'show this help message',
-        handler: () => ({ output: getHelpView(), view: 'help' }),
+        name: 'help', aliases: ['?', '--help', '-h'], group: 'terminal',
+        description: 'this list',
+        handler: () => ({ output: getHelpView() }),
     },
     {
-        name: 'man', aliases: [], group: 'System', args: '<command>',
-        description: 'show the manual for a command',
+        name: 'man', aliases: [], group: 'terminal', args: '<cmd>',
+        description: 'manual for a command',
         handler: ({ args }) => {
             const cmd = resolve(args[0] || '');
-            if (!cmd) return notFound(`No manual entry for ${args[0] || ''}`);
-            return { output: getManView(cmd), view: 'man' };
+            if (!cmd) return err(`man: no manual entry for ${args[0] || '(none)'}`);
+            return { output: getManView(cmd) };
         },
     },
     {
-        name: 'whoami', aliases: [], group: 'System',
-        description: 'print the current user',
-        handler: () => ({ output: getNeofetchView({ short: true }), view: 'whoami' }),
-    },
-    {
-        name: 'neofetch', aliases: ['fetch'], group: 'System',
-        description: 'display system & profile info',
-        handler: () => ({ output: getNeofetchView(), view: 'neofetch' }),
-    },
-    {
-        name: 'echo', aliases: [], group: 'System', args: '<text>',
-        description: 'print text back to the screen',
-        handler: ({ args }) => ({ output: `\n${args.join(' ')}\n`, view: 'echo' }),
-    },
-    {
-        name: 'date', aliases: [], group: 'System',
-        description: 'print the current date & time',
-        handler: () => ({ output: `\n${new Date().toString()}\n`, view: 'date' }),
-    },
-    {
-        name: 'history', aliases: [], group: 'System',
-        description: 'show command history',
+        name: 'history', aliases: [], group: 'terminal',
+        description: 'command history',
         handler: ({ commandHistory }) => ({
             output: commandHistory.length
-                ? `\n${commandHistory.map((c, i) => `  ${String(i + 1).padStart(3)}  ${c}`).join('\n')}\n`
-                : '\nNo commands yet.\n',
-            view: 'history',
+                ? commandHistory.map((c, i) => `  ${String(i + 1).padStart(3)}  ${c}`).join('\n')
+                : 'no commands yet',
         }),
     },
     {
-        name: 'clear', aliases: ['cls'], group: 'System',
-        description: 'clear the terminal screen',
-        handler: () => ({ output: '', view: 'clear', clearScreen: true }),
+        name: 'clear', aliases: ['cls'], group: 'terminal',
+        description: 'clear the screen (Ctrl+L)',
+        handler: () => ({ output: '', clearScreen: true }),
+    },
+    {
+        name: 'whoami', aliases: [], group: 'terminal',
+        description: 'who is this?',
+        handler: () => ({ output: getWhoamiView() }),
+    },
+    {
+        name: 'neofetch', aliases: ['fetch'], group: 'terminal',
+        description: 'system & profile info',
+        handler: () => ({ output: getNeofetchView() }),
+    },
+    {
+        name: 'echo', aliases: [], group: 'terminal', args: '<text>',
+        description: 'print text',
+        handler: ({ rawArgs }) => ({ output: rawArgs || '' }),
+    },
+
+    /* ── site ── */
+    {
+        name: 'contact', aliases: [], group: 'site',
+        description: 'open the contact form',
+        manual: "Opens the message form right in the terminal. For plain details, 'cat ~/contact.txt'.",
+        handler: () => ({
+            output: "opening contact form… ('cat ~/contact.txt' for plain details)",
+            openContact: true,
+        }),
+    },
+    {
+        name: 'menu', aliases: [], group: 'site',
+        description: 'guided tour (numbered menu)',
+        handler: () => ({ output: getMenuView(), isMenu: true }),
+    },
+    {
+        name: 'portfolio', aliases: ['fun'], group: 'site',
+        description: 'switch to the visual portfolio',
+        handler: () => ({ output: 'switching to the visual portfolio…', switchToFun: true }),
+    },
+    {
+        name: 'cv', aliases: ['resume', 'normal'], group: 'site',
+        description: 'switch to the classic CV view',
+        handler: () => ({ output: 'switching to the classic CV…', switchToNormal: true }),
+    },
+    {
+        name: 'exit', aliases: ['home', 'quit', 'logout', 'start'], group: 'site',
+        description: 'back to mode selection',
+        handler: () => ({ output: 'returning to mode selection…', resetMode: true }),
+    },
+
+    /* ── hidden ── */
+    {
+        name: 'fullscreen', aliases: ['maximize'], group: null,
+        description: 'toggle fullscreen',
+        handler: () => ({ output: 'toggling fullscreen…', toggleFullscreen: true }),
     },
     {
         name: 'sudo', aliases: [], group: null, args: '<command>',
         description: 'execute a command as superuser',
-        handler: ({ args }) => ({
-            output: `\nagrim is not in the sudoers file. This incident will be reported. 😏\n${args.length ? `(nice try with "${args.join(' ')}")\n` : ''}`,
-            view: 'sudo', error: true,
-        }),
+        handler: ({ rawArgs }) => {
+            if (rawArgs.replace(/\s+/g, ' ').trim() === 'hire-me') {
+                return {
+                    output: [
+                        '[sudo] password for visitor: ········',
+                        'access granted — recruitment protocol initiated',
+                        '',
+                        '  ✓ resume located          open ~/resume.pdf',
+                        '  ✓ references compiled     ls ~/experience',
+                        '  ✓ channel established     sigdelagrim35@gmail.com',
+                        '',
+                        "Let's build something. Type 'contact' to send a message.",
+                    ].join('\n'),
+                };
+            }
+            return err(`agrim is not in the sudoers file. This incident will be reported. 😏${rawArgs ? `\n(nice try with "${rawArgs}")` : ''}`);
+        },
     },
-
-    /* ─── Mode ───────────────────────────────────────────────────── */
-    { name: 'fun', aliases: ['close'], group: 'Mode', description: 'switch to FUN mode', handler: () => ({ output: 'Switching to FUN mode...\n', view: 'fun', switchToFun: true }) },
-    { name: 'normal', aliases: ['minimize'], group: 'Mode', description: 'switch to NORMAL mode', handler: () => ({ output: 'Switching to NORMAL mode...\n', view: 'normal', switchToNormal: true }) },
-    { name: 'fullscreen', aliases: ['maximize'], group: 'Mode', description: 'toggle fullscreen', handler: () => ({ output: 'Toggling fullscreen...\n', view: 'fullscreen', toggleFullscreen: true }) },
-    { name: 'exit', aliases: ['start', 'quit', 'logout'], group: 'Mode', description: 'return to mode selection', handler: () => ({ output: 'Returning to mode selection...\n', view: 'exit', resetMode: true }) },
 ];
 
-/* ─── Lookup helpers ─────────────────────────────────────────────── */
+/* ─── lookup tables ──────────────────────────────────────────────── */
 
-// name/alias -> command object
 const LOOKUP = (() => {
     const map = {};
     for (const cmd of COMMANDS) {
@@ -190,112 +330,155 @@ const LOOKUP = (() => {
     return map;
 })();
 
-// Numbered shortcuts mirror the main menu order.
-const NUMBER_MAP = { '1': 'about', '2': 'research', '3': 'projects', '4': 'experience', '5': 'skills', '6': 'contact' };
-
 export const resolve = (token) => LOOKUP[String(token).toLowerCase()] || null;
 
-// All visible names for tab-completion (canonical names + aliases that are real words).
-export const COMPLETIONS = [
-    ...COMMANDS.map((c) => c.name),
-    ...Object.keys(NUMBER_MAP),
-].sort();
+// Visible command names for completion + "did you mean".
+const COMMAND_NAMES = COMMANDS.filter((c) => c.group).map((c) => c.name).sort();
 
-// Commands whose argument is a file/section name (so `cat a<Tab>` completes filenames).
-const FILE_ARG_COMMANDS = { cat: 'name', cd: 'section', man: 'cmd' };
+/* ─── help / man views (generated from the registry) ─────────────── */
 
-// Filenames (with extensions) and bare section names, for argument completion.
-const FILE_NAMES = Object.values(FILES).map((f) => f.name);
-const SECTION_NAMES = Object.keys(FILES);
+const usage = (c) => `${c.name}${c.args ? ' ' + c.args : ''}`;
 
-/*
- * Context-aware completion for the whole input line.
- * Returns { completed, matches } where:
- *   completed = the full line to set if there's a single unambiguous completion (else null)
- *   matches   = all candidate tokens (for showing a list when ambiguous)
- * The completion is computed for the LAST word being typed.
- */
-export const complete = (input) => {
-    const endsWithSpace = /\s$/.test(input);
-    const parts = input.split(/\s+/).filter(Boolean);
-    const typingArg = parts.length > 1 || (parts.length === 1 && endsWithSpace);
-
-    let pool;
-    let fragment;
-    let prefix; // everything before the word being completed
-
-    if (!typingArg) {
-        // Completing the command itself.
-        pool = COMPLETIONS;
-        fragment = (parts[0] || '').toLowerCase();
-        prefix = '';
-    } else {
-        const cmd = parts[0].toLowerCase();
-        fragment = endsWithSpace ? '' : (parts[parts.length - 1] || '').toLowerCase();
-        prefix = input.slice(0, input.length - fragment.length);
-        if (FILE_ARG_COMMANDS[cmd] === 'name') pool = FILE_NAMES;
-        else if (FILE_ARG_COMMANDS[cmd] === 'section') pool = SECTION_NAMES;
-        else if (FILE_ARG_COMMANDS[cmd] === 'cmd') pool = COMMANDS.map((c) => c.name);
-        else pool = []; // command takes no completable arg
-    }
-
-    const matches = pool.filter((c) => c.toLowerCase().startsWith(fragment));
-
-    if (matches.length === 1) {
-        return { completed: prefix + matches[0], matches };
-    }
-    if (matches.length > 1) {
-        // Complete the longest common prefix, then let the user pick.
-        const lcp = longestCommonPrefix(matches);
-        const completed = lcp.length > fragment.length ? prefix + lcp : null;
-        return { completed, matches };
-    }
-    return { completed: null, matches: [] };
+export const getHelpView = () => {
+    const GROUP_ORDER = ['filesystem', 'terminal', 'site'];
+    const pad = Math.max(...COMMANDS.filter((c) => c.group).map((c) => usage(c).length)) + 4;
+    const body = GROUP_ORDER
+        .map((g) => {
+            const rows = COMMANDS
+                .filter((c) => c.group === g)
+                .map((c) => `  ${usage(c).padEnd(pad)}${c.description}`)
+                .join('\n');
+            return `${g}\n${rows}`;
+        })
+        .join('\n\n');
+    return `${body}\n\nTab completes commands & paths  ·  ↑↓ history  ·  Ctrl+L clear  ·  man <cmd> for details`;
 };
+
+export const getManView = (cmd) => {
+    const aliases = cmd.aliases.filter((a) => /^[a-z]/.test(a));
+    return [
+        'NAME',
+        `    ${cmd.name} — ${cmd.description}`,
+        '',
+        'SYNOPSIS',
+        `    ${usage(cmd)}`,
+        ...(cmd.manual ? ['', 'DESCRIPTION', ...cmd.manual.split('\n').map((l) => `    ${l}`)] : []),
+        ...(aliases.length ? ['', 'ALIASES', `    ${aliases.join(', ')}`] : []),
+    ].join('\n');
+};
+
+/* ─── tab completion (deliberate, bash-style) ────────────────────── */
+
+// Commands whose Nth+ argument is a path (1-based arg index).
+const PATH_ARG_AT = { ls: 1, cd: 1, cat: 1, head: 1, open: 1, tree: 1, grep: 2 };
 
 const longestCommonPrefix = (arr) => {
     if (!arr.length) return '';
     let p = arr[0];
     for (const s of arr) {
-        while (!s.toLowerCase().startsWith(p.toLowerCase())) p = p.slice(0, -1);
+        while (p && !s.toLowerCase().startsWith(p.toLowerCase())) p = p.slice(0, -1);
         if (!p) break;
     }
     return p;
 };
 
-const notFound = (msg) => ({ output: `\n${msg}\n`, view: undefined, error: true });
-
-// Run a command by its canonical name (used internally, e.g. `cd ..` -> back).
-const runByName = (name, ctx) => LOOKUP[name].handler({ args: [], ...ctx });
-
-// Suggest the closest command for "command not found".
-const suggest = (input) => {
-    const near = COMPLETIONS.find((c) => c.startsWith(input[0]) && Math.abs(c.length - input.length) <= 2);
-    return near ? `\nDid you mean '${near}'?` : '';
+// Shared tail: unique match → full completion; several → longest common prefix.
+const finish = (prefix, frag, rawNames, displays, insertions) => {
+    if (!rawNames.length) return { completed: null, matches: [] };
+    if (rawNames.length === 1) return { completed: prefix + insertions[0], matches: displays };
+    const lcp = longestCommonPrefix(rawNames);
+    return {
+        completed: lcp.length > frag.length ? prefix + lcp : null,
+        matches: displays,
+    };
 };
 
-/* ─── Public entry point ─────────────────────────────────────────── */
+/*
+ * complete(input, cwd) → { completed, matches }
+ *   completed  full replacement line when Tab can make progress (else null)
+ *   matches    candidate display names (shown when Tab can't progress)
+ *
+ * First token completes command names; later tokens complete VFS paths
+ * relative to cwd (cd only offers directories). Unique completions append
+ * ' ' for files/commands and '/' for directories, like bash.
+ */
+export const complete = (input, cwd = HOME) => {
+    const endsWithSpace = /\s$/.test(input);
+    const parts = input.split(/\s+/).filter(Boolean);
+    const typingCmd = parts.length === 0 || (parts.length === 1 && !endsWithSpace);
 
-export const parseCommand = (input, currentView, navigationHistory, commandHistory = []) => {
-    const raw = input.trim();
+    if (typingCmd) {
+        const frag = (parts[0] || '').toLowerCase();
+        const names = COMMAND_NAMES.filter((c) => c.startsWith(frag));
+        return finish('', frag, names, names, names.map((n) => n + ' '));
+    }
+
+    const cmdName = parts[0].toLowerCase();
+    const frag = endsWithSpace ? '' : parts[parts.length - 1];
+    const before = input.slice(0, input.length - frag.length);
+    const argIndex = endsWithSpace ? parts.length : parts.length - 1;
+
+    if (cmdName === 'man') {
+        const names = COMMAND_NAMES.filter((c) => c.startsWith(frag.toLowerCase()));
+        return finish(before, frag, names, names, names.map((n) => n + ' '));
+    }
+
+    if (!PATH_ARG_AT[cmdName] || argIndex < PATH_ARG_AT[cmdName]) {
+        return { completed: null, matches: [] };
+    }
+
+    // Path completion: split the fragment into a directory part and a basename.
+    const slash = frag.lastIndexOf('/');
+    const dirPart = slash >= 0 ? frag.slice(0, slash + 1) : '';
+    const base = slash >= 0 ? frag.slice(slash + 1) : frag;
+    const dirNode = getNode(resolvePath(cwd, dirPart || '.'));
+    if (!dirNode || dirNode.type !== 'dir') return { completed: null, matches: [] };
+
+    const kids = childNames(dirNode)
+        .map((n) => dirNode.children[n])
+        .filter((n) => n.name.toLowerCase().startsWith(base.toLowerCase()))
+        .filter((n) => cmdName !== 'cd' || n.type === 'dir');
+
+    return finish(
+        before + dirPart,
+        base,
+        kids.map((n) => n.name),
+        kids.map(displayName),
+        kids.map((n) => (n.type === 'dir' ? n.name + '/' : n.name + ' '))
+    );
+};
+
+/* ─── "did you mean" suggestion ──────────────────────────────────── */
+
+const suggest = (input) => {
+    if (!input) return '';
+    const near = COMMAND_NAMES.find(
+        (c) => c.startsWith(input[0]) && Math.abs(c.length - input.length) <= 2
+    );
+    return near ? `\n(did you mean '${near}'?)` : '';
+};
+
+/* ─── public entry point ─────────────────────────────────────────── */
+
+export const parseCommand = (input, ctx = {}) => {
+    const { cwd = HOME, commandHistory = [], menuActive = false } = ctx;
+    const raw = String(input).trim();
     const [head, ...args] = raw.split(/\s+/);
     const token = head.toLowerCase();
+    const rawArgs = raw.slice(head.length).trim();
 
-    if (NUMBER_MAP[token]) {
-        return LOOKUP[NUMBER_MAP[token]].handler({ args, currentView, navigationHistory, commandHistory });
+    // Number keys run menu entries — only while the menu is the last output.
+    if (menuActive && /^[0-9]$/.test(token)) {
+        const item = MENU.find((m) => m.key === token);
+        if (item) {
+            const result = parseCommand(item.cmd, { cwd, commandHistory, menuActive: false });
+            const echo = `→ ${item.cmd}`;
+            return { ...result, output: result.output ? `${echo}\n\n${result.output}` : echo };
+        }
     }
 
     const cmd = LOOKUP[token];
-    if (cmd) {
-        const result = cmd.handler({ args, currentView, navigationHistory, commandHistory });
-        // Handlers that don't set a view stay on the current one.
-        if (result.view === undefined) result.view = currentView;
-        return result;
-    }
+    if (cmd) return cmd.handler({ args, rawArgs, cwd, commandHistory });
 
-    return {
-        output: `\ncommand not found: ${head}${suggest(token)}\nType 'help' for available commands.\n`,
-        view: currentView,
-        error: true,
-    };
+    return err(`zsh: command not found: ${head}${suggest(token)}\nType 'help' for available commands.`);
 };

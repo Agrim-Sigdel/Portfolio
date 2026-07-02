@@ -8,7 +8,8 @@ const ReturnToStartButton = ({ onResetMode }) => {
             onClick={onResetMode}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-            data-cursor="Home"
+            onFocus={() => setIsHovered(true)}
+            onBlur={() => setIsHovered(false)}
             style={{
                 position: 'fixed',
                 bottom: '2rem',

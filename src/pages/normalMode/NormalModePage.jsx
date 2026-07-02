@@ -8,9 +8,9 @@ const NormalModePage = ({ onResetMode }) => {
     return (
         <>
             <SEO
-                title={`${common.personal.name} - Normal Mode`}
+                title={`${common.personal.name} - Résumé`}
                 description={common.personal.shortSummary || common.personal.summary}
-                url={`https://agrimsigdel.com.np/normal`}
+                url={`https://agrimsigdel.com.np/cv`}
             />
             <NormalModeLayout onResetMode={onResetMode} />
         </>

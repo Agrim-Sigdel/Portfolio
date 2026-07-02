@@ -13,7 +13,7 @@ const ThemeToggle = () => {
             className="theme-toggle"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            data-cursor={isDark ? 'Light Mode' : 'Dark Mode'}
+            aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
             style={{
                 position: 'fixed',
                 top: '2rem',
@@ -35,7 +35,7 @@ const ThemeToggle = () => {
             }}
             title={`Switch to ${isDark ? 'Light' : 'Dark'} Mode`}
         >
-            {isDark ? <MdLightMode /> : <MdDarkMode />}
+            {isDark ? <MdLightMode aria-hidden="true" /> : <MdDarkMode aria-hidden="true" />}
         </motion.button>
     );
 };

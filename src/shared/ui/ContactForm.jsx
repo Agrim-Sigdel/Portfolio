@@ -97,7 +97,7 @@ export default function ContactForm({ variant = 'fun', className = '', onSent })
       setForm(EMPTY);
       setTouched({});
       onSent?.();
-    } catch (err) {
+    } catch {
       // Fallback: open the visitor's mail client pre-filled so they can still reach out.
       const subject = `Portfolio contact from ${form.name || 'someone'}`;
       const phoneLine = form.phone ? `Phone: ${form.phone}\n` : '';
@@ -110,12 +110,14 @@ export default function ContactForm({ variant = 'fun', className = '', onSent })
   // A field's error is only shown once the field has been touched.
   const errFor = (field) => (touched[field] ? errors[field] : '');
 
-  const field = (name, label, { type = 'text', autoComplete, placeholder, optional = false } = {}) => {
+  const field = (name, label, { type = 'text', autoComplete, placeholder, optional = false, required = false } = {}) => {
     const err = errFor(name);
+    const errId = `${ns}-err-${name}`;
     return (
       <label className={`${ns}-field`}>
         <span className={`${ns}-label`}>
           {label}
+          {required && <span aria-hidden="true"> *</span>}
           {optional && <span className={`${ns}-optional`}> (optional)</span>}
         </span>
         <input
@@ -127,9 +129,12 @@ export default function ContactForm({ variant = 'fun', className = '', onSent })
           onBlur={handleBlur(name)}
           placeholder={placeholder}
           className={`${ns}-input ${err ? `${ns}-input--error` : ''}`}
+          required={required}
+          aria-required={required ? 'true' : undefined}
           aria-invalid={err ? 'true' : undefined}
+          aria-describedby={err ? errId : undefined}
         />
-        {err && <span className={`${ns}-error`} role="alert">{err}</span>}
+        {err && <span id={errId} className={`${ns}-error`} role="alert">{err}</span>}
       </label>
     );
   };
@@ -156,8 +161,8 @@ export default function ContactForm({ variant = 'fun', className = '', onSent })
       </p>
 
       <div className={`${ns}-row`}>
-        {field('name', 'Name', { autoComplete: 'name', placeholder: 'Your name' })}
-        {field('email', 'Email', { type: 'email', autoComplete: 'email', placeholder: 'you@example.com' })}
+        {field('name', 'Name', { autoComplete: 'name', placeholder: 'Your name', required: true })}
+        {field('email', 'Email', { type: 'email', autoComplete: 'email', placeholder: 'you@example.com', required: true })}
       </div>
 
       {field('phone', 'Phone', {
@@ -168,7 +173,10 @@ export default function ContactForm({ variant = 'fun', className = '', onSent })
       })}
 
       <label className={`${ns}-field`}>
-        <span className={`${ns}-label`}>Message</span>
+        <span className={`${ns}-label`}>
+          Message
+          <span aria-hidden="true"> *</span>
+        </span>
         <textarea
           name="message"
           rows={5}
@@ -177,9 +185,12 @@ export default function ContactForm({ variant = 'fun', className = '', onSent })
           onBlur={handleBlur('message')}
           placeholder="Tell me about your project or idea…"
           className={`${ns}-input ${ns}-textarea ${messageErr ? `${ns}-input--error` : ''}`}
+          required
+          aria-required="true"
           aria-invalid={messageErr ? 'true' : undefined}
+          aria-describedby={messageErr ? `${ns}-err-message` : undefined}
         />
-        {messageErr && <span className={`${ns}-error`} role="alert">{messageErr}</span>}
+        {messageErr && <span id={`${ns}-err-message`} className={`${ns}-error`} role="alert">{messageErr}</span>}
       </label>
 
       <div className={`${ns}-actions`}>

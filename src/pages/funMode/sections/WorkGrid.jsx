@@ -6,6 +6,7 @@ import { projectsData } from '../../../entities/portfolio/model';
 const WorkGrid = () => {
     return (
         <section id="work" className="container" style={{ padding: '4rem 0' }}>
+            <h2 className="sr-only">Selected Work</h2>
             <div className="masonry-grid">
                 {projectsData.map((project, index) => (
                     <motion.div
@@ -18,7 +19,6 @@ const WorkGrid = () => {
                             padding: '3rem 2.5rem',
                             backgroundColor: project.color,
                             borderRadius: '8px',
-                            cursor: 'pointer',
                             position: 'relative',
                             overflow: 'hidden'
                         }}

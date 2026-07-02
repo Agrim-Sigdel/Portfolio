@@ -13,7 +13,7 @@ import { Stage, InteractiveSurface, kineticType } from 'easy-3dkit';
  * intercepts clicks. <Stage> falls back gracefully if WebGL is unavailable.
  */
 const StarryNight = () => (
-    <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+    <div aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
         <Stage
             background={null}
             camera={{ position: [0, 0, 6], fov: 60 }}

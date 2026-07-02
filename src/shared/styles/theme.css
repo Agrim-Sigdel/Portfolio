@@ -22,7 +22,7 @@
 :root {
   /* Typography */
   --font-serif: "Fraunces", serif;
-  --font-sans: "Inter", sans-serif;
+  --font-sans: "Instrument Sans", "Inter", system-ui, sans-serif;
   --font-display: "Fraunces", serif;
 
   /* Spacing */
@@ -55,10 +55,13 @@
   background-color: #0b0b0b;
 }
 
-/* Smooth transition between themes */
+/* Smooth transition between themes — scoped to the surfaces that actually
+   change; a universal `*` rule made every theme toggle restyle the whole DOM */
 html,
 body,
-* {
+main,
+section,
+article {
   transition:
     background-color 0.3s ease,
     color 0.3s ease,

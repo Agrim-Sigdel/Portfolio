@@ -32,14 +32,14 @@ const About = () => {
                     <h2 className="font-serif text-5xl mb-12">The <span style={{ fontStyle: 'italic' }}>Human</span> Bit</h2>
 
                     <div style={{ marginBottom: '3rem' }}>
-                        <h4 className="text-sm uppercase tracking-widest mb-4 opacity-50">{about.subtitle}</h4>
+                        <h3 className="text-sm uppercase tracking-widest mb-4 opacity-50">{about.subtitle}</h3>
                         <p className="leading-relaxed text-lg" style={{ color: 'var(--text-cream)' }}>
                             {common.personal.summary}
                         </p>
                     </div>
 
                     <div style={{ marginBottom: '3rem' }}>
-                        <h4 className="text-sm uppercase tracking-widest mb-4 opacity-50">Education & Background</h4>
+                        <h3 className="text-sm uppercase tracking-widest mb-4 opacity-50">Education & Background</h3>
                         <p className="leading-relaxed text-lg" style={{ color: 'var(--text-cream)' }}>
                             {common.education[0].degree} from {common.education[0].school}.
                             {common.education[0].year}.

@@ -18,7 +18,7 @@ const TickerSection = () => {
     const moveRight = useTransform(scrollYProgress, [0, 1], [-300, 300]);
 
     const lines = [
-        { text: "Developement", offset: moveLeft },  // Line 1: Left
+        { text: "Development", offset: moveLeft },  // Line 1: Left
         { text: "Design", offset: moveRight },   // Line 2: Right
         { text: "Ai/Ml", offset: moveLeft },   // Line 3: Left
         { text: "Computer Science", offset: moveRight },   // Line 4: Right
@@ -28,6 +28,7 @@ const TickerSection = () => {
         <section
             ref={containerRef}
             className="ticker-section"
+            aria-hidden="true"
             style={{
                 padding: '10rem 0',
                 backgroundColor: 'var(--bg-black)',

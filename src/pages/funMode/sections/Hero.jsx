@@ -18,8 +18,8 @@ const Hero = () => {
     const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
     return (
-        <section ref={sectionRef} className="hero-section" style={{ height: '150vh', position: 'relative' }}>
-            <div style={{ position: 'sticky', top: 0, height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', paddingTop: '15vh' }}>
+        <section ref={sectionRef} className="hero-section" style={{ height: '150dvh', position: 'relative' }}>
+            <div style={{ position: 'sticky', top: 0, height: '100dvh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', paddingTop: '15dvh' }}>
                 <motion.div style={{ scale, opacity, textAlign: 'center' }}>
                     <motion.h1
                         initial={{ clipPath: 'inset(100% 0% 0% 0%)', opacity: 0 }}

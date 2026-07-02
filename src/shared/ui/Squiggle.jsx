@@ -4,6 +4,7 @@ const Squiggle = ({ style = {}, animateType = 'wiggle', strokeColor = '#FF4C2B',
     const svgRef = useRef(null);
 
     useEffect(() => {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         if (animateType === 'float' && svgRef.current) {
             svgRef.current.animate(
                 [
@@ -23,6 +24,7 @@ const Squiggle = ({ style = {}, animateType = 'wiggle', strokeColor = '#FF4C2B',
     return (
         <svg
             ref={svgRef}
+            aria-hidden="true"
             style={style}
             width={width}
             height={height}

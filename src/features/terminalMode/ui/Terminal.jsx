@@ -1,41 +1,137 @@
 import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { parseCommand, complete } from '../lib/CommandParser';
-import { getWelcomeView, CONTACT_ACTION } from '../lib/TerminalViews';
+import { getWelcomeView } from '../lib/TerminalViews';
+import { CONTACT_ACTION, HOME, getNode } from '../lib/vfs';
 import ContactModal from '../../../shared/ui/ContactModal';
+import SEO from '../../../shared/ui/SEO';
 
 // Lazy-loaded so the Three.js/R3F backdrop only ships when Work mode mounts.
 const StarryNight = lazy(() => import('./StarryNight'));
 
-/* ─── Modern muted palette (Warp / Tokyo-Night inspired) ─────────────── */
+/* ─── Modern muted palette (GitHub-dark inspired) ────────────────────── */
 const C = {
     bg:       '#0d1117', // window body
     bgChrome: '#161b22', // title / status bars
     border:   '#21262d',
     text:     '#c9d1d9', // default output
-    dim:      '#6e7681', // descriptions, separators
-    dimmer:   '#484f58', // ghost text, faint chrome
+    dim:      '#8b949e', // descriptions, separators
+    dimmer:   '#6e7681', // faint chrome
     accent:   '#39d353', // primary green (commands, prompt)
-    accent2:  '#56d4dd', // teal (headers, keys, view)
-    accent3:  '#d2a8ff', // mauve (links / numbers)
+    accent2:  '#56d4dd', // teal (headers, dirs, cwd)
+    accent3:  '#d2a8ff', // mauve (numbers, group headers)
     warn:     '#e3b341',
     error:    '#f85149',
-    promptUser:'#56d4dd',
-    promptHost:'#39d353',
-    promptPath:'#6e7681',
 };
 
 /* ─── Syntax-highlight a line of terminal output ─────────────────────── */
 const HighlightedLine = ({ text }) => {
     if (!text) return null;
 
-    // Section headers (e.g. "[1] ABOUT ME")
-    if (/^\[[\d]\]/.test(text.trim())) {
-        return <span style={{ color: C.accent2, fontWeight: 700, letterSpacing: '0.04em' }}>{text}</span>;
+    // Markdown-ish headings from VFS files ("# Title" / "## Sub")
+    const heading = text.match(/^(#{1,2}) (.*)$/);
+    if (heading) {
+        return (
+            <span>
+                <span style={{ color: C.dimmer }}>{heading[1]} </span>
+                <span style={{ color: heading[1] === '#' ? C.accent2 : C.accent3, fontWeight: 700 }}>{heading[2]}</span>
+            </span>
+        );
+    }
+    // Welcome banner box borders
+    const boxTop = text.match(/^(\s*╭─ )([\w@.-]+)( ─+╮\s*)$/);
+    if (boxTop) {
+        return (
+            <span>
+                <span style={{ color: C.border }}>{boxTop[1]}</span>
+                <span style={{ color: C.accent }}>{boxTop[2]}</span>
+                <span style={{ color: C.border }}>{boxTop[3]}</span>
+            </span>
+        );
+    }
+    if (/^\s*[╭╰][─╮╯\s]*$/.test(text)) {
+        return <span style={{ color: C.border }}>{text}</span>;
+    }
+    const boxMid = text.match(/^(\s*│)(.*)(│\s*)$/);
+    if (boxMid) {
+        return (
+            <span>
+                <span style={{ color: C.border }}>{boxMid[1]}</span>
+                <span style={{ color: C.text, fontWeight: 600 }}>{boxMid[2]}</span>
+                <span style={{ color: C.border }}>{boxMid[3]}</span>
+            </span>
+        );
     }
     // Separator lines
     if (/^[━─═]+$/.test(text.trim())) {
         return <span style={{ color: C.border }}>{text}</span>;
+    }
+    // Guided-menu rows: "  [1]  About       cat ~/about.txt"
+    const menuRow = text.match(/^( {2})\[(\d)\]( {2})(\S[\w ]*?)( {2,})(.+)$/);
+    if (menuRow) {
+        return (
+            <span>
+                <span style={{ color: C.dimmer }}>{menuRow[1]}[</span>
+                <span style={{ color: C.accent3, fontWeight: 700 }}>{menuRow[2]}</span>
+                <span style={{ color: C.dimmer }}>]</span>
+                <span>{menuRow[3]}</span>
+                <span style={{ color: C.text, fontWeight: 600 }}>{menuRow[4]}</span>
+                <span>{menuRow[5]}</span>
+                <span style={{ color: C.accent }}>{menuRow[6]}</span>
+            </span>
+        );
+    }
+    // Tree rows: "│   ├── catd.md" — dim the connectors, color directories
+    const treeRow = text.match(/^([│\s]*[├└]─+ )(.+)$/);
+    if (treeRow) {
+        const isDir = treeRow[2].endsWith('/');
+        return (
+            <span>
+                <span style={{ color: C.dimmer }}>{treeRow[1]}</span>
+                <span style={{ color: isDir ? C.accent2 : C.text, fontWeight: isDir ? 600 : 400 }}>{treeRow[2]}</span>
+            </span>
+        );
+    }
+    // Help group headers + man page section headers
+    if (/^(filesystem|terminal|site)$/.test(text) || /^(NAME|SYNOPSIS|DESCRIPTION|ALIASES)$/.test(text)) {
+        return <span style={{ color: C.accent3, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', fontSize: '0.78rem' }}>{text}</span>;
+    }
+    // Help command rows — "  <cmd> [args]   description"
+    const helpRow = text.match(/^( {2})([a-z][\w?<>[\]| .~/-]*?)( {2,})(.+)$/);
+    if (helpRow) {
+        return (
+            <span>
+                <span>{helpRow[1]}</span>
+                <span style={{ color: C.accent, fontWeight: 600 }}>{helpRow[2]}</span>
+                <span>{helpRow[3]}</span>
+                <span style={{ color: C.dim }}>{helpRow[4]}</span>
+            </span>
+        );
+    }
+    // ls rows — filename tokens; directories (trailing '/') get a distinct color
+    if (text.includes('/') && /^[A-Za-z0-9._-]+\/?( +[A-Za-z0-9._-]+\/?)* *$/.test(text)) {
+        return (
+            <span>
+                {text.split(/(\s+)/).map((tok, i) =>
+                    tok.endsWith('/') && tok.trim()
+                        ? <span key={i} style={{ color: C.accent2, fontWeight: 600 }}>{tok}</span>
+                        : <span key={i} style={{ color: C.text }}>{tok}</span>
+                )}
+            </span>
+        );
+    }
+    // Success checkmarks (sudo hire-me)
+    if (text.trim().startsWith('✓')) {
+        return <span style={{ color: C.accent }}>{text}</span>;
+    }
+    // Menu-echo lines ("→ cat ~/about.txt")
+    if (text.startsWith('→ ')) {
+        return (
+            <span>
+                <span style={{ color: C.dimmer }}>→ </span>
+                <span style={{ color: C.accent }}>{text.slice(2)}</span>
+            </span>
+        );
     }
     // Bullet points
     if (text.trim().startsWith('•') || text.trim().startsWith('*')) {
@@ -48,41 +144,13 @@ const HighlightedLine = ({ text }) => {
             </span>
         );
     }
-    // Help group headers — a bare capitalized word at column 0 (e.g. "Navigation")
-    if (/^(Navigation|Portfolio|System|Mode|NAME|SYNOPSIS|ALIASES)\b/.test(text)) {
-        return <span style={{ color: C.accent3, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', fontSize: '0.78rem' }}>{text}</span>;
-    }
-    // Help command rows — "  <cmd> [args]   description" (2-space indent, gap before desc)
-    const helpRow = text.match(/^(  )([a-z][\w?<>[\]| .-]*?)(\s{2,})(.+)$/);
-    if (helpRow) {
-        return (
-            <span>
-                <span>{helpRow[1]}</span>
-                <span style={{ color: C.accent, fontWeight: 600 }}>{helpRow[2]}</span>
-                <span>{helpRow[3]}</span>
-                <span style={{ color: C.dim }}>{helpRow[4]}</span>
-            </span>
-        );
-    }
-    // Keys like "Email:" "GitHub:"
+    // Keys like "Email:" "Outcome:"
     if (/^[A-Za-z ]+:/.test(text.trim())) {
         const match = text.match(/^([A-Za-z ]+:)(.*)/);
         if (match) return (
             <span>
                 <span style={{ color: C.accent2, fontWeight: 600 }}>{match[1]}</span>
                 <span style={{ color: C.text }}>{match[2]}</span>
-            </span>
-        );
-    }
-    // Menu items  "[1] About Me ..."
-    if (/^\s+\[\d\]/.test(text)) {
-        const match = text.match(/(\s+\[(\d)\]\s+)([A-Za-z ]+)(.*)/);
-        if (match) return (
-            <span>
-                <span style={{ color: C.dimmer }}>{match[1].match(/\s+/)[0]}</span>
-                <span style={{ color: C.accent3, fontWeight: 700 }}>{match[2]}</span>
-                <span style={{ color: C.text, fontWeight: 600 }}>  {match[3]}</span>
-                <span style={{ color: C.dim }}>{match[4]}</span>
             </span>
         );
     }
@@ -127,10 +195,61 @@ const OutputBlock = ({ content, onOpenContact }) => {
     );
 };
 
+/* ─── Live completion suggestions (zsh/fish-style row) ───────────────── */
+// The word fragment currently being completed (last token, after any '/').
+const fragmentOf = (input) => {
+    if (!input || /\s$/.test(input)) return '';
+    const tok = input.split(/\s+/).filter(Boolean).pop() || '';
+    const slash = tok.lastIndexOf('/');
+    return slash >= 0 ? tok.slice(slash + 1) : tok;
+};
+
+const MAX_SUGGESTIONS = 8;
+
+// role="status" so screen readers announce the candidates; rendered OUTSIDE
+// the role="log" scroll container so it's never read as command output.
+const SuggestionRow = ({ suggestions, fragment }) => (
+    <div
+        role="status"
+        style={{
+            flexShrink: 0,
+            padding: suggestions.length ? '8px 24px' : 0,
+            borderTop: suggestions.length ? `1px solid ${C.border}` : 'none',
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '0.8rem', lineHeight: 1.6, color: C.dim,
+        }}
+    >
+        {suggestions.slice(0, MAX_SUGGESTIONS).map((s) => {
+            const matched = fragment && s.toLowerCase().startsWith(fragment.toLowerCase());
+            return (
+                <span key={s} style={{ marginRight: 16, whiteSpace: 'pre' }}>
+                    {matched ? (
+                        <>
+                            <span style={{ color: C.text, fontWeight: 600 }}>{s.slice(0, fragment.length)}</span>
+                            <span>{s.slice(fragment.length)}</span>
+                        </>
+                    ) : s}
+                </span>
+            );
+        })}
+        {suggestions.length > MAX_SUGGESTIONS && (
+            <span style={{ color: C.dimmer }}>+{suggestions.length - MAX_SUGGESTIONS} more</span>
+        )}
+    </div>
+);
+
+/* ─── Prompt: starship-style two segments — cwd + ❯ ──────────────────── */
+const Prompt = ({ path = HOME }) => (
+    <span style={{ flexShrink: 0, fontSize: '0.875rem', whiteSpace: 'pre' }}>
+        <span style={{ color: C.accent2, fontWeight: 600 }}>{path}</span>
+        <span style={{ color: C.accent, fontWeight: 700 }}> ❯ </span>
+    </span>
+);
+
 /* ─── Title bar (macOS traffic lights + centered tab) ────────────────── */
-const TitleBar = ({ currentView, onClose, onMinimize, onMaximize, maximized }) => {
+const TitleBar = ({ cwd, onClose, onMinimize, onMaximize, maximized }) => {
     const dot = (color, onClick, title) => (
-        <button onClick={(e) => { e.stopPropagation(); onClick(); }} title={title} style={{
+        <button onClick={(e) => { e.stopPropagation(); onClick(); }} title={title} aria-label={title} style={{
             width: 12, height: 12, borderRadius: '50%', background: color,
             border: 'none', cursor: 'pointer', padding: 0, transition: 'filter .15s',
         }}
@@ -142,7 +261,7 @@ const TitleBar = ({ currentView, onClose, onMinimize, onMaximize, maximized }) =
         <div
             onDoubleClick={onMaximize}
             style={{
-                display: 'flex', alignItems: 'center', padding: '11px 16px',
+                display: 'flex', alignItems: 'center', padding: '8px 16px',
                 background: C.bgChrome, borderBottom: `1px solid ${C.border}`,
                 userSelect: 'none', flexShrink: 0, gap: 14,
             }}
@@ -157,7 +276,7 @@ const TitleBar = ({ currentView, onClose, onMinimize, onMaximize, maximized }) =
             <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
                 <div style={{
                     display: 'inline-flex', alignItems: 'center', gap: 8,
-                    padding: '4px 14px', borderRadius: 7,
+                    padding: '3px 12px', borderRadius: 7,
                     background: C.bg, border: `1px solid ${C.border}`,
                     fontFamily: "'JetBrains Mono', monospace", fontSize: '0.74rem', color: C.dim,
                 }}>
@@ -166,7 +285,7 @@ const TitleBar = ({ currentView, onClose, onMinimize, onMaximize, maximized }) =
                         agrim@portfolio
                     </span>
                     <span style={{ color: C.dimmer }}>
-                        {currentView === 'welcome' ? '~' : `~/${currentView}`}
+                        {cwd}
                     </span>
                 </div>
             </div>
@@ -176,14 +295,8 @@ const TitleBar = ({ currentView, onClose, onMinimize, onMaximize, maximized }) =
     );
 };
 
-/* ─── Status bar (Starship-style segments) ───────────────────────────── */
-const StatusBar = ({ currentView, commandCount }) => {
-    const [time, setTime] = useState(new Date());
-    useEffect(() => {
-        const t = setInterval(() => setTime(new Date()), 1000);
-        return () => clearInterval(t);
-    }, []);
-
+/* ─── Status bar (static — no ticking clock) ─────────────────────────── */
+const StatusBar = ({ cwd, itemCount }) => {
     const seg = (children, color) => (
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color }}>{children}</span>
     );
@@ -191,19 +304,17 @@ const StatusBar = ({ currentView, commandCount }) => {
     return (
         <div style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            padding: '7px 16px', background: C.bgChrome, borderTop: `1px solid ${C.border}`,
+            padding: '8px 16px', background: C.bgChrome, borderTop: `1px solid ${C.border}`,
             fontFamily: "'JetBrains Mono', monospace", fontSize: '0.7rem', color: C.dim,
-            flexShrink: 0, userSelect: 'none',
+            flexShrink: 0, userSelect: 'none', gap: 12,
         }}>
             {seg(<>
                 <span style={{ width: 7, height: 7, borderRadius: '50%', background: C.accent, boxShadow: `0 0 6px ${C.accent}` }} />
-                work mode
+                zsh · work mode
             </>, C.dim)}
-            {seg(<>view <span style={{ color: C.accent2 }}>{currentView}</span></>)}
-            {seg(<>⌘ <span style={{ color: C.text }}>{commandCount}</span> cmds</>)}
-            {seg(<span style={{ color: C.dim }}>
-                {time.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })}
-            </span>)}
+            {seg(<span style={{ color: C.accent2 }}>{cwd}</span>)}
+            {seg(<><span style={{ color: C.text }}>{itemCount}</span> items</>)}
+            {seg(<span style={{ color: C.dimmer }}>type 'help' for commands</span>)}
         </div>
     );
 };
@@ -244,6 +355,7 @@ const Dock = ({ items }) => (
                 key={key}
                 onClick={onClick}
                 title={title}
+                aria-label={title}
                 whileHover={{ y: -10, scale: 1.18 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 18 }}
@@ -271,14 +383,32 @@ const Dock = ({ items }) => (
     </motion.div>
 );
 
+/* ─── Command palette entries (common commands) ──────────────────────── */
+const MENU_ITEMS = [
+    { label: 'ls',          hint: '❯', cmd: 'ls',                      accent: C.accent2 },
+    { label: 'tree',        hint: '❯', cmd: 'tree',                    accent: C.accent2 },
+    { label: 'about',       hint: '1', cmd: 'cat ~/about.txt',         accent: C.accent },
+    { label: 'experience',  hint: '2', cmd: 'ls ~/experience',         accent: C.accent },
+    { label: 'projects',    hint: '3', cmd: 'ls ~/projects',           accent: C.accent },
+    { label: 'research',    hint: '4', cmd: 'cat ~/research/catd.md',  accent: C.accent },
+    { label: 'skills',      hint: '5', cmd: 'cat ~/skills.txt',        accent: C.accent },
+    { label: 'contact',     hint: '6', cmd: 'contact',                 accent: C.accent },
+    { label: 'resume.pdf',  hint: '⇩', cmd: 'open ~/resume.pdf',       accent: C.accent3 },
+    { label: 'menu',        hint: '☰', cmd: 'menu',                    accent: C.accent2 },
+    { label: 'help',        hint: '?', cmd: 'help',                    accent: C.accent2 },
+    { label: 'clear',       hint: '⌫', cmd: 'clear',                   accent: C.warn },
+    { label: 'portfolio',   hint: '★', cmd: 'portfolio',               accent: C.accent3 },
+];
+
 /* ─── Main Terminal Component ────────────────────────────────────────── */
 const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
-    const [outputLines, setOutputLines] = useState([]);
+    const [outputLines, setOutputLines] = useState(() => [{ type: 'output', content: getWelcomeView() }]);
     const [inputValue, setInputValue] = useState('');
     const [commandHistory, setCommandHistory] = useState([]);
     const [historyIndex, setHistoryIndex] = useState(-1);
-    const [currentView, setCurrentView] = useState('welcome');
-    const [navigationHistory, setNavigationHistory] = useState([]);
+    const [cwd, setCwd] = useState(HOME);
+    const [menuActive, setMenuActive] = useState(false); // number keys work only while the menu is the last output
+    const [suggestions, setSuggestions] = useState([]); // live tab-completion candidates ([] = row hidden)
     const [showMenu, setShowMenu] = useState(false);
     const [windowState, setWindowState] = useState('open'); // 'open' | 'minimized' | 'closed'
     const [maximized, setMaximized] = useState(false);
@@ -287,18 +417,28 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
     const inputRef = useRef(null);
     const scrollRef = useRef(null);
 
+    const cwdNode = getNode(cwd);
+    const itemCount = cwdNode && cwdNode.type === 'dir' ? Object.keys(cwdNode.children).length : 0;
+
     // Re-launch a closed terminal from a fresh session.
     const relaunch = () => {
         setOutputLines([{ type: 'output', content: getWelcomeView() }]);
         setCommandHistory([]);
-        setNavigationHistory([]);
-        setCurrentView('welcome');
+        setCwd(HOME);
+        setMenuActive(false);
+        setSuggestions([]);
         setInputValue('');
         setWindowState('open');
     };
 
+    // Font link stays in <head> after unmount — fonts are cached, removing it causes FOUT on re-entry.
     useEffect(() => {
-        setOutputLines([{ type: 'output', content: getWelcomeView() }]);
+        if (document.head.querySelector('link[data-jbmono]')) return;
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.setAttribute('data-jbmono', '');
+        link.href = 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap';
+        document.head.appendChild(link);
     }, []);
 
     useEffect(() => {
@@ -327,77 +467,74 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
         const activeCommand = (manualValue !== undefined ? manualValue : inputValue).trim();
         if (!activeCommand) return;
 
-        const newOutputLines = [...outputLines, { type: 'command', content: activeCommand }];
-        const result = parseCommand(activeCommand, currentView, navigationHistory, commandHistory);
+        const nextHistory = [...commandHistory, activeCommand];
+        const result = parseCommand(activeCommand, { cwd, commandHistory: nextHistory, menuActive });
 
-        if (result.clearScreen) {
-            setOutputLines([]);
-            setInputValue('');
-            setCurrentView('welcome');
-            setNavigationHistory([]);
-            return;
-        }
+        setCommandHistory(nextHistory);
+        setHistoryIndex(-1);
+        setInputValue('');
+        setSuggestions([]);
+        setMenuActive(Boolean(result.isMenu));
+
+        if (result.clearScreen) { setOutputLines([]); return; }
         if (result.resetMode && onResetMode) { onResetMode(); return; }
         if (result.switchToFun && onSwitchToFun) { onSwitchToFun(); return; }
         if (result.switchToNormal && onSwitchToNormal) { onSwitchToNormal(); return; }
-        if (result.toggleFullscreen) {
-            setMaximized((m) => !m);
-        }
+        if (result.toggleFullscreen) setMaximized((m) => !m);
+        if (result.openContact) setContactOpen(true);
+        if (result.openUrl) window.open(result.openUrl, '_blank', 'noopener,noreferrer');
+
+        const newOutputLines = [...outputLines, { type: 'command', content: activeCommand, cwd }];
         if (result.output) {
             newOutputLines.push({ type: result.error ? 'error' : 'output', content: result.output });
         }
-
         setOutputLines(newOutputLines);
 
-        if (result.view !== currentView && !result.isBack && !result.error) {
-            setNavigationHistory([...navigationHistory, currentView]);
-        } else if (result.isBack && navigationHistory.length > 0) {
-            setNavigationHistory(navigationHistory.slice(0, -1));
-        }
-        if (result.view) setCurrentView(result.view);
-
-        setCommandHistory([...commandHistory, activeCommand]);
-        setHistoryIndex(-1);
-        setInputValue('');
+        if (result.cwd) setCwd(result.cwd);
     };
 
-    // Context-aware completion (commands AND file/section args) — powers Tab + ghost text.
-    const { completed } = inputValue.length > 0 && !/\s$/.test(inputValue)
-        ? complete(inputValue)
-        : { completed: null };
-    // Ghost text: only when the completion strictly extends what's typed.
-    const ghostSuffix =
-        completed && completed.toLowerCase().startsWith(inputValue.toLowerCase()) && completed.length > inputValue.length
-            ? completed.slice(inputValue.length)
-            : '';
+    // Live filtering: recompute candidates while the suggestion row is visible.
+    const handleInputChange = (value) => {
+        setInputValue(value);
+        if (suggestions.length) {
+            setSuggestions(value.trim() ? complete(value, cwd).matches : []);
+        }
+    };
 
     const handleKeyDown = (e) => {
         if (e.key === 'Tab') {
             e.preventDefault();
-            const { completed: c, matches: m } = complete(inputValue);
-            if (c && c !== inputValue) {
-                setInputValue(c);
+            // Tab completes to the longest common prefix; when it can't make
+            // progress, show a live suggestion row (zsh/fish style) — never
+            // print candidates into the scrollback.
+            const { completed, matches } = complete(inputValue, cwd);
+            if (completed && completed !== inputValue) {
+                setInputValue(completed);
                 setHistoryIndex(-1);
-            } else if (m.length > 1) {
-                // Ambiguous — list candidates like a real shell.
-                setOutputLines((prev) => [
-                    ...prev,
-                    { type: 'command', content: inputValue },
-                    { type: 'output', content: `\n${m.join('    ')}\n` },
-                ]);
+                // Unique completion → nothing left to suggest; otherwise keep
+                // an already-visible row in sync with the new input.
+                setSuggestions((prev) => (matches.length > 1 && prev.length ? matches : []));
+            } else if (matches.length > 1) {
+                setSuggestions(matches);
+            } else {
+                setSuggestions([]);
+            }
+            return;
+        }
+        if (e.key === 'Escape') {
+            if (suggestions.length) {
+                // Dismiss the suggestion row first; a second Esc reaches the
+                // window listener that restores a maximized window.
+                e.stopPropagation();
+                setSuggestions([]);
             }
             return;
         }
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'l') {
             e.preventDefault();
             setOutputLines([]);
-            setCurrentView('welcome');
-            setNavigationHistory([]);
-            return;
-        }
-        if (e.key === 'ArrowRight' && ghostSuffix && inputRef.current?.selectionStart === inputValue.length) {
-            e.preventDefault();
-            setInputValue(inputValue + ghostSuffix);
+            setMenuActive(false);
+            setSuggestions([]);
             return;
         }
         if (e.key === 'ArrowUp') {
@@ -406,6 +543,7 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
                 const idx = historyIndex === -1 ? commandHistory.length - 1 : Math.max(0, historyIndex - 1);
                 setHistoryIndex(idx);
                 setInputValue(commandHistory[idx]);
+                setSuggestions([]); // full input replacement — stale candidates
             }
         } else if (e.key === 'ArrowDown') {
             e.preventDefault();
@@ -413,40 +551,22 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
                 const idx = historyIndex + 1;
                 if (idx >= commandHistory.length) { setHistoryIndex(-1); setInputValue(''); }
                 else { setHistoryIndex(idx); setInputValue(commandHistory[idx]); }
+                setSuggestions([]);
             }
         }
     };
 
-    const MENU_ITEMS = [
-        { label: 'about',     hint: '1', cmd: 'about',      accent: C.accent },
-        { label: 'research',  hint: '2', cmd: 'research',   accent: C.accent },
-        { label: 'projects',  hint: '3', cmd: 'projects',   accent: C.accent },
-        { label: 'experience',hint: '4', cmd: 'experience', accent: C.accent },
-        { label: 'skills',    hint: '5', cmd: 'skills',     accent: C.accent },
-        { label: 'contact',   hint: '6', cmd: 'contact',    accent: C.accent },
-        { label: 'ls',        hint: '↳', cmd: 'ls',         accent: C.accent2 },
-        { label: 'tree',      hint: '↳', cmd: 'tree',       accent: C.accent2 },
-        { label: 'help',      hint: '?', cmd: 'help',       accent: C.accent2 },
-        { label: 'neofetch',  hint: '◆', cmd: 'neofetch',   accent: C.accent2 },
-        { label: 'clear',     hint: '⌫', cmd: 'clear',      accent: C.warn },
-        { label: 'fun mode',  hint: '★', cmd: 'fun',        accent: C.accent3 },
-    ];
-
-    // Prompt segments shared by past commands and the live input.
-    const Prompt = () => (
-        <span style={{ flexShrink: 0, fontSize: '0.875rem', whiteSpace: 'pre' }}>
-            <span style={{ color: C.promptUser }}>agrim</span>
-            <span style={{ color: C.dimmer }}> on </span>
-            <span style={{ color: C.promptHost }}>portfolio</span>
-            <span style={{ color: C.accent, fontWeight: 700 }}> ❯ </span>
-        </span>
-    );
-
     return (
+        <>
+        <SEO
+            title="Agrim Sigdel — Terminal"
+            description="Explore Agrim Sigdel's portfolio through an interactive terminal. Type 'help' to get started."
+            url="https://agrimsigdel.com.np/terminal"
+        />
         <div
             onClick={handleTerminalClick}
             style={{
-                width: '100vw', minHeight: '100vh', height: '100vh',
+                width: '100vw', minHeight: '100dvh', height: '100dvh',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 padding: maximized ? 0 : 'min(4vh, 36px) min(4vw, 48px)', boxSizing: 'border-box',
                 background: 'radial-gradient(ellipse at 30% 20%, #131a26 0%, #0a0d12 60%, #06080b 100%)',
@@ -455,12 +575,13 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
             }}
         >
             <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
                 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
                 .term-scroll::-webkit-scrollbar { width: 8px; }
                 .term-scroll::-webkit-scrollbar-track { background: transparent; }
                 .term-scroll::-webkit-scrollbar-thumb { background: ${C.border}; border-radius: 4px; }
                 .term-scroll::-webkit-scrollbar-thumb:hover { background: ${C.dimmer}; }
+                .term-touch-hint { display: none; }
+                @media (hover: none) { .term-touch-hint { display: inline; color: ${C.dim}; font-size: 0.7rem; margin-left: 8px; } }
             `}</style>
 
             {/* Live kinetic starfield backdrop (lazy / WebGL) */}
@@ -485,7 +606,7 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
                 animate={{
                     opacity: 1, y: 0, scale: 1,
                     maxWidth: maximized ? '100vw' : 1080,
-                    maxHeight: maximized ? '100vh' : 760,
+                    maxHeight: maximized ? '100dvh' : 760,
                     borderRadius: maximized ? 0 : 14,
                 }}
                 exit="exit"
@@ -496,6 +617,7 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
                         : { opacity: 0, scale: 0.92, y: 24, transition: { duration: 0.22, ease: 'easeIn' } },
                 }}
                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                role="main"
                 style={{
                     width: '100%', height: '100%', zIndex: 2,
                     display: 'flex', flexDirection: 'column', position: 'relative',
@@ -505,7 +627,7 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
                 }}
               >
                 <TitleBar
-                    currentView={currentView}
+                    cwd={cwd}
                     maximized={maximized}
                     onClose={() => { setShowMenu(false); setMaximized(false); setWindowState('closed'); }}
                     onMinimize={() => { setShowMenu(false); setWindowState('minimized'); }}
@@ -516,23 +638,25 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
                 <div
                     ref={scrollRef}
                     className="term-scroll"
+                    role="log"
+                    aria-live="polite"
                     style={{
-                        flex: 1, overflowY: 'auto', padding: '22px 26px',
-                        paddingBottom: showMenu ? '300px' : '22px',
+                        flex: 1, overflowY: 'auto', overflowX: 'auto', padding: 24,
+                        paddingBottom: showMenu ? 300 : 24,
                         boxSizing: 'border-box', position: 'relative',
                     }}
                 >
                     {outputLines.map((line, i) => (
-                        <div key={i} style={{ marginBottom: line.type === 'command' ? 4 : 10 }}>
+                        <div key={i} style={{ marginBottom: line.type === 'command' ? 4 : 12 }}>
                             {line.type === 'command' ? (
                                 <div style={{ display: 'flex', alignItems: 'baseline' }}>
-                                    <Prompt />
+                                    <Prompt path={line.cwd || HOME} />
                                     <span style={{ color: C.text, fontSize: '0.875rem' }}>{line.content}</span>
                                 </div>
                             ) : (
-                                <div style={{ paddingLeft: 2, color: line.type === 'error' ? C.error : undefined }}>
+                                <div style={{ paddingLeft: 2 }}>
                                     {line.type === 'error'
-                                        ? <pre style={{ margin: 0, fontFamily: 'inherit', fontSize: '0.875rem', color: C.error, whiteSpace: 'pre-wrap' }}>{line.content}</pre>
+                                        ? <pre style={{ margin: 0, fontFamily: 'inherit', fontSize: '0.875rem', lineHeight: 1.6, color: C.error, whiteSpace: 'pre-wrap' }}>{line.content}</pre>
                                         : <OutputBlock content={line.content} onOpenContact={() => setContactOpen(true)} />}
                                 </div>
                             )}
@@ -542,9 +666,9 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
                     {/* Live input row */}
                     <form
                         onSubmit={(e) => handleSubmit(e, inputValue)}
-                        style={{ display: 'flex', alignItems: 'baseline', marginTop: 6 }}
+                        style={{ display: 'flex', alignItems: 'baseline', marginTop: 8 }}
                     >
-                        <Prompt />
+                        <Prompt path={cwd} />
                         <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center' }}>
                             <span style={{ color: C.text, fontSize: '0.875rem', whiteSpace: 'pre' }}>{inputValue}</span>
                             <span style={{
@@ -552,35 +676,31 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
                                 background: C.accent, marginLeft: 1, borderRadius: 1,
                                 animation: 'blink 1.1s step-end infinite',
                             }} />
-                            {ghostSuffix && (
-                                <span style={{ color: C.dimmer, fontSize: '0.875rem', whiteSpace: 'pre' }}>
-                                    {ghostSuffix}
-                                </span>
-                            )}
                             <input
                                 ref={inputRef}
                                 type="text"
                                 value={inputValue}
-                                onChange={(e) => setInputValue(e.target.value)}
+                                onChange={(e) => handleInputChange(e.target.value)}
                                 onKeyDown={handleKeyDown}
                                 autoComplete="off"
                                 spellCheck="false"
+                                aria-label="Terminal command input"
                                 style={{
                                     position: 'absolute', left: 0, top: 0, width: '100%', height: '100%',
-                                    opacity: 0, cursor: 'text', fontSize: '0.875rem',
+                                    // 16px stops iOS zoom-on-focus; the input is invisible so size has no visual effect.
+                                    opacity: 0, cursor: 'text', fontSize: 16,
                                 }}
                             />
                         </div>
-                        {/* Inline accept-hint when there's a ghost suggestion */}
-                        {ghostSuffix && (
-                            <span style={{ color: C.dimmer, fontSize: '0.68rem', flexShrink: 0, paddingLeft: 10 }}>
-                                tab ↹
-                            </span>
-                        )}
+                        <span className="term-touch-hint">tap to type · try “help”</span>
                     </form>
                 </div>
 
-                <StatusBar currentView={currentView} commandCount={commandHistory.length} />
+                {/* Live completion candidates — pinned below the input row,
+                    outside the role="log" container */}
+                <SuggestionRow suggestions={suggestions} fragment={fragmentOf(inputValue)} />
+
+                <StatusBar cwd={cwd} itemCount={itemCount} />
 
                 {/* Floating menu toggle */}
                 <motion.button
@@ -588,6 +708,8 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
                     whileTap={{ scale: 0.94 }}
                     onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
                     title="Command palette"
+                    aria-label="Command palette"
+                    aria-expanded={showMenu}
                     style={{
                         position: 'absolute', bottom: 54, right: 22, zIndex: 200,
                         width: 46, height: 46, borderRadius: 12,
@@ -615,7 +737,7 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
                             style={{
                                 position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 190,
                                 background: 'rgba(13,17,23,0.92)', backdropFilter: 'blur(16px)',
-                                borderTop: `1px solid ${C.border}`, padding: '18px 22px 24px',
+                                borderTop: `1px solid ${C.border}`, padding: '16px 24px 24px',
                             }}
                         >
                             <div style={{
@@ -710,6 +832,7 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
             {/* Shared contact modal — terminal-themed. */}
             <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} variant="terminal" />
         </div>
+        </>
     );
 };
 

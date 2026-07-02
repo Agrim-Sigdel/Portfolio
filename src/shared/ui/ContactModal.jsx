@@ -41,6 +41,21 @@ export default function ContactModal({ open, onClose, variant = 'fun' }) {
         e.stopPropagation();
         onClose();
       }
+      if (e.key === 'Tab') {
+        const focusables = panelRef.current?.querySelectorAll(
+          'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusables?.length) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
     window.addEventListener('keydown', onKey, true);
 
