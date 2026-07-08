@@ -11,6 +11,10 @@ const Terminal = lazy(() => import('./features/terminalMode/ui/Terminal'));
 const FunModePage = lazy(() => import('./pages/funMode/FunModePage'));
 const NormalModePage = lazy(() => import('./pages/normalMode/NormalModePage'));
 
+// framer-motion's global config, lazy-loaded alongside the mode pages so the
+// motion chunk never touches the landing page's critical path.
+const MotionProvider = lazy(() => import('./shared/lib/MotionProvider'));
+
 /*
  * URL <-> internal mode id mapping. The internal ids predate the routes, so the
  * public slugs are deliberately friendlier than the ids:
@@ -116,20 +120,22 @@ function ModeRoute() {
     <div className="App">
       <ErrorBoundary>
         <Suspense fallback={<ModeLoader />}>
-          {/* FUN MODE - Modern interactive website */}
-          {mode === 'fun' && <FunModePage onResetMode={goToStart} />}
+          <MotionProvider>
+            {/* FUN MODE - Modern interactive website */}
+            {mode === 'fun' && <FunModePage onResetMode={goToStart} />}
 
-          {/* WORK MODE - Terminal interface */}
-          {mode === 'work' && (
-            <Terminal
-              onSwitchToFun={() => goToMode('fun')}
-              onSwitchToNormal={() => goToMode('normal')}
-              onResetMode={goToStart}
-            />
-          )}
+            {/* WORK MODE - Terminal interface */}
+            {mode === 'work' && (
+              <Terminal
+                onSwitchToFun={() => goToMode('fun')}
+                onSwitchToNormal={() => goToMode('normal')}
+                onResetMode={goToStart}
+              />
+            )}
 
-          {/* NORMAL MODE - Clean simple HTML */}
-          {mode === 'normal' && <NormalModePage onResetMode={goToStart} />}
+            {/* NORMAL MODE - Clean simple HTML */}
+            {mode === 'normal' && <NormalModePage onResetMode={goToStart} />}
+          </MotionProvider>
         </Suspense>
       </ErrorBoundary>
     </div>

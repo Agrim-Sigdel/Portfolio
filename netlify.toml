@@ -24,3 +24,17 @@
   for = "/index.html"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
+
+# The service worker and its registration script must always revalidate, so a
+# new deploy's worker is picked up promptly. If a stale sw.js were pinned by the
+# CDN/browser cache, autoUpdate couldn't take effect. (The content-hashed
+# workbox-*.js it imports is immutable and safe under default caching.)
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/registerSW.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
