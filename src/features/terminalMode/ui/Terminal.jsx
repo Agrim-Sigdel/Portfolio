@@ -904,23 +904,11 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
                 )}
             </AnimatePresence>
 
-            {/* ─── macOS dock (shown when minimized or closed): terminal on the
-                left, easy-3dkit transport in the middle, start on the right ─── */}
+            {/* ─── macOS dock (shown when minimized or closed): start on the
+                left, easy-3dkit transport in the middle, terminal on the right ─── */}
             <AnimatePresence>
                 {windowState !== 'open' && (
                     <Dock items={[
-                        {
-                            key: 'terminal',
-                            title: windowState === 'minimized' ? 'Terminal (minimized) — click to restore' : 'Terminal — click to launch',
-                            badge: windowState === 'minimized',
-                            onClick: () => (windowState === 'minimized' ? setWindowState('open') : relaunch()),
-                        },
-                        { divider: true },
-                        { key: 'prev', title: 'Previous effect', onClick: fxPrev, dot: false, render: <DockControlIcon><IconPrev /></DockControlIcon> },
-                        { key: 'shuffle', title: 'Shuffle backdrop', onClick: fxShuffle, dot: false, render: <DockControlIcon><IconShuffle /></DockControlIcon> },
-                        { key: 'auto', title: fxAuto ? 'Stop auto-shuffle' : 'Auto-shuffle', onClick: fxToggleAuto, active: fxAuto, dot: false, render: <DockControlIcon active={fxAuto}>{fxAuto ? <IconPause /> : <IconPlay />}</DockControlIcon> },
-                        { key: 'next', title: 'Next effect', onClick: fxNext, dot: false, render: <DockControlIcon><IconNext /></DockControlIcon> },
-                        { divider: true },
                         {
                             key: 'modes',
                             title: 'Back to start (mode selection)',
@@ -936,6 +924,18 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
                                     color: C.accent2, fontSize: '1.1rem',
                                 }}>⊞</div>
                             ),
+                        },
+                        { divider: true },
+                        { key: 'prev', title: 'Previous effect', onClick: fxPrev, dot: false, render: <DockControlIcon><IconPrev /></DockControlIcon> },
+                        { key: 'shuffle', title: 'Shuffle backdrop', onClick: fxShuffle, dot: false, render: <DockControlIcon><IconShuffle /></DockControlIcon> },
+                        { key: 'auto', title: fxAuto ? 'Stop auto-shuffle' : 'Auto-shuffle', onClick: fxToggleAuto, active: fxAuto, dot: false, render: <DockControlIcon active={fxAuto}>{fxAuto ? <IconPause /> : <IconPlay />}</DockControlIcon> },
+                        { key: 'next', title: 'Next effect', onClick: fxNext, dot: false, render: <DockControlIcon><IconNext /></DockControlIcon> },
+                        { divider: true },
+                        {
+                            key: 'terminal',
+                            title: windowState === 'minimized' ? 'Terminal (minimized) — click to restore' : 'Terminal — click to launch',
+                            badge: windowState === 'minimized',
+                            onClick: () => (windowState === 'minimized' ? setWindowState('open') : relaunch()),
                         },
                     ]} />
                 )}
