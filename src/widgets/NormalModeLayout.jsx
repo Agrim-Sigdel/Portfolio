@@ -25,7 +25,7 @@ const NormalModeLayout = ({ onResetMode }) => {
       <div className="cv-download-group">
         <DownloadButton
           className="cv-download-button"
-          href="/AgrimSigdel-Resume.pdf"
+          href="/AgrimSigdel-CV.pdf"
           filename="Agrim Sigdel Resume.pdf"
           idleLabel="Download cv (static)"
           loadingLabel="Downloading…"

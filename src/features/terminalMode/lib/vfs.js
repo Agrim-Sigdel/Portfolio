@@ -169,7 +169,7 @@ export const ROOT = dir('~', [
     file('skills.txt', skillsTxt()),
     file('contact.txt', contactTxt()),
     file('education.txt', educationTxt()),
-    binary('resume.pdf', '/AgrimSigdel-Resume.pdf', 76874),
+    binary('resume.pdf', '/AgrimSigdel-CV.pdf', 76874),
     dir('experience', common.experience.map((e) =>
         file(`${kebab(e.company.split('|')[0])}.md`, experienceMd(e))
     )),
