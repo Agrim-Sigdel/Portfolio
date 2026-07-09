@@ -182,6 +182,30 @@
           { "label": "Live Docs", "url": "https://3d-kit.netlify.app" }
         ],
         "color": "#111"
+      },
+      {
+        "id": 8,
+        "title": "Partweave",
+        "category": "Open Source · Developer Tooling · CLI",
+        "description": "Creator of an open-source full-stack project scaffolder - a TypeScript CLI that generates self-contained monorepos from only the components you pick (Django, Next.js, Expo, plus auth, database, Docker and CI/CD modules), resolving dependencies and rejecting incompatible selections upfront.",
+        "outcome": "'create-t3-app meets shadcn/ui' - deterministic template injection produces fully-owned, ready-to-run code; published to npm and extensible through a modules catalog.",
+        "links": [
+          { "label": "GitHub", "url": "https://github.com/Agrim-Sigdel/partweave" },
+          { "label": "NPM", "url": "https://www.npmjs.com/package/partweave" }
+        ],
+        "color": "#101010"
+      },
+      {
+        "id": 9,
+        "title": "Personal Portfolio",
+        "category": "Web · React · Interactive 3D",
+        "description": "Designer and builder of my personal portfolio - a React/Vite site with Framer Motion motion design, a live Three.js/R3F backdrop powered by my own easy-3dkit, and an installable PWA. Ships a fully interactive terminal mode with a virtual filesystem and command parser as an alternate way to explore the site.",
+        "outcome": "Fast, installable, and playful - the site you're on right now, with a hidden shell for the curious.",
+        "links": [
+          { "label": "Live Site", "url": "https://agrimsigdel.com.np" },
+          { "label": "GitHub", "url": "https://github.com/Agrim-Sigdel/Portfolio" }
+        ],
+        "color": "#131313"
       }
     ],
     "skills": {
