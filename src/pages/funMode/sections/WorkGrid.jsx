@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { FiExternalLink } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { FiExternalLink, FiArrowRight } from 'react-icons/fi';
 import Squiggle from '../../../shared/ui/Squiggle';
 import { projectsData } from '../../../entities/portfolio/model';
 
@@ -56,8 +57,32 @@ const WorkGrid = () => {
                                 <p style={{ color: 'var(--text-cream)', lineHeight: 1.6 }}>{project.outcome}</p>
                             </div>
 
+                            {project.slug && project.caseStudy && (
+                                <div style={{ marginTop: '2rem' }}>
+                                    <Link
+                                        to={`/work/${project.slug}`}
+                                        style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem',
+                                            padding: '0.6rem 1.3rem',
+                                            borderRadius: '4px',
+                                            fontSize: '0.8rem',
+                                            fontWeight: 700,
+                                            letterSpacing: '0.05em',
+                                            textTransform: 'uppercase',
+                                            color: '#fff',
+                                            backgroundColor: 'var(--accent, #ff4c2b)',
+                                            textDecoration: 'none'
+                                        }}
+                                    >
+                                        Read case study <FiArrowRight aria-hidden="true" />
+                                    </Link>
+                                </div>
+                            )}
+
                             {project.links && project.links.length > 0 && (
-                                <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                                <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                                     {project.links.map((link) => (
                                         <a
                                             key={link.url}

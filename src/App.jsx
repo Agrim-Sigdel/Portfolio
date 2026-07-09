@@ -10,6 +10,7 @@ import './App.css';
 const Terminal = lazy(() => import('./features/terminalMode/ui/Terminal'));
 const FunModePage = lazy(() => import('./pages/funMode/FunModePage'));
 const NormalModePage = lazy(() => import('./pages/normalMode/NormalModePage'));
+const CaseStudyPage = lazy(() => import('./pages/caseStudy/CaseStudyPage'));
 
 // framer-motion's global config, lazy-loaded alongside the mode pages so the
 // motion chunk never touches the landing page's critical path.
@@ -61,6 +62,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<SelectorRoute />} />
+      <Route path="/work/:projectSlug" element={<CaseStudyRoute />} />
       <Route path="/:slug" element={<ModeRoute />} />
       {/* Unknown path -> back to the selector */}
       <Route path="*" element={<Navigate to="/" replace />} />
@@ -135,6 +137,35 @@ function ModeRoute() {
 
             {/* NORMAL MODE - Clean simple HTML */}
             {mode === 'normal' && <NormalModePage onResetMode={goToStart} />}
+          </MotionProvider>
+        </Suspense>
+      </ErrorBoundary>
+    </div>
+  );
+}
+
+/* ------------------------------------ a project case study ('/work/:slug') */
+function CaseStudyRoute() {
+  const { theme } = useTheme();
+
+  // Case studies respect the visitor's light/dark preference, like fun mode.
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  // These are normal scrollable pages; each one starts at the top.
+  const { projectSlug } = useParams();
+  useEffect(() => {
+    document.body.style.overflow = 'auto';
+    window.scrollTo(0, 0);
+  }, [projectSlug]);
+
+  return (
+    <div className="App">
+      <ErrorBoundary>
+        <Suspense fallback={<ModeLoader />}>
+          <MotionProvider>
+            <CaseStudyPage />
           </MotionProvider>
         </Suspense>
       </ErrorBoundary>

@@ -160,6 +160,9 @@ export default function ModeTriptych() {
               </span>
               <span className="tri-door-name">{door.name}</span>
               <span className="tri-door-sub">{door.sub}</span>
+              {door.id === 'terminal' && (
+                <span className="tri-door-note">🖥 Best on desktop</span>
+              )}
               <span className="tri-door-cta">
                 Enter <FiArrowRight aria-hidden="true" />
               </span>

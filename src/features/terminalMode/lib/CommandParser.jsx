@@ -7,6 +7,11 @@ import {
     displayName,
 } from './vfs';
 import { getMenuView, getNeofetchView, getWhoamiView, MENU } from './TerminalViews';
+import {
+    CATALOG, EFFECT_COUNT, AUTO_SHUFFLE_MS, getState, currentEffect, effectParams,
+    resolveEffect, fxGoto, fxNext, fxPrev, fxShuffle, fxSetParam, fxResetCurrent,
+    fxToggleHud, fxShowHud, fxSetAuto,
+} from './fxStore';
 
 /*
  * Single source of truth for every terminal command.
@@ -87,6 +92,124 @@ const lookup = (cmd, target, cwd) => {
     const node = getNode(path);
     if (!node) return { error: err(`${cmd}: ${target}: no such file or directory`) };
     return { node, path };
+};
+
+/* ─── fx: easy-3dkit backdrop carousel ───────────────────────────── */
+
+// Render a control's current value compactly ("#06080b" or "14  [4–60]").
+const fmtControl = (ctrl, value) =>
+    ctrl.type === 'color'
+        ? String(value)
+        : `${value}`.padEnd(6) + `[${ctrl.min}–${ctrl.max}]`;
+
+const fxListView = () => {
+    const { index } = getState();
+    const pad = Math.max(...CATALOG.map((e) => e.name.length)) + 2;
+    const rows = CATALOG.map((e, i) => {
+        const mark = i === index ? '▸' : ' ';
+        return `  ${mark} ${String(i + 1).padStart(2)}  ${e.name.padEnd(pad)}${e.blurb}`;
+    });
+    return [
+        `easy-3dkit · ${EFFECT_COUNT} live effects   (currently: ${currentEffect().name})`,
+        '',
+        ...rows,
+        '',
+        "fx <name|number> to switch  ·  fx next / fx prev to flip  ·  fx info for settings",
+    ].join('\n');
+};
+
+const fxInfoView = () => {
+    const { index } = getState();
+    const e = currentEffect();
+    const params = effectParams();
+    const rows = e.controls.map((c) => {
+        const val = fmtControl(c, params[c.key]);
+        return `  ${c.key.padEnd(12)} ${val.padEnd(16)} ${e.docs[c.key] || ''}`;
+    });
+    return [
+        `${e.name}  (${index + 1}/${EFFECT_COUNT})`,
+        e.blurb,
+        '',
+        ...rows,
+        '',
+        'fx set <param> <value>  ·  fx reset  ·  fx next / fx prev  ·  fx panel',
+    ].join('\n');
+};
+
+const fxHelpView = () =>
+    [
+        `easy-3dkit control deck — ${EFFECT_COUNT} effects, ${currentEffect().name} is live`,
+        '',
+        '  fx                    this help',
+        '  fx list               all effects (▸ marks the live one)',
+        '  fx <name|number>      switch to an effect',
+        '  fx next / fx prev     carousel through effects',
+        '  fx shuffle            jump to a random effect',
+        `  fx auto [off]         auto-shuffle every ${AUTO_SHUFFLE_MS / 1000}s (fx auto off to stop)`,
+        '  fx info               settings for the live effect',
+        '  fx set <param> <val>  tweak a setting (number or #hexcolor)',
+        '  fx reset              restore the live effect to its defaults',
+        '  fx panel              toggle the on-screen carousel HUD',
+        '',
+        "Every change is live behind this window. Try 'fx list' or 'fx shuffle'.",
+    ].join('\n');
+
+const fxSet = (args) => {
+    const [param, ...rest] = args;
+    const raw = rest.join(' ').trim();
+    if (!param || !raw) return err("usage: fx set <param> <value>   (see 'fx info' for params)");
+    const e = currentEffect();
+    const ctrl = e.controls.find((c) => c.key.toLowerCase() === param.toLowerCase());
+    if (!ctrl) {
+        return err(`fx: ${e.name} has no setting '${param}'\navailable: ${e.controls.map((c) => c.key).join(', ')}`);
+    }
+    if (ctrl.type === 'color') {
+        if (!/^#?[0-9a-f]{3}([0-9a-f]{3})?$/i.test(raw)) return err(`fx: '${raw}' is not a hex colour (try #33e0ff)`);
+        const hex = raw.startsWith('#') ? raw : `#${raw}`;
+        fxSetParam(ctrl.key, hex);
+        fxShowHud(true);
+        return { output: `${e.name}: ${ctrl.key} = ${hex}` };
+    }
+    const n = parseFloat(raw);
+    if (Number.isNaN(n)) return err(`fx: '${raw}' is not a number (range ${ctrl.min}–${ctrl.max})`);
+    const clamped = Math.min(ctrl.max, Math.max(ctrl.min, n));
+    fxSetParam(ctrl.key, clamped);
+    fxShowHud(true);
+    const note = clamped !== n ? `  (clamped to ${ctrl.min}–${ctrl.max})` : '';
+    return { output: `${e.name}: ${ctrl.key} = ${clamped}${note}` };
+};
+
+const fxCommand = ({ args }) => {
+    const sub = (args[0] || '').toLowerCase();
+
+    if (!sub || sub === 'help' || sub === '-h' || sub === '--help') return { output: fxHelpView() };
+    if (sub === 'list' || sub === 'ls' || sub === 'all') return { output: fxListView() };
+    if (sub === 'info' || sub === 'status' || sub === 'current') return { output: fxInfoView() };
+    if (sub === 'next' || sub === 'n' || sub === '>') { fxNext(); return { output: `▸ ${currentEffect().name}  (${getState().index + 1}/${EFFECT_COUNT})` }; }
+    if (sub === 'prev' || sub === 'p' || sub === '<') { fxPrev(); return { output: `◂ ${currentEffect().name}  (${getState().index + 1}/${EFFECT_COUNT})` }; }
+    if (sub === 'shuffle' || sub === 'rand' || sub === 'random') { fxShuffle(); fxShowHud(true); return { output: `⤨ ${currentEffect().name}  (${getState().index + 1}/${EFFECT_COUNT})` }; }
+    if (sub === 'auto' || sub === 'rotate' || sub === 'play') {
+        const off = /^(off|stop|0|false|no)$/i.test(args[1] || '');
+        fxSetAuto(!off);
+        return { output: off ? 'auto-shuffle stopped' : `auto-shuffle on — a new effect every ${AUTO_SHUFFLE_MS / 1000}s ('fx auto off' to stop)` };
+    }
+    if (sub === 'reset' || sub === 'default') { fxResetCurrent(); fxShowHud(true); return { output: `${currentEffect().name}: settings restored to defaults` }; }
+    if (sub === 'panel' || sub === 'hud') { fxToggleHud(); return { output: getState().hud ? 'carousel panel opened' : 'carousel panel closed' }; }
+    if (sub === 'set') return fxSet(args.slice(1));
+
+    // Anything else is treated as an effect name / number.
+    const i = resolveEffect(args[0]);
+    if (i < 0) return err(`fx: no effect '${args[0]}'\nrun 'fx list' to see the ${EFFECT_COUNT} effects`);
+    fxGoto(i);
+    const e = currentEffect();
+    return { output: `switched to ${e.name}  (${i + 1}/${EFFECT_COUNT})\n${e.blurb}\n\n'fx info' for its settings · 'fx set <param> <value>' to tweak` };
+};
+
+// Run an `fx` subcommand string (e.g. "shuffle", "set speed 2", "plasma") from
+// outside the terminal — used by the wallpaper control bar's command box.
+export const runFxCommand = (input) => {
+    const args = String(input).trim().split(/\s+/).filter(Boolean);
+    return fxCommand({ args });
 };
 
 /* ─── command registry ───────────────────────────────────────────── */
@@ -259,6 +382,14 @@ export const COMMANDS = [
         handler: ({ rawArgs }) => ({ output: rawArgs || '' }),
     },
 
+    /* ── graphics ── */
+    {
+        name: 'fx', aliases: ['3dkit'], group: 'graphics', args: '[effect|next|shuffle|auto|set|info]',
+        description: 'live easy-3dkit backdrop carousel',
+        manual: "Drives the live shader backdrop behind the terminal — all 21 effects from my easy-3dkit library. 'fx list' shows them; 'fx <name>', 'fx next'/'fx prev' and 'fx shuffle' move between effects; 'fx auto' auto-shuffles on a timer ('fx auto off' stops); 'fx info' lists the live effect's settings; 'fx set <param> <value>' tweaks one (a number or a #hexcolor); 'fx reset' restores defaults; 'fx panel' toggles the on-screen carousel HUD. Every change is live — even when the terminal window is closed, via the wallpaper bar.",
+        handler: fxCommand,
+    },
+
     /* ── site ── */
     {
         name: 'contact', aliases: [], group: 'site',
@@ -340,7 +471,7 @@ const COMMAND_NAMES = COMMANDS.filter((c) => c.group).map((c) => c.name).sort();
 const usage = (c) => `${c.name}${c.args ? ' ' + c.args : ''}`;
 
 export const getHelpView = () => {
-    const GROUP_ORDER = ['filesystem', 'terminal', 'site'];
+    const GROUP_ORDER = ['filesystem', 'terminal', 'graphics', 'site'];
     const pad = Math.max(...COMMANDS.filter((c) => c.group).map((c) => usage(c).length)) + 4;
     const body = GROUP_ORDER
         .map((g) => {

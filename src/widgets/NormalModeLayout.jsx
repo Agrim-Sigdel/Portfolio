@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { FiArrowLeft, FiExternalLink } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { FiArrowLeft, FiExternalLink, FiArrowRight } from 'react-icons/fi';
 import content from '../data/content.json';
 import DownloadButton from '../shared/ui/DownloadButton';
+import { generateResumePdf } from '../shared/lib/generateResumePdf';
 import ContactModal from '../shared/ui/ContactModal';
 import '../styles/normal-mode.css';
 
@@ -20,14 +22,23 @@ const NormalModeLayout = ({ onResetMode }) => {
       <button className="cv-return-button" onClick={onResetMode}>
         <FiArrowLeft aria-hidden="true" /> Back to Start
       </button>
-      <DownloadButton
-        className="cv-download-button"
-        href="/AgrimSigdel-Resume.pdf"
-        filename="AgrimSigdel-Resume.pdf"
-        idleLabel="Download PDF"
-        loadingLabel="Downloading…"
-        doneLabel="Downloaded"
-      />
+      <div className="cv-download-group">
+        <DownloadButton
+          className="cv-download-button"
+          href="/AgrimSigdel-Resume.pdf"
+          filename="Agrim Sigdel Resume.pdf"
+          idleLabel="Download cv (static)"
+          loadingLabel="Downloading…"
+          doneLabel="Downloaded"
+        />
+        <DownloadButton
+          className="cv-download-button cv-download-button--generated"
+          getFile={generateResumePdf}
+          idleLabel="Export resume (generated)"
+          loadingLabel="Building…"
+          doneLabel="Exported"
+        />
+      </div>
 
       <main className="cv-paper">
         {/* ---------- Header ---------- */}
@@ -155,9 +166,14 @@ const NormalModeLayout = ({ onResetMode }) => {
                 <li>{proj.description}</li>
                 <li>{proj.outcome}</li>
               </ul>
-              {proj.links && proj.links.length > 0 && (
+              {((proj.links && proj.links.length > 0) || (proj.slug && proj.caseStudy)) && (
                 <div className="cv-entry-links">
-                  {proj.links.map((link, li) => (
+                  {proj.slug && proj.caseStudy && (
+                    <Link to={`/work/${proj.slug}`}>
+                      Read case study <FiArrowRight aria-hidden="true" />
+                    </Link>
+                  )}
+                  {proj.links && proj.links.map((link, li) => (
                     <a key={li} href={link.url} target="_blank" rel="noopener noreferrer">
                       {link.label} <FiExternalLink aria-hidden="true" />
                     </a>

@@ -97,115 +97,523 @@
           "Integrated the system as the computer-vision backbone of a smart-parking platform handling automated billing and real-time traffic analytics."
         ],
         "links": [
-          { "label": "GitHub", "url": "https://github.com/Agrim-Sigdel/CATD" },
-          { "label": "View Paper", "url": "/CATD-Submission.pdf" },
-          { "label": "Download Paper", "url": "/CATD-Submission.pdf", "download": true }
+          {
+            "label": "GitHub",
+            "url": "https://github.com/Agrim-Sigdel/CATD"
+          },
+          {
+            "label": "View Paper",
+            "url": "/CATD-Submission.pdf"
+          },
+          {
+            "label": "Download Paper",
+            "url": "/CATD-Submission.pdf",
+            "download": true
+          }
         ]
       }
     ],
     "projects": [
       {
         "id": 1,
+        "slug": "feriaau",
         "title": "Feriaau",
         "category": "Full-Stack · Web Platform",
         "description": "Lead full-stack engineer for Feriaau - a production web platform built on a modular Python/Django backend with a dynamic React.js/TypeScript frontend, deployed on secure servers with automated CI/CD.",
         "outcome": "Shipped and maintained in production with high availability and a streamlined release pipeline.",
         "links": [
-          { "label": "Live Site", "url": "https://feriaau.com" }
+          {
+            "label": "Live Site",
+            "url": "https://feriaau.com"
+          }
         ],
-        "color": "#141414"
+        "color": "#141414",
+        "caseStudy": {
+          "tagline": "A production web platform on a modular Django backend and a dynamic React/TypeScript frontend.",
+          "role": "Lead Full-Stack Engineer",
+          "stack": [
+            "Python",
+            "Django",
+            "Django REST Framework",
+            "React.js",
+            "TypeScript",
+            "PostgreSQL",
+            "MySQL",
+            "CI/CD",
+            "Linux / VPS"
+          ],
+          "highlights": [
+            "Shipped and maintained in production with high availability",
+            "Modular Django backend with a decoupled React/TypeScript SPA",
+            "Automated CI/CD release pipeline"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "Feriaau is a production web platform I lead as full-stack engineer. It pairs a modular Python/Django backend with a dynamic React.js/TypeScript frontend, deployed on secured servers behind an automated release pipeline. My focus here is the engineering: a clean, decoupled architecture that stays maintainable as the product grows."
+            },
+            {
+              "heading": "My Role",
+              "body": "As lead full-stack engineer I own the architecture across the stack — designing the REST API surface, structuring the React/TypeScript frontend, and setting up the deployment and CI/CD workflow that ships changes to production safely."
+            },
+            {
+              "heading": "Architecture",
+              "body": "The backend is organised as modular Django apps exposing versioned REST APIs, consumed by a single-page React/TypeScript client. That separation keeps the API reusable across surfaces (web and, later, mobile) and lets the frontend evolve independently of backend internals."
+            },
+            {
+              "heading": "Deployment & Reliability",
+              "body": "The platform runs on secured Linux servers with an automated CI/CD pipeline, so releases are repeatable and low-risk. The emphasis is on high availability and a streamlined path from commit to production."
+            },
+            {
+              "heading": "Outcome",
+              "body": "Shipped and maintained in production with high availability and a streamlined release pipeline."
+            }
+          ]
+        }
       },
       {
         "id": 2,
+        "slug": "feriaau-crm",
         "title": "Feriaau CRM",
         "category": "Full-Stack · Multi-Tenant SaaS",
         "description": "Multi-tenant CRM platform powering Feriaau's operations - robust REST APIs, optimized PostgreSQL/MySQL schemas, and strict tenant isolation across the data layer.",
         "outcome": "Maximized application speed and secure multi-tenant isolation for concurrent organizations.",
         "links": [
-          { "label": "Live Site", "url": "https://crm.feriaau.com" }
+          {
+            "label": "Live Site",
+            "url": "https://crm.feriaau.com"
+          }
         ],
-        "color": "#0f0f0f"
+        "color": "#0f0f0f",
+        "caseStudy": {
+          "tagline": "A multi-tenant CRM platform with strict tenant isolation across the data layer.",
+          "role": "Full-Stack Engineer — Backend & Data",
+          "stack": [
+            "Python",
+            "Django",
+            "Django REST Framework",
+            "PostgreSQL",
+            "MySQL",
+            "Multi-tenancy",
+            "REST APIs"
+          ],
+          "highlights": [
+            "Multi-tenant architecture with strict per-tenant data isolation",
+            "Optimised PostgreSQL / MySQL schemas",
+            "Robust REST APIs powering concurrent organizations"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "The Feriaau CRM is a multi-tenant SaaS platform that powers the operations side of Feriaau. The engineering centre of gravity is the data layer: robust REST APIs over optimised relational schemas, with strict isolation so multiple organizations share the same deployment without ever sharing data."
+            },
+            {
+              "heading": "My Role",
+              "body": "I worked on the backend and data layer — designing the REST APIs, modelling and optimising the relational schemas, and implementing the tenant-isolation strategy."
+            },
+            {
+              "heading": "Multi-Tenancy & Isolation",
+              "body": "The core challenge of any CRM is keeping each tenant's data provably separate while running on shared infrastructure. I implemented isolation across the data layer so every query is scoped to its tenant, preventing cross-tenant leakage by construction."
+            },
+            {
+              "heading": "Data Layer",
+              "body": "Schemas were designed and indexed around the access patterns the CRM relies on, and tuned across PostgreSQL and MySQL to keep queries fast as data grows per organization."
+            },
+            {
+              "heading": "Outcome",
+              "body": "Maximised application speed and secure multi-tenant isolation for concurrent organizations."
+            }
+          ]
+        }
       },
       {
         "id": 3,
+        "slug": "feriaau-app",
         "title": "Feriaau App",
         "category": "Mobile · Flutter",
         "description": "Contributor to the Feriaau mobile app - a cross-platform Flutter application for Feriaau users, sharing backend services and REST APIs with the web platform.",
         "outcome": "Published on the Google Play Store and Apple App Store for iOS and Android.",
         "links": [
-          { "label": "Play Store", "url": "https://play.google.com/store/apps/details?id=com.kingsoft.feriaau&pcampaignid=web_share" },
-          { "label": "App Store", "url": "https://apps.apple.com/np/app/feriaau/id6764230718" }
+          {
+            "label": "Play Store",
+            "url": "https://play.google.com/store/apps/details?id=com.kingsoft.feriaau&pcampaignid=web_share"
+          },
+          {
+            "label": "App Store",
+            "url": "https://apps.apple.com/np/app/feriaau/id6764230718"
+          }
         ],
-        "color": "#161616"
+        "color": "#161616",
+        "caseStudy": {
+          "tagline": "A cross-platform Flutter app sharing backend services with the Feriaau web platform.",
+          "role": "Mobile Contributor",
+          "stack": [
+            "Flutter",
+            "Dart",
+            "REST APIs",
+            "iOS",
+            "Android"
+          ],
+          "highlights": [
+            "Published on Google Play and the Apple App Store",
+            "Single cross-platform Flutter codebase",
+            "Shares REST APIs with the web platform"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "The Feriaau app brings the platform to mobile as a single cross-platform Flutter codebase for iOS and Android. It reuses the same backend services and REST APIs as the web platform, so mobile and web stay consistent without duplicating the backend."
+            },
+            {
+              "heading": "My Role",
+              "body": "I contributed to the Flutter application — building UI and wiring it to the shared REST APIs."
+            },
+            {
+              "heading": "Cross-Platform Approach",
+              "body": "Using Flutter meant one Dart codebase targeting both iOS and Android, reusing the platform's existing REST API layer rather than standing up a separate mobile backend."
+            },
+            {
+              "heading": "Outcome",
+              "body": "Published on the Google Play Store and Apple App Store for iOS and Android."
+            }
+          ]
+        }
       },
       {
         "id": 4,
+        "slug": "contractorops-ai",
         "title": "ContractorOps AI App",
         "category": "Mobile · AI · React Native",
         "status": "In Development",
         "description": "High-performance mobile application built with React Native and TypeScript for Contractor Ops AI, with refactored low-latency backend REST APIs and strict component state-management practices.",
         "outcome": "Currently building the app: streamlining real-time application features and resolving full-stack integration bottlenecks across the stack.",
         "links": [],
-        "color": "#101010"
+        "color": "#101010",
+        "caseStudy": {
+          "tagline": "A high-performance React Native app with a refactored low-latency REST backend.",
+          "role": "Mobile / Full-Stack Engineer",
+          "stack": [
+            "React Native",
+            "TypeScript",
+            "REST APIs",
+            "State Management"
+          ],
+          "highlights": [
+            "React Native + TypeScript mobile app",
+            "Refactored low-latency backend REST APIs",
+            "Strict component state-management practices"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "ContractorOps AI is a mobile application I'm building with React Native and TypeScript. Alongside the app I refactored the backend REST APIs for lower latency, with a focus on real-time features and clean state management on the client."
+            },
+            {
+              "heading": "My Role",
+              "body": "I'm building the mobile app and refactoring the supporting REST APIs — tightening latency and resolving integration bottlenecks across the stack."
+            },
+            {
+              "heading": "Engineering Focus",
+              "body": "The client is written in React Native and TypeScript with strict, predictable state management. On the backend I refactored the REST APIs to cut latency, which is what makes the app's real-time features feel responsive."
+            },
+            {
+              "heading": "Status",
+              "body": "Currently in active development — streamlining real-time features and resolving full-stack integration bottlenecks."
+            }
+          ]
+        }
       },
       {
         "id": 5,
+        "slug": "anpr-smart-parking",
         "title": "ANPR + Smart Parking System",
         "category": "AI · Computer Vision",
         "description": "Three-stage cascaded computer-vision pipeline (YOLOv8n → YOLOv11n → RT-DETR) for bi-scriptual Nepali plate recognition, serving as the backbone of an automated smart-parking platform.",
         "outcome": "90.4% end-to-end precision with 61%–73% compute reduction; powers automated billing and real-time traffic analytics.",
         "links": [
-          { "label": "GitHub", "url": "https://github.com/Agrim-Sigdel/ANPR-Parking/" },
-          { "label": "Test the Workflow", "url": "https://app.roboflow.com/workflows/embed/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ3b3JrZmxvd0lkIjoiTzZkaGFoSDIxTE83d0pwd0NqYmUiLCJ3b3Jrc3BhY2VJZCI6Im5UNzFtMmtJRzZXSFYxc3BMUlhKM2t3WmRRMTIiLCJ1c2VySWQiOiJuVDcxbTJrSUc2V0hWMXNwTFJYSjNrd1pkUTEyIiwiaWF0IjoxNzgxNjAyOTU1fQ.fqIJd1S66XN4rD7W6cV62nW8MTFP3Eugefpgr9JQtgc" }
+          {
+            "label": "GitHub",
+            "url": "https://github.com/Agrim-Sigdel/ANPR-Parking/"
+          },
+          {
+            "label": "Test the Workflow",
+            "url": "https://app.roboflow.com/workflows/embed/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ3b3JrZmxvd0lkIjoiTzZkaGFoSDIxTE83d0pwd0NqYmUiLCJ3b3Jrc3BhY2VJZCI6Im5UNzFtMmtJRzZXSFYxc3BMUlhKM2t3WmRRMTIiLCJ1c2VySWQiOiJuVDcxbTJrSUc2V0hWMXNwTFJYSjNrd1pkUTEyIiwiaWF0IjoxNzgxNjAyOTU1fQ.fqIJd1S66XN4rD7W6cV62nW8MTFP3Eugefpgr9JQtgc"
+          }
         ],
-        "color": "#151515"
+        "color": "#151515",
+        "caseStudy": {
+          "tagline": "A cascaded computer-vision pipeline for bi-scriptual Nepali plate recognition.",
+          "role": "Computer Vision Engineer",
+          "stack": [
+            "Python",
+            "YOLOv8n",
+            "YOLOv11n",
+            "RT-DETR",
+            "PyTorch",
+            "Roboflow",
+            "OpenCV"
+          ],
+          "highlights": [
+            "90.4% end-to-end precision",
+            "61%–73% compute reduction",
+            "Three-stage cascaded detection pipeline"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "This project is a three-stage cascaded computer-vision pipeline (YOLOv8n → YOLOv11n → RT-DETR) built to recognise bi-scriptual Nepali number plates, and it serves as the backbone of an automated smart-parking platform."
+            },
+            {
+              "heading": "The Problem",
+              "body": "Nepali plates mix scripts and appear in messy real-world conditions, which makes single-model recognition brittle. The goal was recognition that's accurate but also cheap enough to run live inside a parking system."
+            },
+            {
+              "heading": "Approach",
+              "body": "Rather than one heavy model, I cascaded three: a light YOLOv8n stage to localise, a YOLOv11n stage to refine, and RT-DETR for the hardest recognition step. Each stage only does the work the previous one couldn't — which is where the compute savings come from."
+            },
+            {
+              "heading": "Results",
+              "body": "The pipeline reaches 90.4% end-to-end precision while cutting compute by 61%–73% versus a monolithic approach, and it powers automated billing and real-time traffic analytics in the smart-parking platform."
+            },
+            {
+              "heading": "Try It",
+              "body": "The full detection workflow is runnable through the linked Roboflow workflow, and the source is on GitHub."
+            }
+          ]
+        }
       },
       {
         "id": 6,
+        "slug": "reddit-sentiment-analysis",
         "title": "Reddit Sentiment Analysis",
         "category": "NLP · Deep Learning",
         "description": "Deep NLP pipeline using fine-tuned BERT for nuanced emotion classification on large-scale Reddit data, integrated with LLM-based frontend interfaces.",
         "outcome": "Nuanced multi-class emotion classification with advanced prompt-engineering integration.",
         "links": [
-          { "label": "GitHub", "url": "https://github.com/Agrim-Sigdel/Sentiment-Analysis" }
+          {
+            "label": "GitHub",
+            "url": "https://github.com/Agrim-Sigdel/Sentiment-Analysis"
+          }
         ],
-        "color": "#0d0d0d"
+        "color": "#0d0d0d",
+        "caseStudy": {
+          "tagline": "A fine-tuned BERT pipeline for nuanced emotion classification on Reddit at scale.",
+          "role": "ML / NLP Engineer",
+          "stack": [
+            "Python",
+            "BERT",
+            "PyTorch",
+            "Hugging Face Transformers",
+            "NLP",
+            "LLM prompt engineering"
+          ],
+          "highlights": [
+            "Fine-tuned BERT for multi-class emotion classification",
+            "Large-scale Reddit dataset",
+            "LLM-integrated frontend interfaces"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "A deep NLP pipeline that uses a fine-tuned BERT model for nuanced, multi-class emotion classification on large-scale Reddit data, wired up to LLM-based frontend interfaces."
+            },
+            {
+              "heading": "Approach",
+              "body": "I fine-tuned BERT on Reddit data to move past coarse positive/negative sentiment toward nuanced emotion classes. The trained model is exposed through an interface layer that pairs it with LLM prompt-engineering for richer interaction."
+            },
+            {
+              "heading": "Engineering",
+              "body": "The pipeline covers the full path — large-scale data preparation, fine-tuning, and serving — so the emotion classifier can be queried directly from the frontend."
+            },
+            {
+              "heading": "Outcome",
+              "body": "Nuanced multi-class emotion classification with advanced prompt-engineering integration."
+            }
+          ]
+        }
       },
       {
         "id": 7,
+        "slug": "easy-3dkit",
         "title": "easy-3dkit",
         "category": "Open Source · NPM Package",
         "description": "Creator and maintainer of an open-source library of interactive 3D components for React, built natively on Three.js, React Three Fiber (R3F), and GSAP.",
         "outcome": "Drop-in scroll-reactive surfaces, particle fields, instanced layouts, and post-processing - lightweight and production-ready.",
         "links": [
-          { "label": "NPM", "url": "https://www.npmjs.com/package/easy-3dkit" },
-          { "label": "Live Docs", "url": "https://3d-kit.netlify.app" }
+          {
+            "label": "NPM",
+            "url": "https://www.npmjs.com/package/easy-3dkit"
+          },
+          {
+            "label": "Live Docs",
+            "url": "https://3d-kit.netlify.app"
+          }
         ],
-        "color": "#111"
+        "color": "#111",
+        "caseStudy": {
+          "tagline": "An open-source library of drop-in interactive 3D components for React.",
+          "role": "Creator & Maintainer",
+          "stack": [
+            "React",
+            "Three.js",
+            "React Three Fiber",
+            "GSAP",
+            "JavaScript",
+            "npm"
+          ],
+          "highlights": [
+            "Published open-source on npm with live docs",
+            "Built natively on Three.js, R3F and GSAP",
+            "Scroll-reactive surfaces, particle fields, instanced layouts, post-processing"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "easy-3dkit is an open-source library of interactive 3D components for React that I created and maintain. It's built natively on Three.js, React Three Fiber (R3F) and GSAP, and gives developers drop-in 3D surfaces without wiring up the boilerplate themselves."
+            },
+            {
+              "heading": "The Problem",
+              "body": "Adding real-time 3D to a React app usually means a lot of Three.js/R3F setup before anything appears on screen. I wanted components you could drop in and configure — not a scene graph you have to hand-build every time."
+            },
+            {
+              "heading": "What's Inside",
+              "body": "The kit ships scroll-reactive surfaces, particle fields, instanced layouts and post-processing effects — each a configurable React component that stays lightweight and production-ready."
+            },
+            {
+              "heading": "Real-World Use",
+              "body": "It powers the live backdrop behind this very portfolio's terminal mode, which doubles as a proving ground for the library."
+            },
+            {
+              "heading": "Outcome",
+              "body": "Drop-in scroll-reactive surfaces, particle fields, instanced layouts, and post-processing — lightweight and production-ready, published to npm with live docs."
+            }
+          ]
+        }
       },
       {
         "id": 8,
+        "slug": "partweave",
         "title": "Partweave",
         "category": "Open Source · Developer Tooling · CLI",
         "description": "Creator of an open-source full-stack project scaffolder - a TypeScript CLI that generates self-contained monorepos from only the components you pick (Django, Next.js, Expo, plus auth, database, Docker and CI/CD modules), resolving dependencies and rejecting incompatible selections upfront.",
         "outcome": "'create-t3-app meets shadcn/ui' - deterministic template injection produces fully-owned, ready-to-run code; published to npm and extensible through a modules catalog.",
         "links": [
-          { "label": "GitHub", "url": "https://github.com/Agrim-Sigdel/partweave" },
-          { "label": "NPM", "url": "https://www.npmjs.com/package/partweave" }
+          {
+            "label": "GitHub",
+            "url": "https://github.com/Agrim-Sigdel/partweave"
+          },
+          {
+            "label": "NPM",
+            "url": "https://www.npmjs.com/package/partweave"
+          }
         ],
-        "color": "#101010"
+        "color": "#101010",
+        "caseStudy": {
+          "tagline": "A TypeScript CLI that scaffolds self-contained monorepos from only the parts you pick.",
+          "role": "Creator & Maintainer",
+          "stack": [
+            "TypeScript",
+            "Node.js",
+            "CLI",
+            "Django",
+            "Next.js",
+            "Expo",
+            "Docker",
+            "CI/CD",
+            "npm"
+          ],
+          "highlights": [
+            "\"create-t3-app meets shadcn/ui\"",
+            "Deterministic template injection — you fully own the code",
+            "Dependency resolution with upfront incompatibility checks"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "Partweave is an open-source full-stack project scaffolder — a TypeScript CLI that generates a self-contained monorepo from only the components you choose (Django, Next.js, Expo, plus auth, database, Docker and CI/CD modules). I describe it as 'create-t3-app meets shadcn/ui'."
+            },
+            {
+              "heading": "The Problem",
+              "body": "Starters either give you everything (and you delete half of it) or a fixed stack you can't deviate from. I wanted a scaffolder where you pick exactly the parts you need, get real code you fully own, and never fight incompatible selections after the fact."
+            },
+            {
+              "heading": "Approach",
+              "body": "Partweave uses deterministic template injection: instead of pulling in a runtime dependency, it writes fully-owned, ready-to-run code into your repo. A dependency resolver validates your selections upfront and rejects incompatible combinations before it generates anything."
+            },
+            {
+              "heading": "Architecture",
+              "body": "The generator is built around an extensible modules catalog — each module (a framework, auth, database, Docker, CI/CD) declares what it provides and what it needs, and the resolver weaves the compatible set into one coherent monorepo."
+            },
+            {
+              "heading": "Outcome",
+              "body": "Deterministic template injection produces fully-owned, ready-to-run code; published to npm and extensible through a modules catalog."
+            }
+          ]
+        }
       },
       {
         "id": 9,
+        "slug": "personal-portfolio",
         "title": "Personal Portfolio",
         "category": "Web · React · Interactive 3D",
         "description": "Designer and builder of my personal portfolio - a React/Vite site with Framer Motion motion design, a live Three.js/R3F backdrop powered by my own easy-3dkit, and an installable PWA. Ships a fully interactive terminal mode with a virtual filesystem and command parser as an alternate way to explore the site.",
         "outcome": "Fast, installable, and playful - the site you're on right now, with a hidden shell for the curious.",
         "links": [
-          { "label": "Live Site", "url": "https://agrimsigdel.com.np" },
-          { "label": "GitHub", "url": "https://github.com/Agrim-Sigdel/Portfolio" }
+          {
+            "label": "Live Site",
+            "url": "https://agrimsigdel.com.np"
+          },
+          {
+            "label": "GitHub",
+            "url": "https://github.com/Agrim-Sigdel/Portfolio"
+          }
         ],
-        "color": "#131313"
+        "color": "#131313",
+        "caseStudy": {
+          "tagline": "The site you're on — React, live 3D, an installable PWA, and a hidden terminal.",
+          "role": "Designer & Developer",
+          "stack": [
+            "React",
+            "Vite",
+            "Framer Motion",
+            "Three.js",
+            "React Three Fiber",
+            "easy-3dkit",
+            "PWA",
+            "JavaScript"
+          ],
+          "highlights": [
+            "Installable PWA with a fast, lazy-loaded critical path",
+            "Three distinct modes: interactive, CV, and terminal",
+            "Live 3D backdrop powered by my own easy-3dkit"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "This portfolio is a React/Vite site I designed and built from scratch. It offers three ways to explore the same content: an interactive motion-designed portfolio, a clean CV view, and a fully interactive terminal — plus a live Three.js backdrop and an offline-capable PWA."
+            },
+            {
+              "heading": "Three Modes",
+              "body": "Visitors choose how they browse. 'Normal' is a Framer Motion interactive portfolio, 'CV' is a clean printable resume view, and 'Terminal' is a real shell with a virtual filesystem and command parser — all reading from a single content source of truth."
+            },
+            {
+              "heading": "The Terminal",
+              "body": "The terminal mode implements a virtual filesystem and command parser, so the same project and experience data can be explored via commands. It even carousels live easy-3dkit effects behind the prompt."
+            },
+            {
+              "heading": "Performance",
+              "body": "Each mode is its own lazy-loaded bundle, and heavy dependencies (framer-motion, three.js) are kept off the landing page's critical path so the mode selector loads fast. The site is an installable PWA that works offline."
+            },
+            {
+              "heading": "Under the Hood",
+              "body": "The live 3D backdrop is driven by easy-3dkit — my own open-source library — which makes this site both a portfolio and a live demo of that work."
+            },
+            {
+              "heading": "Outcome",
+              "body": "Fast, installable, and playful — the site you're on right now, with a hidden shell for the curious."
+            }
+          ]
+        }
       }
     ],
     "skills": {
@@ -276,7 +684,10 @@
     "hero": {
       "greeting": "Hi, I'm",
       "action": "I build things that work.",
-      "specialization": ["Computer Vision", "NLP"]
+      "specialization": [
+        "Computer Vision",
+        "NLP"
+      ]
     },
     "about": {
       "title": "The Human Bit",

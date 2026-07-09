@@ -1,10 +1,16 @@
-import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense, useSyncExternalStore } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { parseCommand, complete } from '../lib/CommandParser';
 import { getWelcomeView } from '../lib/TerminalViews';
 import { CONTACT_ACTION, HOME, getNode } from '../lib/vfs';
+import { subscribe as fxSubscribe, getState as fxGetState, fxShuffle, fxPrev, fxNext, fxToggleAuto, AUTO_SHUFFLE_MS } from '../lib/fxStore';
 import ContactModal from '../../../shared/ui/ContactModal';
 import SEO from '../../../shared/ui/SEO';
+
+import FxHud from './FxHud';
+import FxCredit from './FxCredit';
+import FxWallpaperBar from './FxWallpaperBar';
+import { IconPrev, IconNext, IconShuffle, IconPlay, IconPause } from './fxIcons';
 
 // Lazy-loaded so the Three.js/R3F backdrop only ships when Work mode mounts.
 const StarryNight = lazy(() => import('./StarryNight'));
@@ -93,7 +99,7 @@ const HighlightedLine = ({ text }) => {
         );
     }
     // Help group headers + man page section headers
-    if (/^(filesystem|terminal|site)$/.test(text) || /^(NAME|SYNOPSIS|DESCRIPTION|ALIASES)$/.test(text)) {
+    if (/^(filesystem|terminal|graphics|site)$/.test(text) || /^(NAME|SYNOPSIS|DESCRIPTION|ALIASES)$/.test(text)) {
         return <span style={{ color: C.accent3, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', fontSize: '0.78rem' }}>{text}</span>;
     }
     // Help command rows — "  <cmd> [args]   description"
@@ -337,25 +343,30 @@ const TerminalIcon = ({ size = 40 }) => (
 /* ─── macOS-style dock ───────────────────────────────────────────────── */
 const Dock = ({ items }) => (
     <motion.div
+        className="dock-scroll"
         initial={{ y: 90, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 90, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 320, damping: 28 }}
         style={{
             position: 'fixed', bottom: 18, left: '50%', transform: 'translateX(-50%)', zIndex: 300,
-            display: 'flex', alignItems: 'flex-end', gap: 14,
-            padding: '10px 16px', borderRadius: 20,
+            display: 'flex', alignItems: 'center', gap: 'clamp(6px, 2vw, 14px)',
+            padding: '8px clamp(8px, 3vw, 16px)', borderRadius: 20,
+            maxWidth: 'calc(100vw - 16px)', boxSizing: 'border-box', overflowX: 'auto',
             background: 'rgba(22,27,34,0.72)', backdropFilter: 'blur(20px)',
             border: '1px solid rgba(255,255,255,0.08)',
             boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
         }}
     >
-        {items.map(({ key, title, onClick, badge, render }) => (
+        {items.map((it, i) => it.divider ? (
+            <span key={`div-${i}`} aria-hidden="true" style={{ alignSelf: 'center', width: 1, height: 30, background: 'rgba(255,255,255,0.1)', margin: '0 2px' }} />
+        ) : (
             <motion.button
-                key={key}
-                onClick={onClick}
-                title={title}
-                aria-label={title}
+                key={it.key}
+                onClick={it.onClick}
+                title={it.title}
+                aria-label={it.title}
+                aria-pressed={it.active}
                 whileHover={{ y: -10, scale: 1.18 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 18 }}
@@ -365,22 +376,34 @@ const Dock = ({ items }) => (
                     display: 'flex', flexDirection: 'column', alignItems: 'center',
                 }}
             >
-                {render || <TerminalIcon />}
-                {badge && (
+                {it.render || <TerminalIcon />}
+                {it.badge && (
                     <span style={{
                         position: 'absolute', top: -3, right: -3, width: 8, height: 8,
                         borderRadius: '50%', background: C.accent, boxShadow: `0 0 6px ${C.accent}`,
                         border: '1px solid #0d1117',
                     }} />
                 )}
-                {/* running indicator dot */}
+                {/* running indicator dot (app icons only) */}
                 <span style={{
                     width: 4, height: 4, borderRadius: '50%', marginTop: 4,
-                    background: C.dim,
+                    background: it.dot === false ? 'transparent' : C.dim,
                 }} />
             </motion.button>
         ))}
     </motion.div>
+);
+
+/* ─── Dock icon for an fx transport control ──────────────────────────── */
+const DockControlIcon = ({ children, active }) => (
+    <div style={{
+        width: 40, height: 40, borderRadius: 9,
+        background: 'linear-gradient(145deg, #1c2330, #0d1117)',
+        border: `1px solid ${active ? C.accent : C.border}`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: active ? C.accent : C.accent2,
+        boxShadow: active ? `0 0 10px ${C.accent}55, inset 0 1px 0 rgba(255,255,255,0.06)` : '0 4px 12px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)',
+    }}>{children}</div>
 );
 
 /* ─── Command palette entries (common commands) ──────────────────────── */
@@ -394,6 +417,7 @@ const MENU_ITEMS = [
     { label: 'skills',      hint: '5', cmd: 'cat ~/skills.txt',        accent: C.accent },
     { label: 'contact',     hint: '6', cmd: 'contact',                 accent: C.accent },
     { label: 'resume.pdf',  hint: '⇩', cmd: 'open ~/resume.pdf',       accent: C.accent3 },
+    { label: '3d effects',  hint: '◆', cmd: 'fx list',                 accent: C.accent3 },
     { label: 'menu',        hint: '☰', cmd: 'menu',                    accent: C.accent2 },
     { label: 'help',        hint: '?', cmd: 'help',                    accent: C.accent2 },
     { label: 'clear',       hint: '⌫', cmd: 'clear',                   accent: C.warn },
@@ -424,6 +448,7 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
 
     const inputRef = useRef(null);
     const scrollRef = useRef(null);
+    const desktopRef = useRef(null); // drag-bounds for the floating fx window
 
     const cwdNode = getNode(cwd);
     const itemCount = cwdNode && cwdNode.type === 'dir' ? Object.keys(cwdNode.children).length : 0;
@@ -465,6 +490,16 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
         window.addEventListener('keydown', onKey);
         return () => window.removeEventListener('keydown', onKey);
     }, [maximized]);
+
+    // Auto-shuffle the easy-3dkit backdrop while `fx auto` is on. Runs here (a
+    // component that's always mounted) so it keeps rotating even when the
+    // terminal window is closed and only the wallpaper is showing.
+    const fxAuto = useSyncExternalStore(fxSubscribe, fxGetState, fxGetState).auto;
+    useEffect(() => {
+        if (!fxAuto) return undefined;
+        const id = setInterval(fxShuffle, AUTO_SHUFFLE_MS);
+        return () => clearInterval(id);
+    }, [fxAuto]);
 
     const handleTerminalClick = () => {
         if (!isTouch && !showMenu && windowState === 'open') inputRef.current?.focus();
@@ -564,6 +599,60 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
         }
     };
 
+    // ─── Mobile: the terminal shell is keyboard-driven and desktop-only. Don't
+    // open the window at all — show a disclaimer plus the easy-3dkit backdrop
+    // menu (tappable, no keyboard needed) so phones still get the showcase.
+    if (isTouch) {
+        const primaryBtn = { padding: '11px 16px', borderRadius: 9, border: 'none', cursor: 'pointer', background: C.accent, color: C.bg, fontFamily: 'inherit', fontSize: '0.82rem', fontWeight: 700 };
+        const ghostBtn = { padding: '11px 16px', borderRadius: 9, border: `1px solid ${C.border}`, cursor: 'pointer', background: 'transparent', color: C.text, fontFamily: 'inherit', fontSize: '0.82rem' };
+        return (
+            <>
+                <SEO
+                    title="Agrim Sigdel — Terminal"
+                    description="Agrim Sigdel's interactive terminal — best explored on a computer. On mobile, enjoy the live easy-3dkit backdrop."
+                    url="https://agrimsigdel.com.np/terminal"
+                />
+                <div style={{
+                    position: 'relative', width: '100vw', height: '100dvh', overflow: 'hidden',
+                    display: 'flex', flexDirection: 'column',
+                    background: 'radial-gradient(ellipse at 30% 20%, #131a26 0%, #0a0d12 60%, #06080b 100%)',
+                    fontFamily: "'JetBrains Mono', 'Courier New', monospace",
+                }}>
+                    <Suspense fallback={null}><StarryNight /></Suspense>
+                    <FxCredit />
+
+                    {/* Desktop-only disclaimer — centered & responsive */}
+                    <div style={{
+                        flex: 1, position: 'relative', zIndex: 2,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        padding: '24px 16px 172px', boxSizing: 'border-box', overflowY: 'auto',
+                    }}>
+                        <div style={{
+                            width: '100%', maxWidth: 440,
+                            background: 'rgba(13,17,23,0.92)', backdropFilter: 'blur(12px)',
+                            border: `1px solid ${C.border}`, borderRadius: 14, padding: '20px 20px',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: C.accent2, fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 10 }}>
+                                <span style={{ fontSize: '1.05rem' }} aria-hidden="true">🖥</span> Terminal is a desktop experience
+                            </div>
+                            <p style={{ margin: 0, color: C.dim, fontSize: 'clamp(0.82rem, 3.6vw, 0.9rem)', lineHeight: 1.65 }}>
+                                The interactive shell is keyboard-driven — open <span style={{ color: C.text }}>agrimsigdel.com.np</span> on a computer to explore it. On your phone you can still play with the live easy-3dkit backdrop below.
+                            </p>
+                            <div style={{ display: 'flex', gap: 10, marginTop: 16, flexWrap: 'wrap' }}>
+                                <button type="button" onClick={() => onSwitchToFun?.()} style={primaryBtn}>View portfolio →</button>
+                                <button type="button" onClick={() => onResetMode?.()} style={ghostBtn}>Back to modes</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* The easy-3dkit backdrop menu — mobile control surface, pinned bottom */}
+                    <FxWallpaperBar mobile />
+                </div>
+            </>
+        );
+    }
+
     return (
         <>
         <SEO
@@ -572,6 +661,7 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
             url="https://agrimsigdel.com.np/terminal"
         />
         <div
+            ref={desktopRef}
             onClick={handleTerminalClick}
             style={{
                 width: '100vw', minHeight: '100dvh', height: '100dvh',
@@ -590,12 +680,15 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
                 .term-scroll::-webkit-scrollbar-thumb:hover { background: ${C.dimmer}; }
                 .term-touch-hint { display: none; }
                 @media (hover: none) { .term-touch-hint { display: inline; color: ${C.dim}; font-size: 0.7rem; margin-left: 8px; } }
+                .dock-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+                .dock-scroll::-webkit-scrollbar { display: none; }
             `}</style>
 
-            {/* Live kinetic starfield backdrop (lazy / WebGL) */}
+            {/* Live easy-3dkit backdrop (lazy / WebGL) + its credit on the backdrop */}
             <Suspense fallback={null}>
                 <StarryNight />
             </Suspense>
+            <FxCredit />
 
             {/* Soft ambient glow behind the window */}
             <div style={{
@@ -788,6 +881,9 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
               )}
             </AnimatePresence>
 
+            {/* Draggable easy-3dkit mini-player window (floats on the desktop) */}
+            {windowState === 'open' && <FxHud boundsRef={desktopRef} />}
+
             {/* Empty-desktop hint when the window is closed */}
             <AnimatePresence>
                 {windowState === 'closed' && (
@@ -803,12 +899,13 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
                         }}
                     >
                         <div style={{ fontSize: '0.9rem', color: C.dim, marginBottom: 6 }}>No windows open</div>
-                        Click the <span style={{ color: C.accent }}>❯_</span> icon in the dock to relaunch the terminal.
+                        Use the dock to relaunch the terminal, shuffle the backdrop, or head back to start.
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            {/* ─── macOS dock (shown when minimized or closed) ─── */}
+            {/* ─── macOS dock (shown when minimized or closed): terminal on the
+                left, easy-3dkit transport in the middle, start on the right ─── */}
             <AnimatePresence>
                 {windowState !== 'open' && (
                     <Dock items={[
@@ -818,10 +915,17 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
                             badge: windowState === 'minimized',
                             onClick: () => (windowState === 'minimized' ? setWindowState('open') : relaunch()),
                         },
+                        { divider: true },
+                        { key: 'prev', title: 'Previous effect', onClick: fxPrev, dot: false, render: <DockControlIcon><IconPrev /></DockControlIcon> },
+                        { key: 'shuffle', title: 'Shuffle backdrop', onClick: fxShuffle, dot: false, render: <DockControlIcon><IconShuffle /></DockControlIcon> },
+                        { key: 'auto', title: fxAuto ? 'Stop auto-shuffle' : 'Auto-shuffle', onClick: fxToggleAuto, active: fxAuto, dot: false, render: <DockControlIcon active={fxAuto}>{fxAuto ? <IconPause /> : <IconPlay />}</DockControlIcon> },
+                        { key: 'next', title: 'Next effect', onClick: fxNext, dot: false, render: <DockControlIcon><IconNext /></DockControlIcon> },
+                        { divider: true },
                         {
                             key: 'modes',
-                            title: 'Back to mode selection',
+                            title: 'Back to start (mode selection)',
                             onClick: onResetMode,
+                            dot: false,
                             render: (
                                 <div style={{
                                     width: 40, height: 40, borderRadius: 9,

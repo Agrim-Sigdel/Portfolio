@@ -151,6 +151,26 @@
 .tri-door:hover .tri-door-cta svg,
 .tri-door:focus-visible .tri-door-cta svg { transform: translateX(4px); }
 
+/* "Best on desktop" hint — only surfaced on touch / no-hover devices, where
+   the keyboard-driven terminal shell is unavailable. */
+.tri-door-note { display: none; }
+@media (hover: none) {
+  .tri-door-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 3px 9px;
+    border: 1px solid rgba(159, 216, 180, 0.4);
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: #9fd8b4;
+    width: fit-content;
+  }
+}
+
 /* ======================================================== résumé door */
 .tri-door--resume {
   background: #f6f1e7;

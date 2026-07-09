@@ -16,7 +16,7 @@ export const getWelcomeView = () => `
 │  ${'Full-Stack Developer · AI Researcher'.padEnd(42)}│
 ╰────────────────────────────────────────────╯
 
-Type 'help' for commands, 'ls' to look around, or 'menu' for the guided tour.
+Type 'help' for commands, 'ls' to look around, 'menu' for the guided tour, or 'fx' to play with the 3D backdrop.
 `.replace(/^\n+|\n+$/g, '');
 
 /* ─── Guided tour menu (non-technical fallback) ──────────────────────

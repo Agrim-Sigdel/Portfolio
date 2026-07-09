@@ -33,7 +33,7 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 11px 20px;
+  padding: 11px 22px;
   background: #1a1a1a;
   border: none;
   border-radius: 8px;
@@ -50,10 +50,16 @@
   background: #000;
 }
 
-.cv-download-button {
+.cv-download-group {
   position: fixed;
   top: 24px;
   right: 24px;
+  z-index: 1000;
+  display: flex;
+  gap: 10px;
+}
+
+.cv-download-button {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -64,16 +70,27 @@
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
-  z-index: 1000;
   color: #fff;
   text-decoration: none;
-  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease,
+    color 0.2s ease, border-color 0.2s ease;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
 }
 .cv-download-button:hover {
   transform: translateY(-2px);
   background: #000;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+/* The generated (live-content, dated) export reads as the secondary action. */
+.cv-download-button--generated {
+  background: #fff;
+  color: #1a1a1a;
+  border: 1px solid #d6cfc4;
+}
+.cv-download-button--generated:hover {
+  background: #f5f1ea;
+  color: #1a1a1a;
 }
 
 /* The "paper" sheet */
@@ -383,6 +400,11 @@
   .cv-skills-grid {
     grid-template-columns: 1fr;
   }
+  .cv-download-group {
+    top: 16px;
+    right: 16px;
+    gap: 8px;
+  }
   .cv-download-button,
   .cv-return-button {
     padding: 8px 14px;
@@ -396,7 +418,7 @@
 /* ---------- Print ---------- */
 @media print {
   .cv-return-button,
-  .cv-download-button,
+  .cv-download-group,
   #contact {
     display: none;
   }

@@ -7,6 +7,7 @@ const { common } = content;
 // Map canonical projects to the shape the fun-mode WorkGrid expects.
 export const projectsData = common.projects.map((p) => ({
   id: p.id,
+  slug: p.slug || null,
   title: p.title,
   category: p.category,
   status: p.status || null,
@@ -14,7 +15,12 @@ export const projectsData = common.projects.map((p) => ({
   outcome: p.outcome,
   links: p.links || [],
   color: p.color || "#111",
+  caseStudy: p.caseStudy || null,
 }));
+
+// Look up a single project's case study by its URL slug.
+export const getProjectBySlug = (slug) =>
+  projectsData.find((p) => p.slug === slug) || null;
 
 // Research entries (CATD framework, publications).
 export const researchData = common.research || [];
