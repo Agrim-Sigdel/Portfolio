@@ -424,6 +424,22 @@ const MENU_ITEMS = [
     { label: 'portfolio',   hint: '★', cmd: 'portfolio',               accent: C.accent3 },
 ];
 
+/* ─── Mobile quick-command chips (tap-driven, no keyboard needed) ─────── */
+const MOBILE_CHIPS = [
+    { label: 'about',      cmd: 'cat ~/about.txt' },
+    { label: 'experience', cmd: 'ls ~/experience' },
+    { label: 'projects',   cmd: 'ls ~/projects' },
+    { label: 'research',   cmd: 'cat ~/research/catd.md' },
+    { label: 'skills',     cmd: 'cat ~/skills.txt' },
+    { label: 'contact',    cmd: 'contact' },
+    { label: 'resume ⇩',   cmd: 'open ~/resume.pdf' },
+    { label: 'menu',       cmd: 'menu' },
+    { label: 'help',       cmd: 'help' },
+    { label: 'clear',      cmd: 'clear' },
+    { label: 'portfolio →', cmd: 'portfolio' },
+    { label: 'classic cv', cmd: 'cv' },
+];
+
 /* ─── Main Terminal Component ────────────────────────────────────────── */
 const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
     const [outputLines, setOutputLines] = useState(() => [{ type: 'output', content: getWelcomeView() }]);
@@ -437,6 +453,7 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
     const [windowState, setWindowState] = useState('open'); // 'open' | 'minimized' | 'closed'
     const [maximized, setMaximized] = useState(false);
     const [contactOpen, setContactOpen] = useState(false);
+    const [mobileFx, setMobileFx] = useState(false); // touch: overlay the fx backdrop mini-player on demand
 
     // Touch devices navigate the terminal through the command palette, so we
     // never auto-focus the hidden input there — doing so would pop the on-screen
@@ -599,56 +616,172 @@ const Terminal = ({ onSwitchToFun, onSwitchToNormal, onResetMode }) => {
         }
     };
 
-    // ─── Mobile: the terminal shell is keyboard-driven and desktop-only. Don't
-    // open the window at all — show a disclaimer plus the easy-3dkit backdrop
-    // menu (tappable, no keyboard needed) so phones still get the showcase.
+    // ─── Mobile: a real, tap-driven terminal. The shell is the same parser as
+    // desktop; instead of a keyboard it's driven by the quick-command chip row
+    // (no typing needed), with an optional input for those who want to type.
+    // The live easy-3dkit backdrop stays behind it and is one tap away (◆).
     if (isTouch) {
-        const primaryBtn = { padding: '11px 16px', borderRadius: 9, border: 'none', cursor: 'pointer', background: C.accent, color: C.bg, fontFamily: 'inherit', fontSize: '0.82rem', fontWeight: 700 };
-        const ghostBtn = { padding: '11px 16px', borderRadius: 9, border: `1px solid ${C.border}`, cursor: 'pointer', background: 'transparent', color: C.text, fontFamily: 'inherit', fontSize: '0.82rem' };
+        const headerBtn = (label, title, onClick, active) => (
+            <button
+                type="button" title={title} aria-label={title} aria-pressed={active}
+                onClick={(e) => { e.stopPropagation(); onClick(); }}
+                style={{
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    minWidth: 34, height: 30, padding: '0 9px', borderRadius: 8, cursor: 'pointer',
+                    background: active ? `${C.accent}1f` : C.bg,
+                    border: `1px solid ${active ? C.accent : C.border}`,
+                    color: active ? C.accent : C.accent2, fontFamily: 'inherit', fontSize: '0.82rem',
+                }}
+            >{label}</button>
+        );
         return (
             <>
                 <SEO
                     title="Agrim Sigdel — Terminal"
-                    description="Agrim Sigdel's interactive terminal — best explored on a computer. On mobile, enjoy the live easy-3dkit backdrop."
+                    description="Explore Agrim Sigdel's portfolio through an interactive terminal — now on mobile. Tap a command to look around."
                     url="https://agrimsigdel.com.np/terminal"
                 />
                 <div style={{
                     position: 'relative', width: '100vw', height: '100dvh', overflow: 'hidden',
                     display: 'flex', flexDirection: 'column',
+                    padding: 'calc(8px + env(safe-area-inset-top)) 8px calc(8px + env(safe-area-inset-bottom))',
+                    boxSizing: 'border-box',
                     background: 'radial-gradient(ellipse at 30% 20%, #131a26 0%, #0a0d12 60%, #06080b 100%)',
                     fontFamily: "'JetBrains Mono', 'Courier New', monospace",
                 }}>
+                    <style>{`
+                        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+                        .m-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+                        .m-scroll::-webkit-scrollbar-thumb { background: ${C.border}; border-radius: 3px; }
+                        .m-chips { scrollbar-width: none; -ms-overflow-style: none; }
+                        .m-chips::-webkit-scrollbar { display: none; }
+                    `}</style>
+
                     <Suspense fallback={null}><StarryNight /></Suspense>
                     <FxCredit />
 
-                    {/* Desktop-only disclaimer — centered & responsive */}
+                    {/* Terminal window fills the screen; backdrop peeks at the edges */}
                     <div style={{
-                        flex: 1, position: 'relative', zIndex: 2,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        padding: '24px 16px 172px', boxSizing: 'border-box', overflowY: 'auto',
+                        position: 'relative', zIndex: 2, flex: 1, minHeight: 0,
+                        display: 'flex', flexDirection: 'column',
+                        background: 'rgba(13,17,23,0.92)', backdropFilter: 'blur(12px)',
+                        border: `1px solid ${C.border}`, borderRadius: 14, overflow: 'hidden',
+                        boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
                     }}>
+                        {/* Header — identity + mode / backdrop controls */}
                         <div style={{
-                            width: '100%', maxWidth: 440,
-                            background: 'rgba(13,17,23,0.92)', backdropFilter: 'blur(12px)',
-                            border: `1px solid ${C.border}`, borderRadius: 14, padding: '20px 20px',
-                            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+                            display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px',
+                            background: C.bgChrome, borderBottom: `1px solid ${C.border}`, flexShrink: 0,
                         }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: C.accent2, fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 10 }}>
-                                <span style={{ fontSize: '1.05rem' }} aria-hidden="true">🖥</span> Terminal is a desktop experience
+                            <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                                <span style={{ width: 11, height: 11, borderRadius: '50%', background: '#ff5f57' }} />
+                                <span style={{ width: 11, height: 11, borderRadius: '50%', background: '#febc2e' }} />
+                                <span style={{ width: 11, height: 11, borderRadius: '50%', background: '#28c840' }} />
                             </div>
-                            <p style={{ margin: 0, color: C.dim, fontSize: 'clamp(0.82rem, 3.6vw, 0.9rem)', lineHeight: 1.65 }}>
-                                The interactive shell is keyboard-driven — open <span style={{ color: C.text }}>agrimsigdel.com.np</span> on a computer to explore it. On your phone you can still play with the live easy-3dkit backdrop below.
-                            </p>
-                            <div style={{ display: 'flex', gap: 10, marginTop: 16, flexWrap: 'wrap' }}>
-                                <button type="button" onClick={() => onSwitchToFun?.()} style={primaryBtn}>View portfolio →</button>
-                                <button type="button" onClick={() => onResetMode?.()} style={ghostBtn}>Back to modes</button>
-                            </div>
+                            <span style={{
+                                flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                                fontSize: '0.72rem', color: C.dim, textAlign: 'center',
+                            }}>
+                                <span style={{ color: C.accent }}>❯_</span>{' '}
+                                <span style={{ color: C.text }}>agrim@portfolio</span>{' '}
+                                <span style={{ color: C.dimmer }}>{cwd}</span>
+                            </span>
+                            {headerBtn('◆', 'Toggle the 3D backdrop controls', () => setMobileFx((v) => !v), mobileFx)}
+                            {headerBtn('⊞', 'Back to start (mode selection)', () => onResetMode?.())}
                         </div>
+
+                        {/* Scrollable output — same renderer as desktop */}
+                        <div
+                            ref={scrollRef}
+                            className="m-scroll"
+                            role="log"
+                            aria-live="polite"
+                            style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'auto', padding: 16, boxSizing: 'border-box' }}
+                        >
+                            {outputLines.map((line, i) => (
+                                <div key={i} style={{ marginBottom: line.type === 'command' ? 4 : 12 }}>
+                                    {line.type === 'command' ? (
+                                        <div style={{ display: 'flex', alignItems: 'baseline' }}>
+                                            <Prompt path={line.cwd || HOME} />
+                                            <span style={{ color: C.text, fontSize: '0.85rem', wordBreak: 'break-word' }}>{line.content}</span>
+                                        </div>
+                                    ) : (
+                                        <div style={{ paddingLeft: 2 }}>
+                                            {line.type === 'error'
+                                                ? <pre style={{ margin: 0, fontFamily: 'inherit', fontSize: '0.85rem', lineHeight: 1.6, color: C.error, whiteSpace: 'pre-wrap' }}>{line.content}</pre>
+                                                : <OutputBlock content={line.content} onOpenContact={() => setContactOpen(true)} />}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Quick-command chips — the primary, keyboard-free way to explore */}
+                        <div
+                            className="m-chips"
+                            style={{
+                                display: 'flex', gap: 8, padding: '10px 12px', overflowX: 'auto',
+                                borderTop: `1px solid ${C.border}`, flexShrink: 0,
+                                WebkitOverflowScrolling: 'touch',
+                            }}
+                        >
+                            {MOBILE_CHIPS.map(({ label, cmd }) => (
+                                <button
+                                    key={cmd}
+                                    type="button"
+                                    onClick={() => handleSubmit(null, cmd)}
+                                    style={{
+                                        flexShrink: 0, padding: '8px 13px', borderRadius: 999, cursor: 'pointer',
+                                        background: C.bg, border: `1px solid ${C.border}`, color: C.text,
+                                        fontFamily: 'inherit', fontSize: '0.8rem', fontWeight: 500, whiteSpace: 'nowrap',
+                                    }}
+                                >{label}</button>
+                            ))}
+                        </div>
+
+                        {/* Optional input row — tap to type (never auto-focused) */}
+                        <form
+                            onSubmit={(e) => handleSubmit(e, inputValue)}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px',
+                                borderTop: `1px solid ${C.border}`, background: C.bgChrome, flexShrink: 0,
+                            }}
+                        >
+                            <span style={{ color: C.accent, fontSize: '0.9rem', fontWeight: 700, flexShrink: 0 }}>❯</span>
+                            <input
+                                type="text"
+                                value={inputValue}
+                                onChange={(e) => setInputValue(e.target.value)}
+                                placeholder="type a command, or tap one above"
+                                autoComplete="off"
+                                spellCheck="false"
+                                aria-label="Terminal command input"
+                                style={{
+                                    flex: 1, minWidth: 0, height: 40, background: C.bg,
+                                    border: `1px solid ${C.border}`, borderRadius: 9, padding: '0 12px',
+                                    color: C.text, fontFamily: 'inherit', fontSize: 16, outline: 'none',
+                                }}
+                            />
+                            <button
+                                type="submit"
+                                aria-label="Run command"
+                                style={{
+                                    flexShrink: 0, height: 40, padding: '0 16px', borderRadius: 9, cursor: 'pointer',
+                                    background: C.accent, border: 'none', color: C.bg, fontFamily: 'inherit',
+                                    fontSize: '0.82rem', fontWeight: 700,
+                                }}
+                            >run</button>
+                        </form>
                     </div>
 
-                    {/* The easy-3dkit backdrop menu — mobile control surface, pinned bottom */}
-                    <FxWallpaperBar mobile />
+                    {/* The easy-3dkit backdrop mini-player — one tap away via ◆ */}
+                    <AnimatePresence>
+                        {mobileFx && <FxWallpaperBar key="fxbar" mobile />}
+                    </AnimatePresence>
                 </div>
+
+                {/* Shared contact modal — terminal-themed. */}
+                <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} variant="terminal" />
             </>
         );
     }
