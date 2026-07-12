@@ -21,6 +21,8 @@
  * so even the kit's brighter effects read as a calm backdrop here.
  */
 
+import { pullToShader } from './sceneStore';
+
 const range = (key, min, max, step) => ({ key, type: 'range', min, max, step });
 const color = (key) => ({ key, type: 'color' });
 
@@ -219,7 +221,9 @@ export const resolveEffect = (token) => {
 
 const wrap = (i) => ((i % EFFECT_COUNT) + EFFECT_COUNT) % EFFECT_COUNT;
 
-export const fxGoto = (i) => set({ index: wrap(i), hud: true });
+// The fx carousel lives on the shader surface — selecting or tweaking an
+// effect pulls the backdrop to the shader scene so the change is visible.
+export const fxGoto = (i) => { pullToShader(); set({ index: wrap(i), hud: true }); };
 export const fxNext = () => fxGoto(state.index + 1);
 export const fxPrev = () => fxGoto(state.index - 1);
 
@@ -227,12 +231,14 @@ export const fxPrev = () => fxGoto(state.index - 1);
 // quietly for auto-shuffle; callers that want the panel call fxShowHud(true).
 export const fxShuffle = () => {
     if (EFFECT_COUNT < 2) return;
+    pullToShader();
     let i = state.index;
     while (i === state.index) i = Math.floor(Math.random() * EFFECT_COUNT);
     set({ index: i });
 };
 
 export const fxSetParam = (key, value) => {
+    pullToShader();
     const { id } = currentEffect();
     set({ overrides: { ...state.overrides, [id]: { ...(state.overrides[id] || {}), [key]: value } } });
 };

@@ -12,6 +12,11 @@ import {
     resolveEffect, fxGoto, fxNext, fxPrev, fxShuffle, fxSetParam, fxResetCurrent,
     fxToggleHud, fxShowHud, fxSetAuto,
 } from './fxStore';
+import {
+    SCENES, SCENE_COUNT, getState as getSceneState, currentScene, sceneParams,
+    resolveScene, sceneGoto, sceneNext, scenePrev, sceneRandom, sceneSetParam,
+    sceneResetCurrent, sceneSetFollow, sceneFollowTo,
+} from './sceneStore';
 
 /*
  * Single source of truth for every terminal command.
@@ -212,6 +217,123 @@ export const runFxCommand = (input) => {
     return fxCommand({ args });
 };
 
+/* ─── scene: which 3D screen is behind the terminal ──────────────── */
+
+// Section → scene: `cd` steers the backdrop while scene follow is on, so the
+// 3D scene doubles as a spatial cue for where you are in the filesystem.
+const SCENE_FOR_DIR = [
+    ['~/projects', 'orbit'],
+    ['~/experience', 'tunnel'],
+    ['~/research', 'morph'],
+];
+const sceneForPath = (path) => {
+    for (const [dir, id] of SCENE_FOR_DIR) {
+        if (path === dir || path.startsWith(dir + '/')) return id;
+    }
+    return 'shader';
+};
+
+const sceneListView = () => {
+    const { index, follow } = getSceneState();
+    const pad = Math.max(...SCENES.map((s) => s.name.length)) + 2;
+    const rows = SCENES.map((s, i) => {
+        const mark = i === index ? '▸' : ' ';
+        return `  ${mark} ${String(i + 1).padStart(2)}  ${s.name.padEnd(pad)}${s.blurb}`;
+    });
+    return [
+        `easy-3dkit · ${SCENE_COUNT} scenes, each a different element   (currently: ${currentScene().name})`,
+        '',
+        ...rows,
+        '',
+        `scene <name|number> to switch  ·  scene follow is ${follow ? 'on — cd steers the backdrop' : 'off'}`,
+    ].join('\n');
+};
+
+const sceneInfoView = () => {
+    const { index } = getSceneState();
+    const s = currentScene();
+    const params = sceneParams();
+    const rows = s.controls.map((c) => {
+        const val = fmtControl(c, params[c.key]);
+        return `  ${c.key.padEnd(14)} ${val.padEnd(16)} ${s.docs[c.key] || ''}`;
+    });
+    return [
+        `${s.name}  (${index + 1}/${SCENE_COUNT})  —  ${s.element}`,
+        s.blurb,
+        '',
+        ...(rows.length ? rows : ["  (no settings — this scene is driven by 'fx')"]),
+        '',
+        'scene set <param> <value>  ·  scene reset  ·  scene next / scene prev',
+    ].join('\n');
+};
+
+const sceneHelpView = () =>
+    [
+        `easy-3dkit scenes — ${SCENE_COUNT} different 3D screens, ${currentScene().name} is live`,
+        '',
+        '  scene                    this help',
+        '  scene list               all scenes (▸ marks the live one)',
+        '  scene <name|number>      switch to a scene',
+        '  scene next / scene prev  carousel through scenes',
+        '  scene random             jump to a random scene',
+        '  scene info               settings for the live scene',
+        '  scene set <param> <val>  tweak a setting (number or #hexcolor)',
+        '  scene reset              restore the live scene to its defaults',
+        '  scene follow [off]       let cd steer the backdrop by section',
+        '',
+        "The shader scene is the classic backdrop — 'fx' drives its 21 effects.",
+        "Try 'cd ~/projects' with follow on, or 'scene galaxy'.",
+    ].join('\n');
+
+const sceneSet = (args) => {
+    const [param, ...rest] = args;
+    const raw = rest.join(' ').trim();
+    if (!param || !raw) return err("usage: scene set <param> <value>   (see 'scene info' for params)");
+    const s = currentScene();
+    if (!s.controls.length) return err(`scene: ${s.name} has no settings — its look is driven by 'fx'`);
+    const ctrl = s.controls.find((c) => c.key.toLowerCase() === param.toLowerCase());
+    if (!ctrl) {
+        return err(`scene: ${s.name} has no setting '${param}'\navailable: ${s.controls.map((c) => c.key).join(', ')}`);
+    }
+    if (ctrl.type === 'color') {
+        if (!/^#?[0-9a-f]{3}([0-9a-f]{3})?$/i.test(raw)) return err(`scene: '${raw}' is not a hex colour (try #33e0ff)`);
+        const hex = raw.startsWith('#') ? raw : `#${raw}`;
+        sceneSetParam(ctrl.key, hex);
+        return { output: `${s.name}: ${ctrl.key} = ${hex}` };
+    }
+    const n = parseFloat(raw);
+    if (Number.isNaN(n)) return err(`scene: '${raw}' is not a number (range ${ctrl.min}–${ctrl.max})`);
+    const clamped = Math.min(ctrl.max, Math.max(ctrl.min, n));
+    sceneSetParam(ctrl.key, clamped);
+    const note = clamped !== n ? `  (clamped to ${ctrl.min}–${ctrl.max})` : '';
+    return { output: `${s.name}: ${ctrl.key} = ${clamped}${note}` };
+};
+
+const sceneCommand = ({ args }) => {
+    const sub = (args[0] || '').toLowerCase();
+
+    if (!sub || sub === 'help' || sub === '-h' || sub === '--help') return { output: sceneHelpView() };
+    if (sub === 'list' || sub === 'ls' || sub === 'all') return { output: sceneListView() };
+    if (sub === 'info' || sub === 'status' || sub === 'current') return { output: sceneInfoView() };
+    if (sub === 'next' || sub === 'n' || sub === '>') { sceneNext(); return { output: `▸ ${currentScene().name}  (${getSceneState().index + 1}/${SCENE_COUNT})` }; }
+    if (sub === 'prev' || sub === 'p' || sub === '<') { scenePrev(); return { output: `◂ ${currentScene().name}  (${getSceneState().index + 1}/${SCENE_COUNT})` }; }
+    if (sub === 'random' || sub === 'rand' || sub === 'shuffle') { sceneRandom(); return { output: `⤨ ${currentScene().name}  (${getSceneState().index + 1}/${SCENE_COUNT})` }; }
+    if (sub === 'reset' || sub === 'default') { sceneResetCurrent(); return { output: `${currentScene().name}: settings restored to defaults` }; }
+    if (sub === 'follow') {
+        const off = /^(off|stop|0|false|no)$/i.test(args[1] || '');
+        sceneSetFollow(!off);
+        return { output: off ? 'scene follow off — the backdrop stays put' : 'scene follow on — cd now steers the backdrop by section' };
+    }
+    if (sub === 'set') return sceneSet(args.slice(1));
+
+    // Anything else is treated as a scene name / number.
+    const i = resolveScene(args[0]);
+    if (i < 0) return err(`scene: no scene '${args[0]}'\nrun 'scene list' to see the ${SCENE_COUNT} scenes`);
+    sceneGoto(i);
+    const s = currentScene();
+    return { output: `switched to ${s.name}  (${i + 1}/${SCENE_COUNT})  —  ${s.element}\n${s.blurb}\n\n'scene info' for its settings · 'scene follow' to let cd steer again` };
+};
+
 /* ─── command registry ───────────────────────────────────────────── */
 
 export const COMMANDS = [
@@ -241,12 +363,17 @@ export const COMMANDS = [
         manual: "Moves into a directory. Supports relative paths, '..', '.', '~' and '/'. Bare 'cd' returns home.",
         handler: ({ args, cwd }) => {
             const target = args[0];
-            if (!target) return { output: '', cwd: HOME };
-            const path = resolvePath(cwd, target);
+            const path = target ? resolvePath(cwd, target) : HOME;
             const node = getNode(path);
             if (!node) return err(`cd: no such file or directory: ${target}`);
             if (node.type !== 'dir') return err(`cd: not a directory: ${target}`);
-            return { output: '', cwd: path };
+            // Scene follow: sections steer the 3D backdrop. Announce only when
+            // the scene actually changed, so plain cd stays quiet.
+            const switched = sceneFollowTo(sceneForPath(path));
+            return {
+                output: switched ? `· backdrop → ${switched}   ('scene follow off' to stop)` : '',
+                cwd: path,
+            };
         },
     },
     {
@@ -386,8 +513,14 @@ export const COMMANDS = [
     {
         name: 'fx', aliases: ['3dkit'], group: 'graphics', args: '[effect|next|shuffle|auto|set|info]',
         description: 'live easy-3dkit backdrop carousel',
-        manual: "Drives the live shader backdrop behind the terminal — all 21 effects from my easy-3dkit library. 'fx list' shows them; 'fx <name>', 'fx next'/'fx prev' and 'fx shuffle' move between effects; 'fx auto' auto-shuffles on a timer ('fx auto off' stops); 'fx info' lists the live effect's settings; 'fx set <param> <value>' tweaks one (a number or a #hexcolor); 'fx reset' restores defaults; 'fx panel' toggles the on-screen carousel HUD. Every change is live — even when the terminal window is closed, via the wallpaper bar.",
+        manual: "Drives the live shader backdrop behind the terminal — all 21 effects from my easy-3dkit library. 'fx list' shows them; 'fx <name>', 'fx next'/'fx prev' and 'fx shuffle' move between effects; 'fx auto' auto-shuffles on a timer ('fx auto off' stops); 'fx info' lists the live effect's settings; 'fx set <param> <value>' tweaks one (a number or a #hexcolor); 'fx reset' restores defaults; 'fx panel' toggles the on-screen carousel HUD. Every change is live — even when the terminal window is closed, via the wallpaper bar. Using fx switches the backdrop to the shader scene ('scene list' shows the others).",
         handler: fxCommand,
+    },
+    {
+        name: 'scene', aliases: ['scenes', 'bg'], group: 'graphics', args: '[name|next|random|follow|set|info]',
+        description: '3D scenes — a different easy-3dkit element each',
+        manual: "Picks which 3D scene is live behind the terminal. The shader surface (driven by 'fx') is scene 1; the rest are full compositions, each built from a different easy-3dkit element — instanced layouts (galaxy spiral, orbit shells, ring tunnel, cube swarm, wave grid, voxel sphere, gear field, origami fold), a glowing particle field, an ocean plane, a particle portal ring, and a morphing blob. 'scene list' shows them; 'scene <name>' switches; 'scene info' and 'scene set <param> <value>' tweak the live one. With 'scene follow' on (the default), cd steers the backdrop by section — ~/projects orbits, ~/experience flies the tunnel, ~/research morphs.",
+        handler: sceneCommand,
     },
 
     /* ── site ── */
