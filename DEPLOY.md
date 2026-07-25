@@ -69,6 +69,11 @@ Tick each box. Some may already be done — verify anyway.
       - `VITE_SITE_URL` = `https://agrimsigdel.com.np`
 - [ ] (These are safe to expose — RLS enforces access. Never add the Resend or
       service_role key here.)
+- [ ] Netlify's secrets scanner fails the build when it finds these three in
+      `dist/` (Vite inlines every `VITE_` var into the bundle). `netlify.toml`
+      already allows exactly those three via `SECRETS_SCAN_OMIT_KEYS` under
+      `[build.environment]`. If you add another `VITE_` var later, add it to
+      that list too — and only if it's genuinely safe to publish.
 
 ### B2. Forms (cleanup)
 - [ ] Contact now goes through Supabase, so the old **Netlify Forms** entry is

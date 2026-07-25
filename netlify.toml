@@ -2,6 +2,20 @@
   command = "npm run build"
   publish = "dist"
 
+# Vite inlines every VITE_-prefixed variable into the client bundle at build
+# time, so Netlify's secrets scanner finds them in dist/ and fails the build.
+# All three are public-by-design browser values, not secrets:
+#   VITE_SUPABASE_URL       — the project's public API endpoint
+#   VITE_SUPABASE_ANON_KEY  — the anon key, safe to publish; every table has RLS
+#                             enabled with writes restricted to `authenticated`
+#                             (see supabase/migrations/*_init_admin_cms.sql)
+#   VITE_SITE_URL           — the canonical site URL, used in meta tags
+# The privileged keys (service_role, RESEND_API_KEY, WEBHOOK_SECRET) are stored
+# as Supabase Edge Function secrets and never reach the bundle, so they stay
+# under the scanner. Do NOT add anything here that isn't safe in a public page.
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY,VITE_SITE_URL"
+
 [dev]
   command = "npm run dev"
 
