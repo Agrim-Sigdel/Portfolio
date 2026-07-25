@@ -5,6 +5,7 @@ import './index.css'
 import './shared/styles/theme.css'
 import App from './App.jsx'
 import { ThemeProvider } from './shared/lib/ThemeContext'
+import ContentProvider from './shared/lib/ContentProvider'
 
 // framer-motion is intentionally NOT imported here. It's pulled in lazily by the
 // mode pages (via MotionProvider) so the ~136 kB motion chunk stays off the
@@ -12,9 +13,11 @@ import { ThemeProvider } from './shared/lib/ThemeContext'
 createRoot(document.getElementById('root')).render(
 
     <ThemeProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <ContentProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </ContentProvider>
     </ThemeProvider>
 
 )

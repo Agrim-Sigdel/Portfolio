@@ -11,7 +11,7 @@ import Footer from './sections/Footer';
 import TickerSection from './sections/TickerSection';
 import ReturnToStartButton from '../../shared/ui/ReturnToStartButton';
 import SEO from '../../shared/ui/SEO';
-import content from '../../data/content.json';
+import { useContent } from '../../shared/lib/contentStore';
 import { ScrollContainerContext } from './ScrollContainerContext';
 import './funMode.css'; // Add a CSS file reference if needed, assuming it's loaded globally usually
 
@@ -57,12 +57,12 @@ const TiltPresentationWrapper = ({ children, containerRef }) => {
 
     return (
         <div
+            className="fun-mode-backdrop"
             style={{
                 width: '100vw',
                 height: '100dvh',
                 perspective: '1500px',
                 overflow: 'hidden',
-                background: 'linear-gradient(135deg, #0e1215 0%, #163632 100%)'
             }}
             onMouseMove={handleMouseMove}
         >
@@ -93,6 +93,7 @@ const TiltPresentationWrapper = ({ children, containerRef }) => {
 };
 
 const FunModePage = ({ onResetMode }) => {
+    const content = useContent();
     const scrollContainerRef = React.useRef(null);
 
     return (

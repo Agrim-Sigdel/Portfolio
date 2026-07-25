@@ -1,5 +1,15 @@
 /* Fun Mode Page Theme Styles - Deep Teal & Mint Aesthetic */
 
+/* Backdrop behind the floating/tilted content pane.
+   Only visible on the desktop tilt view, where the rounded panel lifts off it.
+   Kept theme-aware so light mode isn't a plain black surround. */
+.fun-mode-backdrop {
+  background: linear-gradient(135deg, #0e1215 0%, #163632 100%);
+}
+[data-theme="light"] .fun-mode-backdrop {
+  background: linear-gradient(135deg, #d4e9e3 0%, #93c6ba 100%);
+}
+
 /* Base (Dark Mode default) */
 .fun-mode-tilted-content {
   --fun-bg: #071011;

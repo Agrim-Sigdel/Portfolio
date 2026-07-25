@@ -1,20 +1,19 @@
 import React, { useState } from 'react';
-import content from '../../data/content.json';
+import { useContent } from '../lib/contentStore';
+import { supabase } from '../lib/supabaseClient';
 
 /*
- * ContactForm: contact form backed by Netlify Forms.
+ * ContactForm: contact form backed by Supabase.
  *
- * Submissions are POSTed (URL-encoded) to Netlify, which stores them in the
- * site's Forms dashboard and (once configured there) emails a notification per
- * submission. Netlify detects the form at build time via the hidden static
- * <form name="contact"> stub in index.html — this React form just has to POST
- * with a matching `form-name` field. A hidden `bot-field` honeypot catches bots.
+ * Submissions are inserted into the `contact_messages` table (public INSERT via
+ * RLS). They surface in the /admin Inbox, and a Database Webhook → Edge Function
+ * emails a notification per submission. A hidden `bot-field` honeypot drops bots.
  *
  * Validation runs client-side before submit (and per-field on blur once a field
  * has been touched): name + message required, email required and well-formed,
  * phone optional but validated if provided.
  *
- * If the POST fails (e.g. running locally without Netlify), we fall back to a
+ * If the insert fails (e.g. Supabase unconfigured locally), we fall back to a
  * mailto: link so the visitor can still reach out.
  *
  * `variant` ("fun" | "cv" | "terminal") only switches the class namespace so
@@ -22,11 +21,6 @@ import content from '../../data/content.json';
  */
 
 const NAMESPACES = { cv: 'cv-contactform', terminal: 'tcf', fun: 'cf' };
-
-const encode = (data) =>
-  Object.keys(data)
-    .map((k) => `${encodeURIComponent(k)}=${encodeURIComponent(data[k])}`)
-    .join('&');
 
 // Pragmatic email check — not RFC-perfect, but rejects the common mistakes.
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -57,7 +51,7 @@ const validate = (form) => {
 const EMPTY = { name: '', email: '', phone: '', message: '' };
 
 export default function ContactForm({ variant = 'fun', className = '', onSent }) {
-  const { email } = content.common.contact;
+  const { email } = useContent().common.contact;
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
@@ -95,12 +89,14 @@ export default function ContactForm({ variant = 'fun', className = '', onSent })
 
     setStatus('sending');
     try {
-      const res = await fetch('/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: encode({ 'form-name': 'contact', 'bot-field': '', ...form }),
+      if (!supabase) throw new Error('Supabase not configured');
+      const { error } = await supabase.from('contact_messages').insert({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim() || null,
+        message: form.message.trim(),
       });
-      if (!res.ok) throw new Error(`Netlify responded ${res.status}`);
+      if (error) throw error;
       setStatus('sent');
       setForm(EMPTY);
       setTouched({});
@@ -154,14 +150,9 @@ export default function ContactForm({ variant = 'fun', className = '', onSent })
     <form
       className={`${ns} ${className}`}
       name="contact"
-      method="POST"
-      data-netlify="true"
-      netlify-honeypot="bot-field"
       onSubmit={handleSubmit}
       noValidate
     >
-      {/* Required so Netlify routes the JS-submitted POST to the right form. */}
-      <input type="hidden" name="form-name" value="contact" />
       {/* Honeypot: hidden from humans, tempting to bots. */}
       <p hidden>
         <label>

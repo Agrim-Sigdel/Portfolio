@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiArrowLeft, FiExternalLink, FiArrowRight } from 'react-icons/fi';
-import content from '../data/content.json';
+import { useContent } from '../shared/lib/contentStore';
 import DownloadButton from '../shared/ui/DownloadButton';
-import { generateResumePdf } from '../shared/lib/generateResumePdf';
+// import { generateResumePdf } from '../shared/lib/generateResumePdf'; // used by the commented-out generated-export button below
 import ContactModal from '../shared/ui/ContactModal';
 import '../styles/normal-mode.css';
 
 const NormalModeLayout = ({ onResetMode }) => {
+  const content = useContent();
   const { common } = content;
   const { personal, contact, education, experience, research, projects, skills } = common;
   const [mounted, setMounted] = useState(false);
@@ -23,21 +24,23 @@ const NormalModeLayout = ({ onResetMode }) => {
         <FiArrowLeft aria-hidden="true" /> Back to Start
       </button>
       <div className="cv-download-group">
+        {/* Backend-managed CV when one has been uploaded via /admin; the
+            bundled public/ copy is the offline/unconfigured fallback. */}
         <DownloadButton
           className="cv-download-button"
-          href="/AgrimSigdel-CV.pdf"
+          href={common.media?.cvUrl || '/AgrimSigdel-CV.pdf'}
           filename="Agrim Sigdel Resume.pdf"
-          idleLabel="Download cv (static)"
+          idleLabel="Download cv"
           loadingLabel="Downloading…"
           doneLabel="Downloaded"
         />
-        <DownloadButton
+        {/* <DownloadButton
           className="cv-download-button cv-download-button--generated"
           getFile={generateResumePdf}
           idleLabel="Export resume (generated)"
           loadingLabel="Building…"
           doneLabel="Exported"
-        />
+        /> */}
       </div>
 
       <main className="cv-paper">

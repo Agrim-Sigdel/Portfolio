@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
 import Squiggle from '../../../shared/ui/Squiggle';
-import content from '../../../data/content.json';
+import { useContent } from '../../../shared/lib/contentStore';
 
 const About = () => {
-    const { common, funMode } = content;
+    const { common, funMode } = useContent();
     const { about } = funMode;
 
     return (

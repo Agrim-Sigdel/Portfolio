@@ -2,9 +2,12 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FiExternalLink, FiArrowRight } from 'react-icons/fi';
 import Squiggle from '../../../shared/ui/Squiggle';
-import { projectsData } from '../../../entities/portfolio/model';
+import { getProjectsData } from '../../../entities/portfolio/model';
+import { useContent } from '../../../shared/lib/contentStore';
 
 const WorkGrid = () => {
+    useContent(); // re-render when content changes
+    const projectsData = getProjectsData();
     return (
         <section id="work" className="container" style={{ padding: '4rem 0' }}>
             <h2 className="sr-only">Selected Work</h2>

@@ -1,10 +1,10 @@
 import React from 'react';
 import NormalModeLayout from '../../widgets/NormalModeLayout';
-import content from '../../data/content.json';
+import { useContent } from '../../shared/lib/contentStore';
 import SEO from '../../shared/ui/SEO';
 
 const NormalModePage = ({ onResetMode }) => {
-    const { common } = content;
+    const { common } = useContent();
     return (
         <>
             <SEO

@@ -2,7 +2,8 @@ import { motion } from 'framer-motion';
 import { FiGithub, FiExternalLink } from 'react-icons/fi';
 import Squiggle from '../../../shared/ui/Squiggle';
 import DownloadButton from '../../../shared/ui/DownloadButton';
-import { researchData } from '../../../entities/portfolio/model';
+import { getResearchData } from '../../../entities/portfolio/model';
+import { useContent } from '../../../shared/lib/contentStore';
 
 const linkIcon = (label) => {
     if (/github/i.test(label)) return <FiGithub aria-hidden="true" />;
@@ -33,6 +34,8 @@ const stats = [
 ];
 
 const Research = () => {
+    useContent(); // re-render when content changes
+    const researchData = getResearchData();
     if (!researchData.length) return null;
 
     return (

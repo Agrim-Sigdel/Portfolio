@@ -2,7 +2,8 @@ import React from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiArrowLeft, FiArrowRight, FiExternalLink } from 'react-icons/fi';
-import { projectsData, getProjectBySlug } from '../../entities/portfolio/model';
+import { getProjectsData, getProjectBySlug } from '../../entities/portfolio/model';
+import { useContent } from '../../shared/lib/contentStore';
 import SEO from '../../shared/ui/SEO';
 import './caseStudy.css';
 
@@ -12,9 +13,6 @@ import './caseStudy.css';
  * `caseStudy` field; this component is pure presentation.
  */
 
-// Only projects that actually have a case study are part of the prev/next chain.
-const chain = projectsData.filter((p) => p.slug && p.caseStudy);
-
 const fade = (delay = 0) => ({
   initial: { y: 24, opacity: 0 },
   animate: { y: 0, opacity: 1 },
@@ -22,8 +20,11 @@ const fade = (delay = 0) => ({
 });
 
 const CaseStudyPage = () => {
+  useContent(); // re-render when content changes
   const { projectSlug } = useParams();
   const project = getProjectBySlug(projectSlug);
+  // Only projects that actually have a case study are part of the prev/next chain.
+  const chain = getProjectsData().filter((p) => p.slug && p.caseStudy);
 
   // Unknown slug, or a project without a written case study -> back to the work grid.
   if (!project || !project.caseStudy) return <Navigate to="/normal" replace />;

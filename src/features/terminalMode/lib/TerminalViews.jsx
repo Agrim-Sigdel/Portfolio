@@ -1,4 +1,4 @@
-import content from '../../../data/content.json';
+import { getContent } from '../../../shared/lib/contentStore';
 
 /*
  * TerminalViews — the few "app-like" screens that aren't files in the VFS:
@@ -6,11 +6,12 @@ import content from '../../../data/content.json';
  * Everything else (about, projects, …) lives in lib/vfs.js as real files.
  */
 
-const { common } = content;
 const DIVIDER = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
 
 /* ─── Welcome banner (kept small; scroll container handles overflow) ── */
-export const getWelcomeView = () => `
+export const getWelcomeView = () => {
+  const { common } = getContent();
+  return `
 ╭─ agrim@portfolio ──────────────────────────╮
 │  ${common.personal.name.padEnd(42)}│
 │  ${'Full-Stack Developer · AI Researcher'.padEnd(42)}│
@@ -18,6 +19,7 @@ export const getWelcomeView = () => `
 
 Type 'help' for commands, 'ls' to look around, 'menu' for the guided tour, or 'scene' / 'fx' to play with the 3D backdrop.
 `.replace(/^\n+|\n+$/g, '');
+};
 
 /* ─── Guided tour menu (non-technical fallback) ──────────────────────
  * Number keys run the mapped command — but only while this menu is the
@@ -49,10 +51,14 @@ Press a number to run the command shown, or type any command yourself.
 };
 
 /* ─── whoami ─────────────────────────────────────────────────────── */
-export const getWhoamiView = () => `agrim — ${common.personal.name}\n${common.personal.tagline}`;
+export const getWhoamiView = () => {
+    const { common } = getContent();
+    return `agrim — ${common.personal.name}\n${common.personal.tagline}`;
+};
 
 /* ─── neofetch ───────────────────────────────────────────────────── */
 export const getNeofetchView = () => {
+    const { common } = getContent();
     const c = common.contact;
     const info = [
         `agrim@portfolio`,

@@ -1,4 +1,4 @@
-import content from '../../../data/content.json';
+import { getContent } from '../../../shared/lib/contentStore';
 
 /*
  * vfs.js — the terminal's virtual filesystem, built once from content.json.
@@ -11,7 +11,9 @@ import content from '../../../data/content.json';
  * Paths are normalized strings: '~', '~/projects', '~/research/catd.md'.
  */
 
-const { common } = content;
+// `common` is refreshed by getRoot() before each (re)build so the tree reflects
+// the latest content. The builder functions below close over this binding.
+let common = getContent().common;
 
 // Sentinel line inside contact.txt — the UI swaps this exact line for a
 // clickable button that opens the shared contact modal.
@@ -164,7 +166,7 @@ const researchName = (r, i) => {
 
 /* ─── the filesystem root ────────────────────────────────────────── */
 
-export const ROOT = dir('~', [
+const buildRoot = () => dir('~', [
     file('about.txt', aboutTxt()),
     file('skills.txt', skillsTxt()),
     file('contact.txt', contactTxt()),
@@ -181,6 +183,21 @@ export const ROOT = dir('~', [
         binary('catd-paper.pdf', '/CATD-Submission.pdf', 530394),
     ]),
 ]);
+
+// The filesystem is rebuilt only when the underlying content object changes
+// (e.g. after Supabase hydration or an admin edit), so repeated ls/cat calls
+// reuse the same tree.
+let _root = null;
+let _rootSrc = null;
+export const getRoot = () => {
+    const c = getContent();
+    if (c !== _rootSrc) {
+        common = c.common;
+        _rootSrc = c;
+        _root = buildRoot();
+    }
+    return _root;
+};
 
 /* ─── path resolution ────────────────────────────────────────────── */
 
@@ -210,7 +227,7 @@ export const resolvePath = (cwd, input = '') => {
 // Walk a normalized path to its node (case-insensitive). Null if missing.
 export const getNode = (path) => {
     const segs = path === HOME ? [] : String(path).slice(2).split('/');
-    let node = ROOT;
+    let node = getRoot();
     for (const s of segs) {
         if (!node || node.type !== 'dir') return null;
         node = node.children[s]

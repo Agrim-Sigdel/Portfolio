@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiGithub, FiLinkedin, FiMail, FiGlobe, FiSend, FiArrowRight } from 'react-icons/fi';
-import content from '../../../data/content.json';
+import { useContent } from '../../../shared/lib/contentStore';
 import ContactModal from '../../../shared/ui/ContactModal';
 import './ModeTriptych.css';
 
@@ -42,14 +42,6 @@ const DOORS = [
 // how long the door-open grow plays before navigation (must stay a touch
 // shorter than the CSS flex-grow transition so the cut never feels abrupt)
 const OPEN_MS = 430;
-
-const { personal, contact } = content.common;
-const SOCIALS = [
-  { id: 'github', label: 'GitHub', href: contact.githubUrl, Icon: FiGithub },
-  { id: 'linkedin', label: 'LinkedIn', href: contact.linkedinUrl, Icon: FiLinkedin },
-  { id: 'email', label: 'Email', href: `mailto:${contact.email}`, Icon: FiMail },
-  { id: 'website', label: 'Website', href: `https://${contact.website}`, Icon: FiGlobe },
-].filter((s) => s.href);
 
 /* ---- per-door decorative art (all aria-hidden by the wrapper) ---- */
 
@@ -93,6 +85,14 @@ const DOOR_ART = {
 };
 
 export default function ModeTriptych() {
+  const { personal, contact } = useContent().common;
+  const SOCIALS = [
+    { id: 'github', label: 'GitHub', href: contact.githubUrl, Icon: FiGithub },
+    { id: 'linkedin', label: 'LinkedIn', href: contact.linkedinUrl, Icon: FiLinkedin },
+    { id: 'email', label: 'Email', href: `mailto:${contact.email}`, Icon: FiMail },
+    { id: 'website', label: 'Website', href: `https://${contact.website}`, Icon: FiGlobe },
+  ].filter((s) => s.href);
+
   const navigate = useNavigate();
   const [opening, setOpening] = useState(null);
   const [contactOpen, setContactOpen] = useState(false);

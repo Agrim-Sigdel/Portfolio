@@ -1,1 +1,1 @@
-export { projectsData, researchData, skillsData, processSteps, getProjectBySlug } from "./portfolioData";
+export { getProjectsData, getResearchData, getSkillsData, processSteps, getProjectBySlug } from "./portfolioData";

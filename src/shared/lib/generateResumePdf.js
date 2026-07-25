@@ -1,4 +1,4 @@
-import content from '../../data/content.json';
+import { getContent } from './contentStore';
 
 /*
  * generateResumePdf — builds a resume PDF from content.json (the single source
@@ -43,7 +43,7 @@ export const timestampedName = (name, date = new Date()) => {
 
 export async function generateResumePdf() {
   const { jsPDF } = await import('jspdf');
-  const { common } = content;
+  const { common } = getContent();
   const { personal, contact, education, experience, research, projects, skills } = common;
 
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });

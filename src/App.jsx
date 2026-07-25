@@ -12,6 +12,10 @@ const FunModePage = lazy(() => import('./pages/funMode/FunModePage'));
 const NormalModePage = lazy(() => import('./pages/normalMode/NormalModePage'));
 const CaseStudyPage = lazy(() => import('./pages/caseStudy/CaseStudyPage'));
 
+// Hidden admin surface — not linked anywhere public. Access is gated by Supabase
+// auth + RLS, not by the obscurity of the route.
+const AdminPage = lazy(() => import('./pages/admin/AdminPage'));
+
 // framer-motion's global config, lazy-loaded alongside the mode pages so the
 // motion chunk never touches the landing page's critical path.
 const MotionProvider = lazy(() => import('./shared/lib/MotionProvider'));
@@ -62,6 +66,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<SelectorRoute />} />
+      <Route path="/admin" element={<AdminRoute />} />
       <Route path="/work/:projectSlug" element={<CaseStudyRoute />} />
       <Route path="/:slug" element={<ModeRoute />} />
       {/* Unknown path -> back to the selector */}
@@ -141,6 +146,20 @@ function ModeRoute() {
         </Suspense>
       </ErrorBoundary>
     </div>
+  );
+}
+
+/* -------------------------------------------- hidden admin panel ('/admin') */
+function AdminRoute() {
+  useEffect(() => {
+    document.body.style.overflow = 'auto';
+  }, []);
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<ModeLoader />}>
+        <AdminPage />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 

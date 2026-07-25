@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion';
 import { FiExternalLink } from 'react-icons/fi';
 import Squiggle from '../../../shared/ui/Squiggle';
-import content from '../../../data/content.json';
+import { useContent } from '../../../shared/lib/contentStore';
 
 const Experience = () => {
-    const { experience } = content.common;
+    const { experience } = useContent().common;
     if (!experience || !experience.length) return null;
 
     return (
