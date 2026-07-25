@@ -4,19 +4,22 @@
 // Sends the message to you via Resend. Secrets (set with `supabase secrets set`):
 //   RESEND_API_KEY  - from resend.com
 //   NOTIFY_TO       - where the notification is sent (your inbox)
-//   NOTIFY_FROM     - a verified Resend sender, e.g. "Portfolio <noreply@your-domain>"
+//   NOTIFY_FROM     - a verified Resend sender, e.g. "Agrim Sigdel <contact@agrimsigdel.com.np>"
 //                     (for quick testing you may use "onboarding@resend.dev")
 //   WEBHOOK_SECRET  - shared secret; the webhook must send it as `Authorization: Bearer <secret>`
 //
+// NOTE: this function must run with verify_jwt = false (see supabase/config.toml).
+// The webhook authenticates with the shared secret above, which is not a JWT, so
+// the platform gateway would otherwise 401 it before this code runs.
+//
 // Deno runtime — no build step.
+
+import { renderNotification } from "../_shared/email.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const NOTIFY_TO = Deno.env.get("NOTIFY_TO");
 const NOTIFY_FROM = Deno.env.get("NOTIFY_FROM") ?? "onboarding@resend.dev";
 const WEBHOOK_SECRET = Deno.env.get("WEBHOOK_SECRET");
-
-const esc = (s: string) =>
-  String(s ?? "").replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c] as string));
 
 Deno.serve(async (req) => {
   // Verify the shared secret so only the Supabase webhook can invoke this.
@@ -34,24 +37,13 @@ Deno.serve(async (req) => {
   let record: Record<string, unknown> = {};
   try {
     const body = await req.json();
-    record = body?.record ?? body ?? {};
+    record = (body?.record ?? body ?? {}) as Record<string, unknown>;
   } catch {
     return new Response("Bad payload", { status: 400 });
   }
 
-  const name = String(record.name ?? "Someone");
-  const email = String(record.email ?? "");
-  const phone = record.phone ? String(record.phone) : "";
-  const message = String(record.message ?? "");
-
-  const html = `
-    <h2>New contact message</h2>
-    <p><strong>From:</strong> ${esc(name)} &lt;${esc(email)}&gt;</p>
-    ${phone ? `<p><strong>Phone:</strong> ${esc(phone)}</p>` : ""}
-    <p style="white-space:pre-wrap">${esc(message)}</p>
-    <hr />
-    <p style="color:#888;font-size:12px">Sent from your portfolio contact form.</p>
-  `;
+  const mail = renderNotification(record);
+  const replyTo = String(record.email ?? "");
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -62,9 +54,10 @@ Deno.serve(async (req) => {
     body: JSON.stringify({
       from: NOTIFY_FROM,
       to: [NOTIFY_TO],
-      reply_to: email || undefined,
-      subject: `Portfolio contact from ${name}`,
-      html,
+      reply_to: replyTo || undefined,
+      subject: mail.subject,
+      html: mail.html,
+      text: mail.text,
     }),
   });
 

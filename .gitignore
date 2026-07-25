@@ -18,6 +18,9 @@ dist-ssr
 !.env.example
 !**/.env.example
 
+# Supabase CLI local state (which project this checkout is linked to)
+supabase/.temp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

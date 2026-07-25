@@ -1,0 +1,17 @@
+project_id = "wmzywhhrsapfhywdiyig"
+
+# The Database Webhook authenticates with `Authorization: Bearer <WEBHOOK_SECRET>`,
+# which is a shared secret, NOT a Supabase JWT. With the default verify_jwt = true
+# the platform gateway rejects that header with 401 before our code ever runs, so
+# the function must opt out of JWT verification. Auth is still enforced — the
+# function checks WEBHOOK_SECRET itself (see functions/notify-contact/index.ts).
+[functions.notify-contact]
+verify_jwt = false
+
+# send-reply is called from the browser by a logged-in admin, who does hold a
+# real JWT — so gateway verification stays ON here as a first layer. It is not
+# the actual authorization check: the anon key is also a valid JWT and is public,
+# so the function additionally resolves the caller against /auth/v1/user and
+# requires a genuine user account. See functions/send-reply/index.ts.
+[functions.send-reply]
+verify_jwt = true

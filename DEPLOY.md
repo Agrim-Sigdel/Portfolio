@@ -55,8 +55,79 @@ Tick each box. Some may already be done — verify anyway.
       ```
 - [ ] **Database → Webhooks → Create:**
       - Table `public.contact_messages`, event **Insert**
+      - Type **HTTP Request** (not "Supabase Edge Functions" — that type pre-fills
+        an `Authorization` header with your anon key, which overwrites the secret
+        below and makes the function 401 on every call)
       - POST → `https://wmzywhhrsapfhywdiyig.functions.supabase.co/notify-contact`
       - Header: `Authorization: Bearer <the same WEBHOOK_SECRET>`
+      - Only ever **one** webhook on this table; edit the existing one rather than
+        adding a second, or every message emails you twice.
+
+> **Why `supabase/config.toml` matters.** Edge Functions default to
+> `verify_jwt = true`, but this webhook authenticates with a shared secret, not a
+> JWT. With the default on, Supabase's gateway returns 401 *before* the function
+> runs — no email, and nothing obvious in the logs. `config.toml` sets
+> `verify_jwt = false` for `notify-contact`; auth is still enforced by the
+> function's own `WEBHOOK_SECRET` check. Always deploy from the repo root so that
+> config is picked up — deploying without it silently re-enables JWT verification.
+
+### A5b. Verifying the email path
+- [ ] Function is actually deployed (a missing deploy 404s exactly like a typo'd name):
+      ```bash
+      supabase functions list --project-ref wmzywhhrsapfhywdiyig   # expect verify_jwt: false
+      ```
+- [ ] Test the function alone, bypassing the webhook:
+      ```bash
+      curl -i -X POST https://wmzywhhrsapfhywdiyig.functions.supabase.co/notify-contact \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $(grep '^WEBHOOK_SECRET=' supabase/.env | cut -d= -f2)" \
+        -d '{"record":{"name":"Test","email":"you@example.com","message":"hello"}}'
+      ```
+      `{"ok":true}` = function + Resend fine. Plain `Unauthorized` = secret mismatch.
+      A *JSON* 401 about a JWT = `verify_jwt` is still on.
+- [ ] Test the whole chain by inserting as an anonymous visitor would:
+      ```bash
+      curl -i -X POST "$VITE_SUPABASE_URL/rest/v1/contact_messages" \
+        -H "apikey: $VITE_SUPABASE_ANON_KEY" -H "Authorization: Bearer $VITE_SUPABASE_ANON_KEY" \
+        -H "Content-Type: application/json" \
+        -d '{"name":"E2E","email":"you@example.com","message":"end to end"}'
+      ```
+      Expect `201`. If the function test passed but no email arrives from this,
+      the webhook is missing, disabled, or carrying a stale secret.
+      (Don't add `Prefer: return=representation` — that also demands a SELECT
+      policy, which anon deliberately lacks, so it fails with a misleading RLS
+      error even when inserts are perfectly healthy.)
+- [ ] If `NOTIFY_FROM` is `onboarding@resend.dev`, Resend only delivers to the
+      address that owns the Resend account. Sending anywhere else returns success
+      but never arrives — verify a domain and use `noreply@agrimsigdel.com.np` for
+      real use.
+
+### A6. Replying and composing from the admin inbox
+- [ ] Apply both mail migrations (`supabase db push`, or paste each into the SQL Editor):
+      - `20260725190000_contact_replies.sql` — `contact_replies` + `contact_messages.replied_at`.
+        Until it runs, replies send but aren't logged and no "Replied" badge appears.
+      - `20260725200000_compose_outbound.sql` — makes `contact_replies.message_id`
+        nullable so composed mail (which answers no incoming message) can be logged.
+        Until it runs, composing still sends but is missing from the log.
+- [ ] Inbox has two paths, both through `send-reply`:
+      **Reply** on a message (recipient comes from the row) and **New message**
+      (recipient comes from the form, validated as a single address).
+- [ ] `REPLY_FROM` is set and `agrimsigdel.com.np` is **verified** in Resend
+      (Resend → Domains → status `verified`, sending `enabled`).
+- [ ] Deploy the function: `supabase functions deploy send-reply`
+
+> **Sending is not receiving.** Replies go *out* from `contact@agrimsigdel.com.np`,
+> and when someone hits reply it lands wherever that address's MX records point —
+> Resend does not host a mailbox for you. Its inbound feature is `disabled` on this
+> domain. If you want mail *to* `contact@…` to actually arrive somewhere, point MX
+> at a real provider (Gmail/Fastmail/Zoho) or enable Resend Inbound separately.
+
+> **Why send-reply doesn't rely on `verify_jwt`.** The anon key is itself a valid
+> JWT and ships publicly in the bundle, so gateway verification alone would expose
+> a mailer that sends as your domain — an open spam relay. The function resolves
+> the caller against `/auth/v1/user` and requires a real account. It also reads the
+> recipient from the `contact_messages` row rather than the request body, so it can
+> only ever reply to someone who actually wrote in.
 
 ---
 

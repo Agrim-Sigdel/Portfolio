@@ -482,5 +482,87 @@
 .admin-msg-email { color: var(--ad-accent-hover); text-decoration: none; font-size: 13px; }
 .admin-msg-date { margin-left: auto; font-size: 12px; }
 .admin-msg-body { margin: 8px 0 12px; color: var(--ad-text-soft); white-space: pre-wrap; line-height: 1.5; }
-.admin-msg-actions { display: flex; gap: 8px; }
+.admin-msg-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .admin-msg-actions .admin-btn { text-decoration: none; }
+
+/* "Replied" marker — driven by contact_messages.replied_at, which the
+   send-reply function stamps after Resend accepts the send. */
+.admin-msg-badge {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ad-ok);
+  background: var(--ad-ok-bg);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+/* Previously sent replies, shown inline under the original message. */
+.admin-reply-sent {
+  border-left: 2px solid var(--ad-accent);
+  padding: 2px 0 2px 12px;
+  margin: 0 0 12px;
+}
+.admin-reply-sent-head {
+  display: block;
+  font-size: 11.5px;
+  color: var(--ad-muted);
+  margin-bottom: 4px;
+}
+.admin-reply-sent p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ad-text-soft);
+  white-space: pre-wrap;
+}
+
+.admin-reply-box {
+  border-top: 1px solid var(--ad-line);
+  margin-top: 4px;
+  padding-top: 4px;
+}
+.admin-reply-box .admin-field { margin: 10px 0; }
+.admin-reply-quote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--ad-label);
+  margin: 0 0 12px;
+  cursor: pointer;
+}
+.admin-reply-quote input { accent-color: var(--ad-accent); }
+
+/* Compose panel — a fresh message rather than a reply. */
+.admin-compose-toggle { margin-left: 8px; }
+.admin-compose {
+  border: 1px solid var(--ad-border);
+  border-radius: 10px;
+  background: var(--ad-input-bg);
+  padding: 4px 16px 14px;
+  margin: 12px 0 4px;
+}
+.admin-compose-from { margin: 12px 0 0; font-size: 12.5px; }
+.admin-compose-from strong { color: var(--ad-text-soft); font-weight: 600; }
+
+/* Tab counts */
+.admin-tab-count {
+  display: inline-block;
+  margin-left: 6px;
+  min-width: 16px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--ad-btn-bg);
+  color: var(--ad-muted);
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.admin-tab-count.is-unread { background: var(--ad-accent); color: var(--ad-on-accent); font-weight: 600; }
+
+/* Sent view */
+.admin-msg-badge-quiet { color: var(--ad-muted); background: var(--ad-btn-bg); }
+.admin-sent-subject { margin: 8px 0 2px; font-size: 13.5px; color: var(--ad-text); font-weight: 600; }
+.admin-sent-meta { margin: 6px 0 0; font-size: 11.5px; }
