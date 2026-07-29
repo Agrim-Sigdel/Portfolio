@@ -10,7 +10,35 @@ const WorkGrid = () => {
     const projectsData = getProjectsData();
     return (
         <section id="work" className="container" style={{ padding: '4rem 0' }}>
-            <h2 className="sr-only">Selected Work</h2>
+            {/* Was an sr-only heading, so the grid arrived with no title at all.
+                Now a visible section header matching About / Research / Process:
+                squiggle + accent eyebrow + serif h2 with an italic accent word. */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                style={{ marginBottom: '3.5rem' }}
+            >
+                <div style={{ position: 'relative', display: 'inline-block' }}>
+                    <Squiggle
+                        style={{ top: '-10px', left: '-20px' }}
+                        animateType="float"
+                        strokeColor="var(--text-muted)"
+                        strokeWidth="5"
+                        width="150"
+                        height="50"
+                        viewBox="0 0 400 100"
+                    />
+                    <p className="text-accent uppercase tracking-widest text-xs font-bold mb-4">
+                        Projects &amp; Open Source
+                    </p>
+                </div>
+                <h2 className="font-serif text-5xl">
+                    Selected <span style={{ fontStyle: 'italic' }}>works</span>.
+                </h2>
+            </motion.div>
+
             <div className="masonry-grid">
                 {projectsData.map((project, index) => (
                     <motion.div

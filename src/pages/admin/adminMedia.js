@@ -37,20 +37,51 @@ export async function listMedia() {
     }));
 }
 
+/*
+ * Storage writes are gated by RLS policies that grant insert/update/delete on
+ * bucket_id = 'media' to the `authenticated` role. Two very different problems
+ * both surface as the same opaque "new row violates row-level security policy":
+ * the policies were never created, or the admin session has expired so the
+ * request goes up as `anon`. Checking the session first lets us tell them apart
+ * and say which one it is.
+ */
+async function assertCanWrite() {
+  const { data } = await supabase.auth.getSession();
+  if (!data?.session) {
+    throw new Error(
+      'You are signed out, so the upload went up unauthenticated. Reload and sign in again.'
+    );
+  }
+}
+
+const RLS_HINT =
+  'Storage rejected the write (row-level security). The `media` bucket needs ' +
+  'insert/update/delete policies for the `authenticated` role — see SETUP.md step 5.';
+
 /** Upload (or replace) a file; returns its public URL. */
 export async function uploadMedia(file, path = file.name) {
+  await assertCanWrite();
   const { error } = await bucket().upload(path, file, {
     upsert: true,
     contentType: file.type || undefined,
     cacheControl: '3600',
   });
-  if (error) throw new Error(error.message);
+  if (error) {
+    // Storage surfaces the Postgres RLS failure verbatim; replace it with
+    // something that names the actual fix.
+    if (/row-level security|violates/i.test(error.message)) throw new Error(RLS_HINT);
+    throw new Error(error.message);
+  }
   return publicUrlFor(path);
 }
 
 export async function deleteMedia(name) {
+  await assertCanWrite();
   const { error } = await bucket().remove([name]);
-  if (error) throw new Error(error.message);
+  if (error) {
+    if (/row-level security|violates/i.test(error.message)) throw new Error(RLS_HINT);
+    throw new Error(error.message);
+  }
 }
 
 /* ── Case-study showcase assets ──────────────────────────────────────────

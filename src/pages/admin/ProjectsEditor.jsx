@@ -150,7 +150,13 @@ export default function ProjectsEditor({ value, onChange, onBusy }) {
                   renderItem={(sec, patchSec) => (
                     <>
                       <TextField label="Heading" value={sec.heading} onChange={(v) => patchSec({ heading: v })} />
-                      <TextAreaField label="Body" value={sec.body} onChange={(v) => patchSec({ body: v })} rows={5} />
+                      <TextAreaField
+                        label="Body"
+                        value={sec.body}
+                        onChange={(v) => patchSec({ body: v })}
+                        rows={8}
+                        hint="Leave a blank line between paragraphs. A single line break stays in the same paragraph."
+                      />
                       <StringListField
                         label="Bullets (one per line)"
                         items={sec.bullets}

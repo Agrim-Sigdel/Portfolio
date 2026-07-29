@@ -60,7 +60,7 @@ const Research = () => {
                     <p className="text-accent uppercase tracking-widest text-xs font-bold mb-4">Research &amp; Publications</p>
                 </div>
                 <h2 className="font-serif text-5xl">
-                    Peer-reviewed <span style={{ fontStyle: 'italic' }}>science</span>.
+                    Computer <span style={{ fontStyle: 'italic' }}>Vison</span>.
                 </h2>
             </motion.div>
 

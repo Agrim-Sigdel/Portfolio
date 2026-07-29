@@ -136,20 +136,41 @@ create policy "contact admin update"
 > uploading — the editor warns above 8 MB. MP4 (H.264) plays everywhere; WebM is
 > smaller but not universal on older Safari.
 
-Then add write policies (SQL Editor):
+> ### ⚠️ The policies below are required — creating the bucket is not enough
+>
+> A public bucket gives you public **reads**. Writes still go through row-level
+> security on `storage.objects`, and with RLS on and no policy, every upload fails
+> with `new row violates row-level security policy`. Symptom: the CV slot and the
+> case-study media uploader both refuse everything, and the bucket stays empty.
+>
+> Check whether you've run them — this lists the policies on the bucket:
+>
+> ```sql
+> select policyname, cmd, roles
+> from pg_policies
+> where schemaname = 'storage' and tablename = 'objects';
+> ```
+>
+> You want rows for `INSERT`, `UPDATE` and `DELETE` granted to `{authenticated}`.
+> No rows means the step below was never run.
 
-```sql
--- public read is automatic for a public bucket; restrict writes to admin
-create policy "media admin upload"
-  on storage.objects for insert
-  to authenticated with check (bucket_id = 'media');
-create policy "media admin update"
-  on storage.objects for update
-  to authenticated using (bucket_id = 'media');
-create policy "media admin delete"
-  on storage.objects for delete
-  to authenticated using (bucket_id = 'media');
-```
+Then add the write policies. **Run [`supabase/storage-policies.sql`](./supabase/storage-policies.sql)**
+in the SQL Editor — it is idempotent (every statement drops first), so it is safe to
+re-run and will not fail with `42710: policy ... already exists` on a partially
+applied setup.
+
+It creates four policies on `storage.objects`, all scoped to `bucket_id = 'media'`:
+
+| Policy | Grants | Why it's needed |
+|---|---|---|
+| `media read` | `select` to `anon`, `authenticated` | the admin Media tab's `list()` call — public-URL reads bypass RLS, this does not |
+| `media admin upload` | `insert` to `authenticated` | new uploads |
+| `media admin update` | `update` to `authenticated` | **required** — uploads use upsert, so *replacing* a file takes the update path |
+| `media admin delete` | `delete` to `authenticated` | removing a file from the Media tab |
+
+> Missing the `update` policy is the subtle one: new files upload fine and
+> replacements fail, which reads as an intermittent RLS error rather than a
+> missing policy.
 
 ---
 

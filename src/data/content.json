@@ -135,47 +135,77 @@
           "sections": [
             {
               "heading": "Overview",
-              "body": "Feriaau lets many independent vendors each run a real loyalty programme — storefront, catalogue, points, rewards, coupons, orders, staff accounts and their own branding — from one platform and one database. The backend is a modular Django monolith of 21 domain apps exposing versioned REST APIs; the frontend is a React 19 + TypeScript single-page app organised by audience rather than by component type. It runs in production at feriaau.com with a separate staging environment.",
+              "body": "Feriaau lets many independent vendors each run a real loyalty programme from one platform and one database — storefront, catalogue, points, rewards, coupons, orders, staff accounts with genuine permissions, and their own branding — without any of them hiring an engineering team.\n\nThe backend is a modular Django 5 monolith: 21 domain apps, each exposing its own versioned REST API module, sitting on PostgreSQL 15 with Redis 7 for cache and as the Celery broker. Wagtail runs alongside the API so marketing pages are editable by people who don't deploy. The frontend is a React 19 + TypeScript SPA built with Vite, organised by audience rather than by component type.\n\nIt has been in production since late 2025 across a staging and a production environment, and is the platform the Feriaau mobile apps consume.",
               "media": []
             },
             {
-              "heading": "My Role",
-              "body": "I work across the whole stack: designing the API surface app by app, building and structuring the React/TypeScript client, tuning the PostgreSQL schema and queries, configuring the production servers, and owning the CI/CD pipeline that ships changes. It is a team codebase — my scope is the architecture and the delivery path, not sole authorship.",
+              "heading": "Scale & Shape",
+              "body": "The numbers matter mostly because they set the constraint the architecture had to answer: this is too large to hold in your head, so structure has to do the remembering.",
+              "bullets": [
+                "2,061 commits across a team, on a stage → main branch model with merge requests",
+                "~87,700 lines of Python across 503 files, excluding migrations",
+                "~143,500 lines of TypeScript across 733 files",
+                "21 Django domain apps · 22 versioned api/v1 URL modules",
+                "70+ page directories on the frontend, split by audience: public, user, admin, superadmin, vendor"
+              ],
+              "media": []
+            },
+            {
+              "heading": "The Problem",
+              "body": "A loyalty programme sounds like a points counter. Built for many vendors at once it is really three harder problems wearing a points counter as a disguise.\n\nThe first is identity of ownership: a customer does not have \"points\", they have points at a vendor. The second is permission: a vendor admin, a vendor staff member, a super admin and a customer all touch the same endpoints and must see different things. The third is auditability: points are money-adjacent, so every mutation has to be reconstructible after the fact when a customer disputes a balance.",
               "media": []
             },
             {
               "heading": "Architecture",
-              "body": "Three tiers, containerised. React talks to Django REST Framework over JWT; Django's domain layer sits behind a service layer over the ORM, with Wagtail alongside it for marketing content editors can change without a developer. PostgreSQL 15 and Redis 7 sit underneath, with Celery workers and a database-backed beat scheduler for asynchronous and scheduled work. Docker Compose runs seven services: database, backend, Redis, Celery worker, Celery beat, frontend and a React builder.",
+              "body": "Three tiers, containerised, communicating over REST. React holds server state entirely in TanStack Query — no Redux, no global store — and authenticates with JWT. Django REST Framework handles authentication, permissions, throttling and serialisation, then hands off to a service layer over the ORM.\n\nDocker Compose runs seven services: database, backend, Redis, Celery worker, Celery beat, frontend, and a React builder, with named volumes for Postgres, Redis, media and static.\n\nMulti-vendor isolation is row scoping on the vendor foreign key, with the active vendor carried in a custom header. CORS is extended to allow x-vendor-id and x-vendor-name — plus x-page-context and x-action-label, which exist purely so the audit log can record what the user was doing rather than just which endpoint fired.",
               "bullets": [
-                "Multi-vendor isolation by row scoping on the vendor foreign key, with the active vendor carried in an x-vendor-id header",
-                "Points are modelled per (user, vendor) pair with an append-only transaction ledger, so a balance is always reconstructible",
-                "Two Celery queues including a dead-letter queue, so permanently failed tasks land somewhere inspectable"
+                "points.UserVendorPoints keys the balance on the (user, vendor) pair — loyalty is per-vendor by construction",
+                "points.PointTransaction is an append-only ledger, so a balance is always reconstructible and auditable",
+                "orders is the largest domain at 15 models; users carries 11, including activity logs and their archive tables",
+                "Celery runs two queues — the default and a dead_letter queue — with explicit task routing",
+                "CELERY_TASK_REJECT_ON_WORKER_LOST requeues a task whose worker dies instead of losing it silently"
               ],
               "media": []
             },
             {
-              "heading": "Engineering Decisions",
-              "body": "Three choices did the most work:",
+              "heading": "Decision: one response contract, not 300",
+              "body": "Every endpoint renders through a single StandardizedJSONRenderer with a matching custom exception handler. Success and failure share one envelope shape.\n\nThe alternative — each viewset shaping its own response — means the React client writes a bespoke unwrap for every endpoint and guesses at the error shape. One renderer means one client-side contract, and an error surface that cannot drift per endpoint because no endpoint gets to define it.",
+              "media": []
+            },
+            {
+              "heading": "Decision: business rules as global permission classes",
+              "body": "Three custom permission classes sit in DEFAULT_PERMISSION_CLASSES, so they apply to every endpoint unless explicitly overridden — opt-out rather than opt-in.\n\nMPINChangeRequired blocks the entire API for a user still holding a temporary mobile PIN until they change it. VendorActivePermission blocks every request belonging to a vendor that is inactive or whose trial has expired. RequireReAuthentication intercepts sensitive super-admin actions — enumerated in a JSON file rather than hard-coded — and demands a fresh re-authentication.\n\nEach of these is a business rule that would otherwise be copy-pasted into dozens of views and forgotten in one of them. Pushing them into the permission layer makes \"we forgot to check\" structurally impossible: adding a new endpoint inherits every rule for free.",
+              "media": []
+            },
+            {
+              "heading": "Decision: throttling as configuration",
+              "body": "There are 22 named throttle scopes, and every rate is read from an environment variable with a sane default — login at 5/minute, registration at 3/hour, reward redemption at 10/hour, bulk operations at 10/hour, file uploads at 20/hour.\n\nThe shape came from a real problem. QA runs kept tripping the login throttle mid-suite, and each adjustment was a code change and a redeploy. Externalising the rates turned a tuning problem into a config problem: staging can be permissive while production keeps brute-force protection strict. A dedicated LoginRateThrottle stayed on the login view specifically so relaxing the general limits could never relax that one.",
+              "media": []
+            },
+            {
+              "heading": "Integrating a POS we didn't control",
+              "body": "Feriaau syncs bidirectionally with Atithi, an external restaurant POS, whose API surface and status vocabulary were still being finalised while we built against them.\n\nThe easy version is to store their identifier in a column on our Order model. Instead the integration is its own Django app with five explicit ID-mapping tables — customer, vendor, order, product and table. Neither system has to know the other's identifier scheme, mappings survive re-syncs, and the whole integration is removable.\n\nA singleton AtithiSyncConfig row carries a master kill switch and per-flow toggles, plus a JSONField mapping our order statuses to theirs — so when their vocabulary changed, it was a database edit rather than a deploy. Outbound events go through Celery tasks; inbound settlement and status webhooks are logged in full, denormalised for lookup without a join.",
               "bullets": [
-                "One standardised JSON renderer and exception handler, so the client has exactly one response contract instead of a per-endpoint guess",
-                "Business rules as global permission classes — inactive-vendor blocking, forced temporary-PIN change, and re-authentication for sensitive admin actions apply to every endpoint by default rather than being remembered per view",
-                "22 named throttle scopes with every rate read from an environment variable — after QA kept tripping login limits mid-suite, tuning stopped being a code deploy"
+                "Bidirectional and event-driven: outbound via Celery, inbound via logged webhooks",
+                "Status mapping stored as JSON so it changes without a code deploy",
+                "Master toggle plus per-flow toggles — the integration can be switched off in one field",
+                "Every webhook recorded in AtithiWebhookLog for replay and dispute resolution"
               ],
               "media": []
             },
             {
-              "heading": "Integrating an External POS",
-              "body": "The platform syncs bidirectionally with Atithi, an external restaurant POS. Rather than storing their identifiers on our own records, I built a dedicated Django app with five ID-mapping tables, a singleton configuration row carrying a master kill switch and per-flow toggles, and a JSON status map so their status vocabulary can be remapped without a code deploy. Outbound events go through Celery; inbound webhooks are logged in full. The integration can be switched off in a single field if their API misbehaves.",
+              "heading": "Problems worth naming",
+              "body": "Coupon transfer between users is a two-phase handoff with explicit accept and reject states. Naive transfer — reassigning the owner — creates double-spend and dispute problems; a pending state does not.\n\nTrial expiry is enforced at the platform level rather than per feature. VendorTrialConfig and VendorTrialExtensionHistory hold the policy and its history, and the global VendorActivePermission does the enforcing, so an expired trial closes the vendor's entire API surface in one place while the extension history stays available for support and billing.\n\nActivity logging was built with its own end in mind: UserActivityLog has both an archive table and a configurable archive policy, because audit logs grow without bound and that is easier to plan for than to discover.\n\nThe most recent work adds walk-in customers with just a name and phone — a loyalty system whose data model assumes every customer has an account cannot serve a physical shop counter.",
               "media": []
             },
             {
               "heading": "Delivery & Reliability",
-              "body": "GitLab CI runs on a shell executor on our own server with a deliberately asymmetric model: pushing to the staging branch deploys automatically, while production requires a manual trigger. Deploy logic lives in versioned scripts rather than CI YAML, with local simulation compose files so the pipeline itself can be tested. API documentation is generated by drf-spectacular and served behind a login; a profiling hook can be switched on per environment.",
+              "body": "GitLab CI runs on a shell executor on our own server with a deliberately asymmetric model: pushing to the stage branch deploys automatically to staging, while production requires a manual trigger from main. Staging optimises for speed of feedback, production for intent.\n\nDeploy logic lives in versioned shell scripts rather than in CI YAML, so it can be tested — there are dedicated compose files for simulating the pipeline and the server locally before anything touches a real environment.\n\nAPI documentation is generated by drf-spectacular and served behind a login. A django-silk profiling hook can be switched on per environment. The whole API prefix is configurable, so the surface can be relocated under a path without touching a single route definition.",
               "media": []
             },
             {
               "heading": "Outcome",
-              "body": "Shipped and maintained in production across staging and production environments, with a documented 16-section developer handbook covering architecture, data model, APIs, security, performance, testing and an extension guide — so the platform stays workable by people who did not build it.",
+              "body": "Shipped and maintained in production with a staging environment in front of it and a release path that is repeatable rather than heroic.\n\nAlongside the code sits a 16-section developer handbook — architecture, data model, application flow, key modules, configuration, APIs, error handling, security, performance, local development, testing, an extension guide and a glossary — plus a design system and style guide. The platform is workable by people who did not build it, which for a codebase this size is the actual deliverable.",
               "media": []
             }
           ],
@@ -224,65 +254,89 @@
           "sections": [
             {
               "heading": "Overview",
-              "body": "Nepali fashion commerce runs on Instagram and TikTok with checkout by direct message — no catalogue, no trust, no returns process. The thing stopping people buying clothes online is not price, it is not knowing how something will look on them. peeq puts virtual try-on at the centre of the shopping experience: a shopper takes a photo, picks a piece, and sees it on themselves. Shops get a catalogue, an in-store kiosk and an online storefront; the kiosk is the wedge into physical shops that a pure-online competitor does not have.",
+              "body": "Nepali fashion commerce runs on Instagram and TikTok with checkout by direct message — no catalogue, no trust, no returns process. The thing stopping people buying clothes online is not price; it is not knowing how something will look on them.\n\npeeq puts virtual try-on at the centre of shopping. A shopper takes a photo, picks a piece, and sees it on themselves. Shops get a catalogue, an in-store kiosk and an online storefront. And for tailoring shops, peeq can show a garment that does not exist yet — a fabric rendered into a cut nobody has photographed.\n\nNext.js 15 App Router, React 19, TypeScript strict, Supabase for Postgres, Auth, Storage and row-level security. Around 22,750 lines across 102 files, 77 commits, 24 migrations, 15 API routes.",
               "media": []
             },
             {
-              "heading": "My Role",
-              "body": "I designed and built the product end to end — the shopper, vendor and admin surfaces, the AI pipeline and its cost controls, the Postgres schema and its 24 migrations, the payment integrations, and the product plan the whole thing is built against.",
+              "heading": "The Problem",
+              "body": "Three constraints shaped everything. The product is only convincing if try-on is good, which means paying a per-generation cost to an AI provider on every interaction. The customers are small Kathmandu shops, so that cost has to stay proportionate to what they sell rather than to how much traffic they get. And the sales motion is walking into a shop with a laptop, often without reliable internet.\n\nA fourth constraint arrived with the tailoring shops: most of a catalogue is a photograph of something hanging in the back, but a tailor sells cloth plus a promise. There is nothing to photograph until someone orders.",
               "media": []
             },
             {
               "heading": "Architecture",
-              "body": "Next.js 15 App Router with server-rendered storefront and product pages for shareable link cards, Supabase for Postgres, Auth, Storage and row-level security, and fifteen API routes that keep every provider key server-side. The decision that shaped everything else is a single storage adapter with two backends behind one interface.",
+              "body": "Server-rendered storefront and product pages give shareable link cards; the kiosk and dashboard are client-driven. Fifteen API routes keep every provider key server-side — the earlier prototype shipped a key in client code, and the README still carries the instruction to rotate it.\n\nThe decision that shaped everything else is a single storage adapter with two backends behind one interface. Without Supabase environment variables the whole app runs on localStorage: zero setup, works offline, which is exactly how it gets demoed on a laptop inside a shop. With them set, the same UI runs multi-tenant against Postgres, Storage and RLS.\n\nNo code branches on environment. The offline sales demo and the production SaaS are the same build.",
               "bullets": [
-                "Without Supabase env vars the whole app runs on localStorage — zero setup, works offline, which is how it gets demoed on a laptop inside a shop",
-                "With them set, the same UI runs multi-tenant against Postgres, Storage and RLS. No code branches on environment",
-                "Renders live in a private bucket and are served through signed URLs re-signed on every read"
+                "Shopper: landing, kiosk, per-shop kiosk at /k/[slug], storefront and product pages at /s/[slug]",
+                "Vendor: catalogue, fabrics and the fabric studio, analytics, leads inbox, plan",
+                "Admin: shop approval queue, billing inbox, ops, users, overview",
+                "Renders live in a private bucket, served through signed URLs re-signed on every read with a one-hour TTL",
+                "Postgres schema across 24 migrations: shops, garments, tryon_results, tryon_events, leads, rate_limits, error_logs, plans, shop_subscriptions, payments, plan_requests, fabrics, styles, compositions"
               ],
               "media": []
             },
             {
-              "heading": "The Try-On Pipeline",
-              "body": "Two finishes sit behind one shopper-facing choice, and the model names are deliberately never exposed to the UI so providers stay swappable. A quick finish runs fal.ai's FASHN v1.6 — a dedicated try-on model, seconds. A studio finish runs an OpenAI gpt-image-2 image edit — slower, finer, and shared with the vendor's counter bench. Studio falls back to quick when no key is configured, and content moderation runs on the shopper photo before generation.",
+              "heading": "The try-on pipeline",
+              "body": "Two finishes sit behind one shopper-facing choice. A quick finish runs fal.ai's FASHN v1.6 — a dedicated try-on model, results in seconds. A studio finish runs an OpenAI gpt-image-2 image edit — slower, finer detail, and shared with the vendor's counter bench.\n\nModel names are deliberately never exposed to the UI. The shopper picks a finish, not a vendor, which keeps the provider swappable without a product change. Studio falls back to quick when no OpenAI key is configured, and content moderation runs on the shopper's photo before generation.\n\nThe route sets a 300-second max duration, learned the hard way: a multi-piece studio render is the slowest case and the platform default was killing requests mid-generation — after the shopper had already waited and after the credit had already been spent.",
               "media": []
             },
             {
-              "heading": "Making the Economics Work",
-              "body": "Every generation costs money, so cost control is architecture rather than an afterthought:",
+              "heading": "Cost control is the architecture",
+              "body": "Every generation is money, so the defences are layered rather than bolted on, and they compose: an abusive request has to get past all of them.",
               "bullets": [
-                "Results are cached on a hash of person, garment and category — repeat try-ons are free and do not even consume rate-limit quota",
-                "Per-IP limits (30 generations per 10 minutes) and a global daily cap so a distributed abuser cannot drain the account",
-                "Per-shop plan allowances metered atomically in Postgres, reserved before the call and refunded on failure, and fail-closed on any database error",
-                "The server only ever uses the shop catalogue's own image URL — arbitrary URLs from the client are ignored"
+                "Result cache keyed on a hash of person, garment and category — a repeat try-on is free, and cache hits deliberately do not consume rate-limit quota",
+                "Per-IP limit of 30 generations per 10 minutes",
+                "A global daily cap, default 500 and environment-tunable, so a distributed abuser cannot drain the provider account",
+                "Per-shop plan allowances metered atomically in Postgres functions, reserved before the call and refunded if it fails — concurrent try-ons cannot overshoot a plan",
+                "Metering is fail-closed: any database error blocks the spend rather than allowing it",
+                "In Supabase mode the garment must exist in that shop's catalogue, and the server uses the catalogue's own image URL — arbitrary URLs from the client are ignored",
+                "A four-megabyte payload ceiling, far above the app's own compression"
               ],
               "media": []
             },
             {
-              "heading": "Made to Order",
-              "body": "Most of a catalogue is a photograph of something hanging in the back. A tailoring shop sells something else: cloth plus a promise. Pick this fabric, have it stitched into that cut — nobody has photographed the result, because it does not exist until someone orders it. So peeq models fabrics and cuts separately and renders the pairing, but only for combinations a vendor deliberately authored and priced. A render like that contains no person, so it caches forever and is shared by every shopper: cost scales with the combinations a shop chose to sell, not with traffic.",
+              "heading": "Made to order",
+              "body": "A tailoring shop sells cloth plus a promise: pick this fabric, have it stitched into that cut. Nobody has photographed the result, because it does not exist until someone orders it.\n\nSo fabrics and cuts are modelled separately and the pairing is rendered. A fabric is a bolt of cloth, priced per meter or piece or set, carrying a vendor note for what a photo cannot show — where a border falls, how heavily it drapes. A style is a cut; platform-global ones ship as a seeded library and a shop can add its own. A composition is one row per pairing a vendor deliberately authored, priced and published.\n\nThe critical decision is that a composition is not a cache. Generating on demand would fill the catalogue with combinations the shop cannot actually stitch, and a shopper would be looking at a promise nobody made. Every row is a product a human chose and a tailor agreed to make.\n\nIt is also what makes the economics work. A composition render has nobody in it, so it caches forever and is shared by every shopper. Cost scales with the combinations a vendor authored, not with traffic.",
               "media": []
             },
             {
-              "heading": "The Ghost-Mannequin Lock",
-              "body": "A made-to-order render becomes the garment input to try-on. If it comes back on a model — or a mannequin with a shaped bust and hips — that silhouette is baked into the garment image and try-on drags it onto the shopper, who then sees a body that is not theirs and orders a garment cut for it. So: no person, no face, no shaped torso, ever, stated in the prompt as absence rather than instruction. It happens to also be the format try-on models are trained on, so the constraint that protects body fidelity improves fit quality at the same time.",
+              "heading": "The ghost-mannequin lock",
+              "body": "This is the single most important constraint in the compose path, and it is an ethics rule that turned out to be the technically optimal one.\n\nA made-to-order render becomes the garment input to try-on. If it comes back on a model — or on a mannequin with a shaped bust and hips — that body silhouette is baked into the garment image, and try-on drags it onto the shopper. They then see a body that is not theirs, and order a garment cut for it.\n\nSo: no person, no face, no shaped torso, ever. And the prompt states it as absence rather than instruction, because the difference matters. \"Render the top\" leaves the model free to add trousers for a tidier picture; \"below the hem there is nothing but empty background\" does not.\n\nGhost-mannequin also happens to be the format try-on models are trained on. The constraint that protects body fidelity improves fit quality at the same time.",
               "media": []
             },
             {
-              "heading": "Product Surface",
-              "body": "Beyond the try-on itself, the platform carries the parts a demo does not have:",
+              "heading": "Coverage, and routing around a model limit",
+              "body": "A cut's coverage is an enum — top, bottom or set — rather than prose, because it is read twice: once by the compose prompt, to decide what to draw and what must be absent, and once by try-on placement, to choose how the garment is applied. A note could only ever do the first job; try-on cannot read a sentence, and a suruwal sent up untyped gets hung on the torso.\n\nMulti-piece outfits exposed a harder limit. FASHN warps exactly one garment onto a body, so a set sent down the quick path returns the kurtha and silently drops the churidar and the dupatta. That is a capability limit of the model, not a wording problem — no amount of prompt tuning fixes it. So the API forces set pieces onto the studio path, where the prompt can enumerate every piece.\n\nRecognising when to stop prompting and route around the model is the part of this worth remembering.",
+              "media": []
+            },
+            {
+              "heading": "Prompts as versioned software",
+              "body": "The prompts are treated as artifacts, not string literals. There is a studio prompt version constant, a dedicated compose prompt review document, and a commit history that reads like a changelog for them.\n\nOne commit adds a body lock — size the garment to the body, never the reverse. Another sets a rule that the pattern must survive enhancement. Another drops a fidelity parameter because gpt-image-2 rejects it with a 400. Another tunes quality per case: low for a single piece, medium for a set.\n\nThe same discipline shows in failure handling. An early build fell back to the manual positioning preview when a generation failed, which looked like a result. A later commit changed it so a failed try-on says so. In a product whose entire value is trust, an honest failure beats a prettier lie.",
+              "media": []
+            },
+            {
+              "heading": "Product surface",
+              "body": "The parts a demo does not have are what make it a business.",
               "bullets": [
-                "Plans, subscriptions, payments and plan requests, with Khalti and eSewa integrated server-side",
-                "An admin console with a shop approval queue, billing inbox and operations views",
-                "Vendor analytics with a 30-day chart, per-garment history and CSV export, plus a leads inbox",
+                "Plans, subscriptions, payments and plan requests, with a free tier and request guards",
+                "Khalti ePayment and eSewa ePay v2 integrated server-side with HMAC signing and per-gateway verify callbacks, sandbox by default",
+                "Admin console: shop approval queue covering pending, rejected and suspended states, plus billing inbox and ops",
+                "Vendor analytics with stat tiles, a 30-day chart, per-garment history and CSV export, on anonymous session ids",
                 "Per-garment QR hanger tags — a shopper scans a tag and that garment tries itself on, on their own phone",
-                "A consent gate before the camera, a photo-never-saved policy, and an installable PWA kiosk for shop tablets"
+                "Two-step checkout, orders inbox, shopper order history, item codes and a cart",
+                "Shop discovery on a map via Leaflet and OpenStreetMap, with shop types and categories",
+                "A consent screen before the camera, a photo-never-saved policy, and a private results bucket",
+                "An installable PWA so the kiosk runs full-screen on a shop tablet"
               ],
+              "media": []
+            },
+            {
+              "heading": "Front-end craft",
+              "body": "Fonts are self-hosted through next/font rather than a CSS import, because the import was a render-blocking request Next could not preload — every page painted in the fallback face and reflowed when the display font landed.\n\nPinch-zoom is deliberately not locked. It is how people read a price at arm's length and how they check a weave; disabling it is a WCAG failure and, on a shopping site, removes the one gesture the product is about.\n\nLight and dark come straight from the device with no in-app switch — no script, no stored preference, nothing to hydrate around. The browser theme colour is pinned to the page background with a comment explaining that the two must track each other, or the OS chrome sits at a different colour from the page it frames.",
               "media": []
             },
             {
               "heading": "Outcome",
-              "body": "A working three-sided platform built toward launch: vendors can list, price, meter and get paid; shoppers can try on and order; and the made-to-order path lets a tailoring shop sell a garment that does not exist yet. Payment gateways are integrated and verifiable on their sandbox endpoints, pending go-live.",
+              "body": "A working three-sided platform built toward launch: vendors can list, price, meter and get paid; shoppers can try on and order; and a tailoring shop can sell a garment that does not exist yet.\n\nPayment gateways are integrated and verifiable against their sandbox endpoints, pending go-live. The product plan that drives the roadmap — influencer storefronts with commission, a multi-shop shopper app — is written down and phased rather than aspirational.",
               "media": []
             }
           ],
@@ -328,43 +382,78 @@
           "sections": [
             {
               "heading": "Overview",
-              "body": "Every new full-stack project starts with the same two days: wire a Django server, wire a Next.js app, wire an Expo app, connect them, add auth, a database, Docker, CI. Existing scaffolders give you either a fixed stack or a blank page. Partweave generates only the parts you pick, wires them together, and hands you the code — there is no runtime dependency on the generator. Its own README calls it create-t3-app meets shadcn/ui.",
+              "body": "Every new full-stack project starts with the same two days: wire a Django server, wire a Next.js app, wire an Expo app, connect them, add auth, a database, Docker, CI. Existing scaffolders give you either a fixed stack you must take whole, or a blank page.\n\nPartweave generates only the parts you pick, wires them together, and hands you the code — there is no runtime dependency on the generator afterwards. Its own README describes it as create-t3-app meets shadcn/ui: choose your stack, then own what lands in your repo.\n\nAround 7,200 lines of TypeScript across 38 files in the CLI, seven commands, twelve modules, six build targets, published to npm and runnable with a single npx invocation.",
               "media": []
             },
             {
               "heading": "The Problem",
-              "body": "A generator that only runs once is half a tool. The hard parts are deciding which combinations are legal, injecting wiring into five different file formats, and being safe to run again on a project that already exists.",
+              "body": "A generator that runs once is half a tool. The genuinely hard parts are deciding which combinations are legal before writing anything, injecting wiring into five different file formats, and being safe to run again on a project that already exists.\n\nGet the first wrong and users get broken projects. Get the second wrong and you maintain a parser per language. Get the third wrong and the tool can only ever be used on day one.",
               "media": []
             },
             {
-              "heading": "Capabilities, Not Packages",
-              "body": "Every component declares itself as data in a module manifest: which targets it contributes to, which apps it requires, which modules it conflicts with, which capability it provides, and the lines it injects. The key move is that dependencies are expressed as capabilities. The auth module does not require Postgres — it requires a database. Swap in a different database module that provides the same capability and auth keeps working untouched.",
+              "heading": "Capabilities, not packages",
+              "body": "Every component declares itself as data in a module manifest: which targets it contributes to, which apps it requires, which modules it conflicts with, which capability it provides, and the lines it injects.\n\nThe key move is that dependencies are expressed as capabilities rather than module names. The auth module does not require Postgres — it requires a database. Swap in a different database module that also provides that capability and auth keeps working, untouched. Two modules that provide the same capability conflict automatically, without either naming the other.\n\nRequirements come in two flavours because real stacks need both. Conjunctive requirements demand that all listed apps are selected. Disjunctive ones express \"needs a web or mobile client\" as an OR-group, and all groups must hold.",
               "bullets": [
-                "Conjunctive requirements (all of these apps) and disjunctive ones (a web or mobile client)",
-                "Two modules providing the same capability conflict automatically",
-                "A module that would contribute to none of the selected apps is rejected rather than installed as a silent no-op",
-                "Environment keys are routed to the right app's env file by prefix"
+                "requires pulls in other modules transitively; conflicts rejects incompatible pairs",
+                "provides is a capability tag — duplicate providers are a conflict by construction",
+                "Environment keys are routed to the right app's env file by prefix, so a NEXT_PUBLIC_ key cannot land in the server's config",
+                "A module contributing to none of the selected apps is rejected rather than installed — otherwise it is a silent no-op and the user believes they got a feature they did not"
               ],
               "media": []
             },
             {
-              "heading": "Injection Without a Parser",
-              "body": "Generated scaffolds carry anchor comments; modules declare lines and the engine injects them at the matching anchor. Injection is idempotent — a line already present is skipped — and preserves the anchor's indentation. This is deliberately not AST manipulation: one injector works identically across Python settings files, TypeScript providers, package manifests and Dockerfiles, where the alternative was five language-specific transformers. Because it is idempotent, adding a component to an existing project later is safe.",
+              "heading": "Injection without a parser",
+              "body": "Generated scaffolds carry anchor comments. Modules declare lines; the engine injects them at the matching anchor — installed apps, URL patterns, settings, providers, routes, dependency lists.\n\nThis is deliberately not AST manipulation. One injector works identically across Django settings, TypeScript provider trees, package manifests, pyproject files and Dockerfiles. The alternative was five language-specific transformers to build and keep working.\n\nTwo properties make it usable rather than merely clever. Injection is idempotent — a line already present is skipped — which is what makes adding a component to an existing project safe to re-run. And it preserves the anchor's indentation, so the output is formatted code rather than something you have to tidy afterwards.\n\nThe cost is real and worth stating: anchors must exist in the scaffold, and a user who deletes one breaks later injection. That trade bought support for every file type in the stack from a single implementation.",
               "media": []
             },
             {
               "heading": "Determinism",
-              "body": "Modules can also declare soft joins — wiring applied only when some other selected module provides a given capability. Those are keyed by capability and applied in a separate pass, so the output is identical regardless of the order modules are resolved in. Non-deterministic output is the worst possible bug in a code generator, so it has its own test suite alongside tests for manifest validation, requirement evaluation, the injection engine and root generation.",
+              "body": "Modules can declare soft joins — wiring applied only when some other selected module provides a given capability. A storage module can contribute extra configuration to the server, but only if auth is present.\n\nThe hard part is not the feature, it is that the result must not depend on which module the resolver happens to visit first. Soft joins are keyed by capability and applied in a separate pass over the already-resolved set, which makes them order-independent.\n\nNon-deterministic output is the worst possible bug in a code generator: it produces projects that differ for reasons nobody can see. It has its own test suite, alongside tests for manifest validation, requirement evaluation, the registry, extraction, reporting and root generation.",
               "media": []
             },
             {
-              "heading": "Ergonomics",
-              "body": "Seven commands, including the ones you only write after using generators in anger: plan for a dry run, doctor to diagnose a generated project, explore to browse the catalogue, and extract to turn existing code back into a module. Package managers are detected with fallbacks, so it works whether or not pnpm and uv are installed.",
+              "heading": "The engine",
+              "body": "The CLI source reads like a compiler pipeline, and the separation is what makes each stage testable on its own.",
+              "bullets": [
+                "registry and catalog discover and load module manifests",
+                "contract validates each manifest against the module contract",
+                "resolve evaluates requirements and conflicts into a final module set",
+                "compose assembles the plan; render handles token substitution; inject applies the wiring",
+                "rootgen generates the monorepo root — workspace files, tsconfig, scripts",
+                "projectmanifest records what was installed, so a later add knows the current state",
+                "pm detects package managers with fallbacks; preflight checks the environment before anything is written",
+                "extract-infer runs the pipeline backwards, inferring a module from existing code"
+              ],
+              "media": []
+            },
+            {
+              "heading": "Commands built from using generators in anger",
+              "body": "Seven commands, and three of them exist because of specific frustrations.\n\nPlan is a dry run: show me what this would generate before it touches my disk. Doctor diagnoses an already-generated project, because the interesting failures happen after generation, not during it. Extract runs the whole thing in reverse — turn existing code into a module — which is what lets the catalogue grow from real projects instead of hand-authored manifests.\n\nThe other four are create, add, list and explore. Add is the one that only works because injection is idempotent.",
+              "media": []
+            },
+            {
+              "heading": "What ships in the catalogue",
+              "body": "Twelve modules today, each built once so it stops being rewritten per project.",
+              "bullets": [
+                "db-postgres — Postgres wiring and driver, provides the database capability",
+                "auth — register, login, refresh, JWT, a custom user model and a TokenStore on both clients; spans server, web, mobile and shared",
+                "storage — a StorageProvider abstract base with local and S3 implementations, documented as the swappable-provider reference",
+                "docker — local Postgres compose plus a production server image",
+                "ci — per-app GitHub Actions with path filtering, so a mobile change does not run the server suite",
+                "ui-kit — owned Button, Badge, Card, Container and Input primitives",
+                "example — a working screen proving the client-to-server round trip",
+                "rbac, rate-limit, audit-log, feedback and workflow-engine added in later releases"
+              ],
+              "media": []
+            },
+            {
+              "heading": "Scope, stated honestly",
+              "body": "The README puts the limitation above the fold, in the project's own marketing copy: Partweave scaffolds one opinionated stack — Django, Next.js and Expo. You pick which of those apps and which components to include, but the frameworks themselves are not swappable yet. Pluggable stacks are on the roadmap, not in the box.\n\nThe roadmap in the feature catalogue specs roughly thirty further modules as mini-specifications — what each provides, which apps it touches, what it depends on — so a contributor can build one by dropping a folder in and following the module contract.",
               "media": []
             },
             {
               "heading": "Outcome",
-              "body": "Published to npm and runnable with a single npx command, with a documented module contract and an authoring guide so the catalogue can grow by dropping a folder in. The README states the scope limit honestly up front: it scaffolds one opinionated stack today, and pluggable frameworks are on the roadmap rather than in the box.",
+              "body": "Published to npm, runnable with npx, with a documented module contract, an authoring guide, and CI on every push.\n\nThe part worth keeping is not the generator; it is that the resolution model turned out to be the interesting problem. Capability-keyed dependencies, order-independent soft joins and idempotent injection are three ideas that would apply to any plugin system, and this is where they got worked out.",
               "media": []
             }
           ],
@@ -412,48 +501,72 @@
           "sections": [
             {
               "heading": "Overview",
-              "body": "Adding 3D to a React site is disproportionately hard for what is usually a background effect: three.js, R3F, drei, a camera rig, a render loop, resize handling, a WebGL fallback, reduced-motion handling, and shader knowledge. easy-3dkit collapses that to a Stage and a component — and ships a documentation site, a live gallery and its own create-app so a working project is one command away.",
+              "body": "Adding 3D to a React site is disproportionately hard for what is usually a background effect. You need three.js, React Three Fiber, drei, a camera rig, a render loop, resize handling, a WebGL-unavailable fallback, reduced-motion handling, and enough shader knowledge to write the thing you actually wanted.\n\neasy-3dkit collapses that to a Stage and a component. It ships a documentation site, a live gallery, and its own create-app so a working project is one command away.\n\nAround 14,800 lines of TypeScript across 119 files, exposing 50+ effects across six families through 81 exports from a single entry file.",
               "media": []
             },
             {
               "heading": "The Problem",
-              "body": "A component library is a promise you cannot take back. Every export is API surface, every dependency is something you impose on the consumer's bundle, and packaging mistakes only show up after publishing. So the library is designed around its boundary rather than its features.",
+              "body": "A component library is a promise you cannot take back. Every export is API surface you have to keep working. Every dependency is something you impose on a consumer's bundle. And packaging mistakes have a particular cruelty: they only appear after you publish, in someone else's project.\n\nSo the library is designed around its boundary rather than around its features. The public entry file opens with the rule stated outright — this file is the package boundary, everything a consuming app is allowed to import lives here, keep internals private.",
               "media": []
             },
             {
-              "heading": "What's Inside",
-              "body": "Three layers behind a single public entry file. An engine layer owns the canvas, camera, easing and failure handling — WebGL availability detection, an error boundary and a fallback. A hooks layer exposes reusable reactive inputs like pointer position, scroll progress and the user's reduced-motion preference. A component layer holds six master families.",
+              "heading": "Three layers",
+              "body": "The engine layer owns the canvas, camera, easing and failure handling: Stage, CameraRig, a WebGL error boundary, a fallback component, a WebGL availability check, view-angle helpers, an easing set, an input-mode store and a scroll driver.\n\nThe hooks layer exposes reusable reactive inputs — pointer position, scroll progress, and the user's reduced-motion preference.\n\nThe component layer holds the six master families: particle fields, ripple shaders, floating objects, scroll scenes and animators, interactive surfaces, instanced grids, and post-processing.",
+              "media": []
+            },
+            {
+              "heading": "The variant pattern",
+              "body": "Rather than fifty components, a handful of master components accept variant objects. An interactive surface takes a material; an instanced grid takes a layout. That yields 22 surface effects and 11 instanced arrangements from two components, with the render loop, uniform handling and lifecycle written once.\n\nThe part that matters more: the extension point is public. The variant type, the standard uniform set and the shader chunks are all exported, so a consumer can author a twenty-third material without forking the library. Being able to extend without forking is the difference between a library and a starting point.",
               "bullets": [
-                "Rather than 50 components, master components take variant objects — an interactive surface takes a material, an instanced grid takes a layout",
-                "That yields 22 surface effects and 11 instanced arrangements from two components",
-                "The variant type, the standard uniform set and the shader chunks are all exported, so a user can author a 23rd effect without forking"
+                "Materials include glassmorphism, iridescent, thermal vision, frosted glass, holographic foil, toon cel, wireframe morph, moiré, fractal zoom, liquid blob, brushed metal, neon line art, bioluminescent, x-ray ghost, rain streaks, scanlines, 8-bit dither, kinetic type, plasma, voronoi cells and heat haze",
+                "Layouts include orbit, tunnel, isometric stack, voxel sphere, voronoi shatter, gear field, kinetic ring, origami fold, wave grid, galaxy spiral and cube swarm",
+                "Standalone components cover card flip, magnetic group, squash-stretch, elastic jiggle, path spline, morph shape, exploded view, parallax layers, ocean plane, portal ring, camera flythrough and popup fold"
               ],
               "media": []
             },
             {
-              "heading": "Packaging Decisions",
-              "body": "The whole 3D stack is declared as peer dependencies rather than bundled, because shipping three.js would give a consumer two copies with separate module registries — the most common and most confusing failure in the R3F ecosystem. Post-processing lives on its own export subpath so the main entry never references an optional peer, which means users who do not want it never have to install it.",
+              "heading": "Packaging: the duplicate-three problem",
+              "body": "The entire 3D stack is declared as peer dependencies rather than bundled — three.js, React Three Fiber, drei, GSAP, React, and post-processing.\n\nBundling three.js would give a consumer two copies with separate module registries. Objects created by one would not be recognised by the other, producing errors that look like nonsense: an instance that fails an instanceof check against its own class. It is the most common and most confusing failure in the R3F ecosystem, and the library is designed around avoiding it. The README states the peer install line explicitly rather than hoping the user works it out.",
               "media": []
             },
             {
-              "heading": "Release Engineering",
-              "body": "Publishing is guarded rather than manual:",
+              "heading": "Packaging: making an optional peer actually optional",
+              "body": "Post-processing ships from its own export subpath, so the main entry never references the optional peer dependency at all.\n\nIf it lived in the main entry, every consumer would need the post-processing package installed whether or not they ever rendered an effect — because the import would be evaluated regardless. A subpath export means users who do not want it never install it, and users who do get types and runtime from one place.",
+              "media": []
+            },
+            {
+              "heading": "Release engineering",
+              "body": "Publishing is guarded rather than manual, and each script exists because of a class of bug it catches.",
               "bullets": [
-                "The docs site can build against the published bundle instead of the source, catching missing exports and bad paths before a user does",
-                "Separate checks verify the packed tarball, measure bundle size, smoke-test with and without WebGL, and verify server-side rendering compatibility",
-                "A test asserts the public export surface, so removing an export cannot happen by accident",
-                "Reduced-motion behaviour has its own test — a 3D library that ignores it makes some users unwell"
+                "A separate library build and a separate types build from a dedicated tsconfig, so the published artifact is not the app build",
+                "A pack check that verifies what actually lands in the tarball",
+                "A size measurement, so bundle growth is visible rather than discovered",
+                "Smoke tests run twice — with WebGL and without — because the no-GPU path is the one nobody tests",
+                "A Next.js check, because server-side rendering is where 3D libraries break: window access at module scope",
+                "A starter-template sync and smoke test, so the create-app cannot drift from the library",
+                "A dogfood build that compiles the docs site against the published dist instead of the source",
+                "Changesets for versioning and changelog discipline; the publish script cannot run without a full build"
               ],
               "media": []
             },
             {
-              "heading": "Real-World Use",
-              "body": "The library powers the live backdrop on this site, which is also how packaging regressions get caught early: the consumer and the author are the same person, and the consumer builds against the published artifact.",
+              "heading": "Why building against dist matters",
+              "body": "A library repo that imports its own source never exercises the packaged artifact. Everything resolves through the bundler's path aliases, so a missing export, a wrong types path or a file left out of the package manifest is invisible right up until the moment a user installs it.\n\nThe dogfood build flips an environment flag and rebuilds the documentation site against the published output. If an export is missing, the site fails to build — in CI, not in someone's inbox.",
+              "media": []
+            },
+            {
+              "heading": "Tests that test the right things",
+              "body": "The test suite is small and deliberately aimed at library-specific failure modes rather than at coverage.\n\nAn exports test asserts the public surface, so removing or renaming an export cannot happen by accident — for a library, that is a breaking change, and this makes it a deliberate one. A mount test verifies components actually render. A reduced-motion test covers the accessibility path, because a 3D library that ignores prefers-reduced-motion makes some users physically unwell, and that hook is exported for exactly this reason.",
+              "media": []
+            },
+            {
+              "heading": "Real-world use",
+              "body": "The library powers the live backdrop on this portfolio, which is also how packaging regressions get caught early: the consumer and the author are the same person, and the consumer builds against the published artifact rather than the source.\n\nThe portfolio's own bundling decisions came out of that relationship — three.js is deliberately left in a lazily-loaded chunk rather than forced into a named vendor bundle, which is documented in the other case study on this site.",
               "media": []
             },
             {
               "heading": "Outcome",
-              "body": "A published, versioned package with a live gallery, a scaffolding command, changelog discipline through Changesets, and a public API designed to be extended rather than forked.",
+              "body": "A published, versioned package with a live gallery, a scaffolding command, changelog discipline, and a public API designed to be extended rather than forked.\n\nIt is pre-1.0 and honest about that. What it demonstrates is not scale but judgement: knowing that a library's hard problems are its boundary, its peers and its release path, not the number of effects behind them.",
               "media": []
             }
           ],
@@ -498,38 +611,54 @@
           "sections": [
             {
               "heading": "Overview",
-              "body": "A CRM where multiple organisations share one deployment and one database but can never see each other's rows — contacts, deals, tickets, tasks, meetings, invoices and commissions, with roles, permissions, invitations, two-factor auth and audit logging underneath. This is a different problem from a multi-vendor marketplace: there, a leak is a UX bug; here, it is a breach.",
+              "body": "A CRM where multiple organisations share one deployment and one database but can never see each other's rows — contacts, deals, tickets, tasks, meetings, invoices and commissions, with roles, permissions, invitations, two-factor authentication and audit logging underneath.\n\nDjango 5.2 with DRF and SimpleJWT on PostgreSQL 15 and Redis 7, containerised, with Celery and Flower for background work and MinIO for object storage. Five apps, roughly 50 models, 320 commits.\n\nThis is a different problem from a multi-vendor marketplace. There, a leak between vendors is a UX bug. Here, a leak between tenants is a breach.",
               "media": []
             },
             {
-              "heading": "My Role",
-              "body": "Backend and platform: the tenancy model, the RBAC layer, the soft-delete engine, the API surface, and the security review of my own isolation model. The interface is delivered as server-rendered Django templates with a hand-rolled SPA-fragment loader rather than a JavaScript framework — the app is form and table heavy, and fragments reuse the same permission context the API already computes.",
+              "heading": "The interface, stated plainly",
+              "body": "There is no React frontend. The UI is server-rendered Django templates driving a hand-rolled SPA-fragment system: a persistent app shell, a fragment template that renders one page component into a main container, and a client-side loader that swaps fragments without a full navigation.\n\nThat was a defensible choice. The team was already deep in Django, the application is form-and-table heavy, and fragments reuse the same permission context the API layer has already computed — so a field that a role cannot see is never rendered, rather than being hidden client-side.\n\nThe cost is equally real: things a framework gives you free were hand-written, including the data table, the kanban board and the dialog system. Around 56 templates and 50 JavaScript modules.",
               "media": []
             },
             {
-              "heading": "Multi-Tenancy",
-              "body": "Shared table with an organisation foreign key, enforced in layers. Middleware resolves the current organisation from the URL slug, a header or the session and validates membership before anything downstream reads it. A tenant base model auto-fills the organisation from request context on save and raises rather than persisting a row it cannot scope. Scoped managers filter querysets, and every permission check runs against the validated organisation and membership pair.",
+              "heading": "Architecture",
+              "body": "Five apps with sharp boundaries. Identity holds organisations, users, memberships, roles, permissions, sessions, social accounts, invitation and verification tokens, platform and per-organisation default settings, and the audit log — sixteen models. The CRM app holds the pipeline, stages, statuses, contacts with custom field definitions and import jobs, deals, tasks, tickets, meetings with attendees and invitations, and a comment model per entity — seventeen models. Finance holds invoices, invoice items, salespeople and commissions. Integrations holds custom fields, API keys, webhooks with delivery records, and uploads. Core holds the base model, the tenant model, the soft-delete engine, scoped managers, RBAC, middleware, permissions, throttling and the sidebar models.",
               "bullets": [
-                "26 business models inherit the tenant base class — an unscoped write fails loudly at the ORM boundary",
-                "Role permissions are cached and explicitly invalidated, rather than joined on every check",
-                "Record-level ownership sits on top of role-level permissions",
-                "Navigation is data — sidebar sections, items and actions are database rows, so it is per-organisation configuration"
+                "Role permissions are cached and explicitly invalidated on change, rather than joined on every check",
+                "Record-level ownership enforcement sits on top of role-level permissions",
+                "Navigation is data — sidebar sections, items and actions are database rows, so it is per-organisation configuration rather than a hard-coded template",
+                "Internationalisation via modeltranslation, with UI copy held in a JSON layer so text is data too"
               ],
               "media": []
             },
             {
-              "heading": "The Soft-Delete Engine",
-              "body": "Django's usual soft-delete patterns do not cascade, so soft-deleting a parent leaves active children pointing at a deleted row. I built a collector that walks relations, computes the closure of rows to soft-delete, and then applies real deletion semantics to it: cascade children are soft-deleted with the parent, set-null referrers are nulled only if they are not themselves in the closure, protect is checked before anything is written, models excluded from soft deletion are left untouched, and re-deleting an already-deleted row is a no-op.",
+              "heading": "Tenancy, enforced in layers",
+              "body": "Shared table with an organisation foreign key, enforced at four levels rather than trusted at one.\n\nMiddleware resolves the current organisation from the URL slug, a header, the session, or a sole membership — and validates that the user actually belongs to it before anything downstream reads it. A tenant base model auto-fills the organisation from request context on save, and raises rather than persisting a row it cannot scope. Scoped managers filter querysets. And every permission check runs against the validated organisation and membership pair.\n\nTwenty-six business models inherit that base class. An unscoped write fails loudly at the ORM boundary rather than quietly creating an invisible or cross-tenant row.",
               "media": []
             },
             {
-              "heading": "Auditing My Own Isolation",
-              "body": "While migrating the browser SPA from token storage to session cookies, the fetch layer began sending two different organisation headers — which surfaced that the app had three independently-resolved notions of the current organisation, with different source orders and different validation. I traced every path and wrote it up: the primary data paths are provably safe, because list, retrieve and create all require a validated organisation and membership pair. But the row-level security the app advertised did not exist — a per-request database setting was being executed and read by nothing. The audit separates what is proven safe from what is header-trusted, and lays out a phased remediation: unify on the validated resolver, then add real database policies as a backstop.",
+              "heading": "The soft-delete cascade engine",
+              "body": "Django's usual soft-delete patterns do not cascade. Soft-deleting a parent leaves active children pointing at a row that is gone, which is a data-integrity bug that surfaces months later as a mysterious orphan.\n\nSo deletion walks the relation graph and computes the closure of rows to soft-delete, then applies real deletion semantics to that closure. Cascade children are soft-deleted with the parent. Set-null referrers are nulled — but only if they are not themselves in the closure, because nulling a link on a row you are also deleting is pointless churn. Protect is checked before anything is written, so a protected reference aborts the whole operation rather than leaving it half-applied. Models excluded from soft deletion are left untouched and never hard-deleted. And re-deleting an already-deleted row is a no-op, so the operation is idempotent.\n\nIt is the smallest piece of code in the project and the one I would show first.",
+              "media": []
+            },
+            {
+              "heading": "Auditing my own isolation",
+              "body": "While migrating the browser SPA from token storage to session cookies, the fetch layer began sending two different organisation headers. That surfaced something worth finding: the application had three independently-resolved notions of \"the current organisation\", with different source orders and different validation.\n\nOne resolver — the middleware — checks URL slug, then header, then session, then a sole membership, and validates membership. A second reads a different header, falls back to the session, then to the user's first membership, and does not validate. A third, used by the current-user endpoint, reads the header then filters by membership.\n\nThe primary data paths turned out to be safe: list, retrieve and create all require the validated organisation-and-membership pair, and refuse rather than degrade when it is absent. The risk lived in the secondary, header-trusted paths.\n\nThe audit also found that the row-level security the app advertised did not exist. A per-request database setting was being executed on every request and consumed by nothing — there were no Postgres policies behind it. All isolation was, and is, application-level.",
+              "bullets": [
+                "Documented what is provably safe first, so the remediation could not regress it",
+                "Separated proven-safe paths from header-trusted ones rather than reporting a single verdict",
+                "Phased plan: unify on the validated resolver, then add real database policies as a backstop",
+                "Written before anyone asked for it, as part of an auth migration rather than an incident"
+              ],
+              "media": []
+            },
+            {
+              "heading": "Operational details worth keeping",
+              "body": "A deploy-config commit restricted the API and the Celery monitoring UI to localhost bindings. Flower exposed publicly leaks task payloads — which for this application means customer data passing through background jobs.\n\nGlobal loading state and double-submission prevention were implemented once in the fetch layer rather than per form, which is the difference between a convention and a guarantee.\n\nAround forty feature and page-plan design documents sit in the repository, written before the code rather than after it.",
               "media": []
             },
             {
               "heading": "Outcome",
-              "body": "A CRM running the operations behind Feriaau, with tenant isolation enforced in four layers, deletion that stays consistent across 26 related models, and a written security review that says plainly which guarantees are application-level and which are not.",
+              "body": "A CRM running the operations behind Feriaau, with tenant isolation enforced in four layers, deletion that stays consistent across 26 related models, and a written security review that says plainly which guarantees are application-level and which are not.\n\nThe honest summary is the one in that review: the primary paths are safe, the database has no backstop yet, and the plan to add one is written down. That is a more useful thing to be able to say than \"it's isolated\".",
               "media": []
             }
           ],
@@ -581,42 +710,63 @@
           "sections": [
             {
               "heading": "Overview",
-              "body": "A parking facility needs to know which vehicle entered, when, which one left, and what to charge. Manual logbooks at comparable facilities in Kathmandu carry a meaningful transcription error rate, worse at night and worse for embossed plates. This system replaces the logbook using the cameras that are already there: it recognises the plate at entry, opens a session, recognises it again at exit, and computes the bill — over standard RTSP, with no hardware modification.",
+              "body": "A parking facility needs to know which vehicle entered, when, which one left, and what to charge. Manual logbooks at comparable facilities in Kathmandu carry a transcription error rate we estimated at 3–7% per session, worse at night and worse for embossed plates.\n\nThis system replaces the logbook using the cameras that are already there. It recognises the plate at entry, opens a session, recognises it again at exit, and computes the bill — over standard RTSP, with no hardware modification and no gantry.\n\nThe vision pipeline is also the validation case for a research framework, Cascaded AI Task Decomposition, accepted subject to minor revision at NCCS in June 2026.",
               "media": []
             },
             {
               "heading": "The Problem",
-              "body": "Nepali plates stack several hard problems on each other. The character set is bi-scriptual, which means 61 classes rather than the Latin-only set most ANPR work assumes. Embossed surfaces produce specular glare that defeats edge-based OCR. Monsoon light varies enormously. And a single model asked to find a vehicle in a full frame and read a twelve-pixel glyph is optimising objectives at incompatible spatial scales.",
+              "body": "Nepali plates stack several hard problems on each other. The character set is bi-scriptual — Devanagari and Latin — which means 61 classes rather than the Latin-only set most published ANPR work assumes. Embossed surfaces produce specular glare that defeats edge-gradient-based OCR. Kathmandu's monsoon gives highly variable illumination and elevated atmospheric particulates. And Nepali plate formats are poorly represented in public datasets, so any supervised approach starts with a data deficit.\n\nUnderneath all of that sits a modelling problem. A single network asked to find a vehicle in a full frame and read a twelve-pixel glyph is optimising objectives at incompatible spatial scales. It is not that any one component is weak; it is that the objectives compete.",
               "media": []
             },
             {
-              "heading": "Approach",
-              "body": "Split the compound problem into three specialised models, each working on a progressively tighter crop. A pre-trained YOLOv8n gates every frame on whether a vehicle is present. A custom-trained YOLOv11n localises the plate inside the vehicle crop. An RF-DETR Base recogniser reads characters inside the plate crop across 61 classes, with regex validation and a left-to-right sort assembling the final string.",
-              "bullets": [
-                "Each stage strips background clutter before handing off, which the ablation measures as a 13.2 percentage-point gain",
-                "The heavy recogniser only runs when the cheap detector confirms a vehicle, cutting effective compute by 61–73% depending on traffic",
-                "Frames are sampled rather than exhausted, and a tracker gives each vehicle a persistent identity so its plate is read once and cached, not re-read hundreds of times"
-              ],
+              "heading": "The framework",
+              "body": "Cascaded AI Task Decomposition is the deliberate split of a compound vision problem into a sequential pipeline of specialised, independently trained models, each operating on a progressively cropped region of interest.\n\nEach stage strips background clutter before handing off, so every downstream model sees a cleaner, tighter and more uniform input than the one before it. The ablation isolates that effect at 13.2 percentage points.\n\nThe generalisation claim is the actual contribution. ANPR is the validation case, not the point — the paper draws an explicit structural equivalence with multi-agent LLM orchestration: a complex task broken into sub-tasks assigned to specialists, each one narrowing the context for the next.",
+              "media": []
+            },
+            {
+              "heading": "Three stages",
+              "body": "A pre-trained YOLOv8n processes every incoming frame at 640×640 and gates on whether a vehicle is present, filtering to four COCO classes — car, motorcycle, bus, truck. Frames with no vehicle are discarded immediately.\n\nA custom-trained YOLOv11n localises the plate inside the vehicle crop. Training used a learning rate of 1e-2 with mosaic and mixup augmentation.\n\nAn RF-DETR Base recogniser, on a DINOv2 backbone, reads characters inside the plate crop across 61 classes. Training used a learning rate of 5e-4 — twenty times smaller, because this is fine-tuning a pre-trained transformer rather than training a small detector — with crop and rotate augmentation.\n\nPost-processing assembles the plate string by sorting detections left to right and validating against format regexes, which is also what catches rare-token misrecognition.",
               "media": []
             },
             {
               "heading": "Results",
-              "body": "On the held-out test set the plate localiser reaches 97.1% mAP@50 and the character recogniser 97.8% mAP@50. End-to-end precision is estimated at 90.4% by combining the measured per-stage precisions — an estimate rather than a measurement, and one whose independence assumption is mildly optimistic, since a partially cropped vehicle makes the next stage more likely to fail too. A dedicated held-out benchmark of true embossed plates is the stated next step.",
+              "body": "On the held-out test set the plate localiser reaches 97.1% mAP@50 and the character recogniser 97.8% mAP@50.\n\nStrict-IoU numbers are lower and the paper explains rather than hides them: 91.0% for the localiser, around 81.0% for the recogniser. mAP@50 counts a character correct at 50% overlap; mAP@50:95 averages over progressively stricter thresholds up to 95%, penalising minor box looseness. Since the downstream task only needs the right character in the right left-to-right order — not pixel-perfect geometry — mAP@50 is the operationally relevant metric, and the gap reflects box-tightness variation on low-resolution embossed glyphs.",
+              "bullets": [
+                "Stage 1 vehicle detection: 98.5% precision, 99.1% recall, 98.8% F1",
+                "Stage 2 plate localisation: 97.1% mAP@50, 91.0% mAP@50:95, 96.5% precision, 93.7% recall, 95.1% F1",
+                "Stage 3 character OCR: 97.8% mAP@50, ~81.0% mAP@50:95, 95.1% precision, 93.8% recall, 94.4% F1",
+                "Gating the expensive recogniser behind the cheap detector cuts effective compute by 61–73%, depending on vehicle density"
+              ],
               "media": []
             },
             {
-              "heading": "The Data Problem",
-              "body": "There is essentially no public dataset of Nepali embossed plates, so the target domain could not be sampled directly. Instead the problem was decomposed into two learnable factors sourced separately: 1,380 Nepali traditional flat plates carrying the script and layout, and 1,127 Indian embossed plates carrying the surface texture and specular behaviour. Augmented to 9,366 images with 21,648 hand-annotated character boxes, the recogniser generalises to Nepali embossed plates it never saw in training — worth 24.5 percentage points over a single-domain baseline under specular reflection.",
+              "heading": "A number reported as an estimate",
+              "body": "End-to-end precision is estimated at 90.4%, as the product of the measured per-stage precisions: 0.985 × 0.965 × 0.951.\n\nThe paper is explicit, in the abstract, that this is a model-based estimate rather than a directly measured full-string read accuracy — and then names the flaw in its own assumption. Statistical independence is optimistic: when stage one crops a vehicle partially out of frame, stage two receives an incomplete input and is significantly more likely to fail too. The stages are correlated for exactly the cases that matter, so the product overestimates.\n\nTwo mitigations are proposed rather than implied: expand stage one training to include partially occluded vehicles, or insert a quality filter that discards crops below a bounding-box-area threshold before they reach stage two. A dedicated held-out benchmark of true embossed plates remains the principal target for future validation.",
               "media": []
             },
             {
-              "heading": "The Platform",
-              "body": "The pipeline is the vision backbone of a parking system built on FastAPI and MongoDB with a Next.js dashboard. It ingests RTSP, streams annotated video to operators over HLS and MJPEG, pushes live detections over WebSockets, coordinates entry and exit into billable sessions, and adapts stream quality and processing load independently. Circuit breakers wrap the inference path so a hosted-model outage degrades to pass-through video instead of stalling every camera, and mock detectors let the API, session and streaming layers be tested without a GPU.",
+              "heading": "Solving the data deficit",
+              "body": "There is essentially no public dataset of Nepali embossed plates, so the target domain could not be sampled directly. Instead the problem was decomposed into two learnable factors, each sourced from a domain that did have data.\n\nNepali traditional flat plates — 1,380 images, 55% of the corpus — carry the script and the character layout. Indian embossed plates — 1,127 images, 45% — carry the surface texture and specular behaviour. Augmentation expanded 2,507 source plates to 9,366 images, a 3.7× factor, split 75/20/5. The character dataset yielded 21,648 bounding-box annotations across 61 classes at a median resolution of 324×121 pixels, all annotated by hand.\n\nThe recogniser has never seen a Nepali embossed plate. It generalises to them by composing two factors that were never observed together — worth 24.5 percentage points over a single-domain baseline under specular-reflection conditions.\n\nThe limitation is disclosed alongside the result: eleven of the 61 classes have fewer than three total annotations and no test-set coverage, and rare-token misrecognition is caught by the regex validation stage rather than by the model.",
+              "media": []
+            },
+            {
+              "heading": "From pipeline to platform",
+              "body": "The deployed system is FastAPI with MongoDB via an async driver, a Next.js 14 dashboard, and around 28,000 lines of Python against 22,800 of TypeScript.\n\nEighteen backend services handle stream management, two- and three-stage detection pipelines, session coordination, adaptive processing, adaptive quality, HLS and MJPEG streaming with detection overlays, WebSocket fan-out, circuit breaking and webhooks. Sixteen REST route modules cover auth, users, cameras, sessions, detections, pricing, analytics, dashboards, uploads and webhooks.\n\nNotably, both a two-stage and a three-stage pipeline ship, switchable from the admin dashboard. The research configuration maximises accuracy; the deployed one trades a little for latency and cost. Which is correct depends on the site.",
+              "media": []
+            },
+            {
+              "heading": "Reading a plate once per vehicle",
+              "body": "Running the full pipeline on every frame of every stream is computationally impossible at multi-camera scale, and also pointless — a vehicle occupies hundreds of consecutive frames.\n\nFrames are sampled at a configurable interval, defaulting to every tenth. Detections are filtered to the four vehicle classes so non-vehicle frames never reach the expensive stages. ByteTrack assigns each vehicle a persistent track identity across frames. And the recognised plate string is cached against that track id.\n\nThe result is one OCR per vehicle rather than one per frame. That single caching decision is the difference between one camera and eight on the same hardware.",
+              "media": []
+            },
+            {
+              "heading": "Failing safely",
+              "body": "Stages two and three call a hosted inference API, which means a network blip or a rate limit could cascade: every frame retrying, queues backing up, every live stream stalling at once.\n\nCircuit breakers wrap the inference path and surface their state in the admin dashboard alongside error logs, so an outage degrades to pass-through video rather than taking the platform down — and an operator can see why rather than guess.\n\nAdaptive stream quality and adaptive processing load are deliberately separate managers. A client on poor Wi-Fi is a different problem from a server that cannot keep up with eight cameras, and conflating them means the system degrades along the wrong axis.\n\nMock detection models and demo media fixtures let the API, session and streaming layers be tested without a GPU or an API key — which is why this computer-vision project has a test suite that actually runs.",
               "media": []
             },
             {
               "heading": "Outcome",
-              "body": "A prototype platform doing automated billing and traffic analytics off existing camera infrastructure, and a framework paper — Cascaded AI Task Decomposition — accepted subject to minor revision, in which this system is the validation case rather than the contribution.",
+              "body": "A prototype platform doing automated billing and traffic analytics off existing camera infrastructure, and a first-author framework paper accepted subject to minor revision.\n\nAt the estimated accuracy, roughly one vehicle in ten may need manual intervention — a substantial reduction against a fully manual baseline, and stated as pending empirical confirmation rather than claimed.",
               "media": []
             }
           ],
@@ -664,40 +814,51 @@
           "sections": [
             {
               "heading": "Overview",
-              "body": "\"Is this subreddit angry?\" has no good answer available. Sentiment tools give positive or negative on a single text; emotion at the level of a community, tracked over time and comparable across communities, needs aggregation rules someone has to actually decide. This platform analyses posts, comments and whole subreddits into a seven-emotion distribution, tracks the top communities on a schedule, and ranks them on leaderboards.",
+              "body": "\"Is this subreddit angry?\" is a question with no good answer available. Sentiment tools give you positive or negative on a single text. Emotion at the level of a community, tracked over time and comparable across communities, needs aggregation rules that somebody has to actually decide.\n\nThis platform analyses posts, comments and whole subreddits into a seven-emotion distribution, re-analyses the top communities on a schedule so the data becomes a time series, and ranks them on leaderboards.\n\nFlask and SQLAlchemy on PostgreSQL, Celery and Celery Beat over Redis, HuggingFace Transformers in the worker — and a second inference engine that runs entirely in the visitor's browser.",
               "media": []
             },
             {
-              "heading": "Approach",
-              "body": "Every prediction is a probability distribution over seven emotions that sums to one. A post score is the weighted mean of its title, its body and up to fifty comments; a subreddit score is the mean of its posts. The decision that matters is means rather than totals: summing made every score scale with comment volume, so the leaderboard was effectively ranking subreddits by how busy they were instead of by mood. Averaging puts a ten-thousand-comment community and a two-hundred-comment one on the same scale.",
+              "heading": "The Problem",
+              "body": "Two constraints pulled against each other. Transformer inference on demand, for anyone who visits a public site, is not something a personal project can afford to pay for. But a demo with no interactivity is not a demo.\n\nAnd under that sat a subtler problem: how do you compare the mood of a community with ten thousand comments to one with two hundred, without simply measuring which is busier?",
               "media": []
             },
             {
-              "heading": "Two Engines",
-              "body": "The same analysis runs two ways, and the user picks:",
-              "bullets": [
-                "A cloud engine — a DistilRoBERTa emotion classifier trained on GoEmotions, running in a Celery worker, used for whole-subreddit batch work and the scheduled tracker",
-                "A browser engine — an ONNX GoEmotions model executed by Transformers.js on WebAssembly inside a Web Worker, weights downloaded to IndexedDB on first use, so interactive analysis costs nothing and the text never leaves the device",
-                "The browser model's 28 labels are bucketed into the server's seven, so the interface renders one shape either way",
-                "The docs state plainly that the two engines are different models over different label sets, so their numbers are only comparable within an engine"
-              ],
+              "heading": "Two engines, one interface",
+              "body": "The same analysis runs two ways and the user picks.\n\nThe cloud engine runs a DistilRoBERTa emotion classifier — trained on GoEmotions, seven labels — inside a Celery worker. It handles whole-subreddit batch work and the scheduled tracker, where the job is long and the result is stored.\n\nThe browser engine runs an ONNX GoEmotions model with 28 labels, executed by Transformers.js on WebAssembly inside a Web Worker. Weights download to IndexedDB on first use — not on page load — so the cost of the model is paid only by users who actually choose it. Inference then costs nothing, needs no round trip, and the text never leaves the device.\n\nThe 28 browser labels are bucketed into the server's seven, so the interface renders one shape either way.",
+              "media": []
+            },
+            {
+              "heading": "Saying that the numbers are not comparable",
+              "body": "The architecture document states it plainly: the two engines are not interchangeable. They are different models over different label sets, so the same sentence can score differently depending on which one ran it. Both emit the same seven-category shape and both normalise to a probability distribution, but the numbers are only comparable within an engine.\n\nBuilding two inference paths is competent. Documenting, in user-facing docs, that their outputs must not be compared is the part that keeps the tool honest — because the interface makes them look identical, and nothing else would stop a user drawing a false conclusion.",
+              "media": []
+            },
+            {
+              "heading": "Means, not sums",
+              "body": "Every prediction is a probability distribution over seven emotions summing to one. A post score is the weighted mean of its title, its body and up to fifty comments, with comments weighted at 0.8. A subreddit score is the mean of its posts' distributions.\n\nThe original implementation summed. That made every score scale with comment volume, so the leaderboard was effectively ranking subreddits by how busy they were rather than by mood — a large community topped every emotion at once, which is the tell that the metric was measuring the wrong thing.\n\nAveraging puts a ten-thousand-comment community and a two-hundred-comment one on the same scale. The leaderboard measures mood, not volume.\n\nUnknown labels are dropped and the remainder renormalised, so the distribution still sums to one; text the model cannot score at all falls back to neutral rather than being silently omitted.",
+              "media": []
+            },
+            {
+              "heading": "Preprocessing argued from the model",
+              "body": "Text cleaning is deliberately conservative. It strips URLs, markdown link targets, quoted parent comments, HTML entities and control characters — and leaves casing, punctuation and emoji alone.\n\nThose carry emotion signal the transformer was trained on. ALL CAPS is anger. Three exclamation marks are not the same as one. Aggressive lowercasing and punctuation stripping is bag-of-words-era preprocessing inherited from TF-IDF pipelines, and applying it to a transformer actively costs accuracy.\n\nThat decision has a consequence recorded next to it: because punctuation survives cleaning, template output must stay escaped, and no field derived from Reddit or from user-submitted text may be marked safe. Tracing a preprocessing choice through to an XSS rule, and writing it down for whoever comes next, is the part worth copying.",
               "media": []
             },
             {
               "heading": "Engineering",
-              "body": "Flask enqueues work with Celery over Redis and the interface polls a task-status endpoint; Celery Beat re-analyses top subreddits on an interval, which is what makes the historical trend charts possible. Analyses are stored as one row per post with the full nested comment scores as JSON, plus aggregate snapshots with the seven emotions as indexed float columns — because those get sorted and averaged for leaderboards, and JSON does not index portably.",
+              "body": "Flask enqueues work and the interface polls a task-status endpoint. Celery Beat re-analyses top subreddits on a configurable interval, which is what turns one-off analysis into the time series the trend charts need.\n\nA memory bug worth naming: the model and the Reddit client were originally constructed at import time. Because the web app imports the task module simply to enqueue work, every Gunicorn worker was loading a copy of the transformer weights it would never use. Both moved behind lazy accessors, with a worker-init hook that warms the model in Celery processes only — so the weights live exactly where inference happens, and the first task is still fast.",
               "bullets": [
-                "The model and Reddit client are constructed lazily and warmed only in worker processes — building them at import time put a copy of the weights in every web worker",
-                "Text cleaning strips URLs, quoted parents and control characters but deliberately leaves casing, punctuation and emoji alone, because those carry the signal a transformer was trained on",
-                "Because punctuation survives cleaning, template output must stay escaped — the preprocessing decision is traced through to its templating consequence in the docs",
-                "The leaderboard query avoids Postgres-only syntax so the same code runs against the SQLite fallback used locally and in tests",
+                "Four Celery tasks: single post, whole subreddit, free-text playground, and the scheduled batch",
+                "Analyses stored one row per post with the full nested comment scores as JSON",
+                "Aggregate snapshots store the seven emotions as indexed float columns, because leaderboards sort and average them and JSON does not index portably",
+                "A source column separates real Reddit posts from playground submissions, and playground rows are excluded from the public feed",
+                "The leaderboard's latest-per-subreddit query avoids Postgres-only syntax, so the same code runs against the SQLite fallback used locally",
+                "Rate limiting via Flask-Limiter backed by Redis, with an in-memory fallback for bare runs",
                 "Tests stub the model pipeline, so the suite runs in about a second and never downloads weights"
               ],
               "media": []
             },
             {
               "heading": "Outcome",
-              "body": "A containerised platform that batch-analyses subreddits on a schedule, offers instant analysis at zero marginal inference cost, and reports community mood on a scale that does not reward being loud.",
+              "body": "A containerised platform that batch-analyses subreddits on a schedule, offers instant analysis at zero marginal inference cost, and reports community mood on a scale that does not reward being loud.\n\nWorth stating plainly: the emotion model is used off the shelf rather than fine-tuned, and it is English-only. The engineering is in the pipeline, the aggregation semantics and the dual-engine design, not in training a model.",
               "media": []
             }
           ],
@@ -737,48 +898,60 @@
           "sections": [
             {
               "heading": "Overview",
-              "body": "Contractors run their business from a truck: leads, quotes, proposals, projects, crews, invoices and a calendar, on a phone, often on bad signal, often without remembering a password. ContractorOps is the field CRM for that. The mobile app is a pure API client with no backend code in it, talking to a separate FastAPI service.",
+              "body": "Contractors run their business from a truck: leads, quotes, proposals, projects, crews, invoices and a calendar — on a phone, often on bad signal, often without remembering a password.\n\nContractorOps is the field CRM for that. The mobile app is a pure API client with no backend code in it, talking to a separate FastAPI service on PostgreSQL. Expo SDK 54, React Native 0.81, React 19, TypeScript in strict mode: around 56,100 lines across 283 files.",
               "media": []
             },
             {
               "heading": "My Role",
-              "body": "Building the mobile application and refactoring the backend REST APIs it consumes — reshaping payloads and serialisation for low-latency mobile use, and resolving the integration bottlenecks between the two.",
+              "body": "Building the mobile application, and refactoring the backend REST APIs it consumes — reshaping payloads and serialisation for low-latency mobile use, and resolving the full-stack integration bottlenecks between the two.",
               "media": []
             },
             {
-              "heading": "Engineering Focus",
-              "body": "The layering rule is that route files are declarations, not screens — a route is a one-line re-export of a screen that lives in a feature folder. Routes are the URL tree; screens are code, and a route file cannot accumulate logic because there is nowhere to put it. Server state flows through TanStack Query; the UI is a small in-house design system rather than a third-party kit, because a heavy kit would fight the bespoke design.",
+              "heading": "The layering rule",
+              "body": "One rule explains the whole structure: files under the routes directory are route declarations, not screens. A route file is a one-line re-export of a screen that lives in a feature folder.\n\nRoutes are the URL tree; screens are code. Moving a screen does not rewrite it, and a route file cannot accumulate logic because there is nowhere to put it. Feature folders own their own screens and logic; a design-system folder holds headless hooks and themed views; theme, api, auth, error, config and lib hold the cross-cutting pieces.",
               "bullets": [
-                "Headless hooks own behaviour, state and accessibility; themed views map variants to design tokens, so no call site holds a raw font size or hex",
-                "Environment configuration is validated with zod at startup and fails loudly, rather than on the first network call",
+                "Route groups separate the authenticated tab shell from the auth flow, each with its own guard layout",
+                "Feature surface spans leads, lead generation, quotes, proposals, projects, clients, invoices, tasks, crews, bookings, calendar, conversations, frontline and settings",
+                "All query keys are centralised in one module so cache invalidation is consistent and discoverable",
                 "Client types are generated from the backend's OpenAPI schema, so client and server cannot drift silently"
               ],
               "media": []
             },
             {
-              "heading": "The Bootstrap Problem",
-              "body": "The classic cold-start bug is that the tab tree mounts before authentication resolves, so every data hook fires without a token, gets rejected, and the user sees skeletons everywhere. Two mechanisms rule it out. Tokens are read once from secure storage into an in-memory mirror, so the request path attaches them synchronously and never awaits the keychain. And while authentication or fonts are still resolving, the router is not mounted at all — only a launch screen is — so the authenticated tree literally cannot exist to fire a request. A font load error counts as ready, so a missing font can never wedge startup.",
+              "heading": "The bootstrap gate",
+              "body": "The classic cold-start bug in a mobile app: the authenticated tab tree mounts before authentication resolves, so every data hook fires without a bearer token, receives a 401, and the user stares at skeletons everywhere.\n\nTwo mechanisms rule it out, described in the codebase as belt and suspenders.\n\nFirst, an in-memory token mirror. Secure storage is asynchronous, but the request path has to attach a token synchronously. Tokens are read from the keychain once at startup into a module-level variable; the API client reads that variable on every request and never awaits secure storage in the hot path. Secure storage is the write path; memory is the read path.\n\nSecond, a root gate. While authentication status is still resolving — or while fonts are still loading — only a launch screen renders. The router stack is not mounted at all, so the tab tree literally cannot exist to fire a query. A minimum display time stops the launch animation flashing, and a font-load error counts as ready, so a missing font can never wedge startup behind the gate.",
               "media": []
             },
             {
-              "heading": "Failing Well on Bad Signal",
-              "body": "Four layers, each with a designated job:",
+              "heading": "Single-flight token refresh",
+              "body": "When an access token expires, several in-flight requests fail at once. If each one fires its own refresh, they rotate the token out from under each other and the session dies for reasons that look random.\n\nThe API client holds a module-level lock: concurrent 401s await the same in-flight refresh promise, then each original request retries exactly once. If the refresh fails, tokens are cleared, the auth context drops the session, the query cache is cleared, and the route guards redirect to login.\n\nClearing the query cache is the detail people miss. Without it the next user to sign in on that device sees the previous user's cached data.",
               "bullets": [
-                "A root error boundary turns a render crash into a friendly retry instead of a redbox",
-                "Global query and mutation handlers route failures centrally, and retries fire only for network and server errors — never for a 4xx, where retrying is itself the bug",
-                "Connectivity is bridged into the query client, so requests pause offline and resume on reconnect behind a visible banner",
-                "Every failure is normalised into one typed error shape, so the UI never touches a raw fetch error"
+                "Bearer token attached synchronously from the in-memory mirror",
+                "Exactly one retry per request — a retry loop on an auth failure is an outage, not a recovery",
+                "Every failure normalised into one typed error, including FastAPI's detail and validation-array shapes",
+                "A 20-second timeout, with caller abort signals forwarded so the query layer can cancel",
+                "A tunnel-specific header, because the dev tunnel's HTML interstitial otherwise breaks web fetches"
               ],
               "media": []
             },
             {
-              "heading": "Auth Under Concurrency",
-              "body": "When an access token expires, several in-flight requests fail at once. Each firing its own refresh would rotate the token out from under the others, so refreshes are single-flight: concurrent failures share one in-flight refresh, then each original request retries exactly once. If the refresh fails, tokens are cleared, the session drops and the query cache is cleared — so the next session never sees the previous one's cached data.",
+              "heading": "Four layers of failing well",
+              "body": "A field app on bad signal fails constantly. The requirement was that it never white-screens and never fails silently, so each class of failure has a designated handler.\n\nA root error boundary turns a render or lifecycle crash into a friendly retry rather than a redbox. Global query and mutation cache handlers route failures centrally: a 401 stays silent because the client already handled it, network and server errors raise a toast, anything else surfaces the normalised message. Connectivity is bridged into the query client so requests pause offline and resume on reconnect, behind a visible banner. And a single themed toast surface handles transient messages.\n\nThe retry policy is the line worth quoting: retries fire only for network and 5xx errors, never for a 4xx. Retrying a validation error is not resilience, it is a bug repeated three times.",
+              "media": []
+            },
+            {
+              "heading": "A design system instead of a UI kit",
+              "body": "There is no third-party component library, because a heavy kit would fight a bespoke prototype design.\n\nInstead each primitive is two pieces. A headless hook owns behaviour, state and accessibility and renders nothing — returning a props bag with press handling, disabled state, accessibility role and hit slop. A themed view composes over it and maps variant and size to tokens.\n\nThe tricky parts — accessibility, press and loading gating — are written once. Each themed view stays a thin styling map. Text takes a typography variant and a colour token, so no call site ever holds a raw font size or hex value.\n\nThe theme tokens were extracted from an HTML prototype, and carry a React Native-specific detail: RN has no colour-mix function, so opacity tints are precomputed to static values in parallel light and dark palettes.",
+              "media": []
+            },
+            {
+              "heading": "Decisions with the reasoning attached",
+              "body": "Environment configuration is validated with zod at startup and throws a loud, readable error if the API URL is missing — fail fast, not on the first network call. The bundler inlines those variables at build time, which is why changing one needs a cache-clearing restart, and that is documented rather than rediscovered.\n\nA single flag flips the whole app between a local backend behind a tunnel and the hosted one, each with its own URL variable, so backend work does not require keeping a tunnel alive.\n\nThe Expo SDK is pinned to 54, downgraded from 56 so it runs in the standard client on the physical test device — recorded in the repo's agent instructions specifically so nobody helpfully upgrades it.\n\nJWTs are kept lean because the keychain has a size limit per key and oversized values can fail to save silently; profile data comes from a current-user endpoint and is cached in the query layer instead of being stuffed into token claims.",
               "media": []
             },
             {
               "heading": "Status",
-              "body": "In active development. Recent work spans quote generation and materials search, proposals, project financials and attachments, crew and calendar surfaces, lead generation campaigns, and an in-app assistant that streams over server-sent events with a buffered fallback.",
+              "body": "In active development. Recent work covers quote generation with materials search and payment draws, standalone proposals, project financials and attachments, crew and calendar surfaces, lead-generation campaign lifecycle controls, property-data enrichment on leads, and an in-app assistant that streams over server-sent events with a buffered fallback and a tool-results trace.\n\nThe architecture document that explains why each pattern was chosen is checked into the repository — which for a client project is the part that keeps it maintainable after handover.",
               "media": []
             }
           ],
@@ -828,7 +1001,7 @@
           "sections": [
             {
               "heading": "Overview",
-              "body": "A loyalty platform that only works in a browser does not work. Customers earn points at a physical counter and want to check a balance, scan a QR code or redeem a reward on their phone in seconds. Staff need to place an order at the till. Two audiences, two apps, one backend — both consuming the same REST APIs as the Feriaau web platform, so mobile and web never drift.",
+              "body": "A loyalty platform that only works in a browser does not work. Customers earn points at a physical counter and want to check a balance, scan a QR code or redeem a reward on their phone in seconds. Staff at the till need to place an order and print an invoice without leaving it.\n\nTwo audiences, two Flutter apps, one REST API — the same backend the Feriaau web platform uses, so mobile and web never drift apart.\n\nThe consumer app is published on Google Play and the App Store, past its 46th build across 568 commits and roughly 47,000 lines of Dart. The vendor companion is smaller and newer.",
               "media": []
             },
             {
@@ -837,36 +1010,49 @@
               "media": []
             },
             {
-              "heading": "Architecture",
-              "body": "Both apps use the same layering, which is what lets one person move between them. A core layer holds cross-cutting concerns: the API client and interceptors, token storage, the refresh service, dependency injection, theming, routing and shared widgets. Each feature is then split into a domain half (models and repository interfaces) and a presentation half (BLoCs or Cubits, pages and widgets).",
+              "heading": "One architecture, two apps",
+              "body": "Both apps use the same layering, and that is what makes it possible for one person to move between them without re-learning anything.\n\nA core layer holds everything cross-cutting: the API client and its interceptors, token storage, the refresh service, dependency injection, theming, routing, shared widgets and utilities. Each feature is then split into a domain half — models and repository interfaces — and a presentation half holding BLoCs or Cubits, pages and feature-local widgets.\n\nThe rule that makes it work: presentation never touches core services directly. A page dispatches to a BLoC, which calls a repository interface, whose implementation is injected. Swapping the HTTP client or stubbing a repository for a test touches one registration line.",
               "bullets": [
-                "Presentation never touches services directly — it dispatches to a BLoC, which calls a repository interface whose implementation is injected",
-                "Consumer app: fourteen features including rewards, points, coupons, cart, vendor discovery, scanner and notifications",
-                "Vendor app: a focused set around authentication, orders and notifications, using code-generated dependency injection since it was expected to grow",
-                "Repository results are returned as explicit success-or-failure values rather than thrown exceptions"
+                "Consumer app: fourteen features — auth, dashboard, vendors, rewards, points, coupons, cart, history, maps, notifications, scanner, pages, onboarding and a points guide",
+                "Vendor app: focused on auth, home, orders and notifications",
+                "Repository results are returned as explicit success-or-failure values rather than thrown exceptions",
+                "Cubits handle simple state such as theming; BLoCs handle flows with a real event vocabulary"
               ],
               "media": []
             },
             {
-              "heading": "Beyond the Basics",
-              "body": "The consumer app carries the things a shipped product needs:",
+              "heading": "Different DI for different ages",
+              "body": "The two apps deliberately differ on dependency injection, and the difference is the point.\n\nThe consumer app — fourteen features, 294 files, already stable — uses hand-written service-locator registrations. The vendor app, started later and expected to grow, uses the same locator with code generation on top, so registrations cannot drift from constructors.\n\nNeither app pays for machinery it does not need. Codegen earns its keep when the surface is still moving; on a settled codebase it is a build step for no benefit.",
+              "media": []
+            },
+            {
+              "heading": "Token lifecycle",
+              "body": "Token storage, the refresh service and the HTTP interceptors are three separate files, and the separation is the interesting part.\n\nThe interceptor detects an expired-token response. The refresh service performs a single refresh. Storage is the only thing that touches persistence. The classic bug this design prevents is the refresh stampede — ten concurrent failures each firing their own refresh call and invalidating each other's result.",
+              "media": []
+            },
+            {
+              "heading": "What the consumer app actually does",
+              "body": "The feature list is what separates a shipped product from a demo, and each item carries a decision behind it.",
               "bullets": [
                 "QR scanning to earn and redeem, plus generated codes for display",
-                "Vendor discovery on a clustered map, because a pin per vendor degrades badly at scale",
-                "An offline-tolerant local cache, shimmer skeletons and cached images for perceived speed",
-                "Rich push notifications — which required downloading and caching notification imagery before the local notification can render it",
-                "PDF invoice generation and printing, infinite feeds, and an in-app update prompt so users are not stranded on old builds against a moving API"
+                "Vendor discovery on a map with marker clustering — a pin per vendor degrades badly past a few hundred",
+                "An offline-tolerant local cache so a balance is readable without signal",
+                "Rich push notifications, which required downloading and caching the imagery before the local notification can render it, since a payload carries a URL and not an image",
+                "PDF invoice generation and printing",
+                "Infinite feeds, shimmer skeletons and cached images for perceived speed",
+                "An in-app update prompt, so users are not stranded on old builds against a moving API",
+                "A scratch-card reveal for rewards, and OTP autofill on sign-in"
               ],
               "media": []
             },
             {
-              "heading": "A Detail Worth Keeping",
-              "body": "The app originally opened with a custom animated splash built in Flutter. But a Flutter-rendered splash cannot appear until the engine boots, so users saw a blank frame first. It was replaced with the native splash the OS renders before Dart runs. Deleting the flashiest code path because it measurably hurt perceived start-up is the sort of change that only shows up in the numbers.",
+              "heading": "Deleting the splash animation",
+              "body": "The app originally opened with a custom animated splash built in Flutter. It was replaced with the native splash the operating system renders.\n\nThe reason is structural rather than aesthetic: a Flutter-rendered splash cannot appear until the engine has booted, so users saw a blank frame first and only then the animation. The native splash renders before Dart runs at all.\n\nDeleting the flashiest code path because it measurably hurt the metric it was supposed to help is the kind of change that only shows up if someone is actually watching cold-start time.",
               "media": []
             },
             {
               "heading": "Outcome",
-              "body": "Published on Google Play and the Apple App Store, iterated across dozens of builds through a review-based branch workflow, with a second vendor-facing app sharing the same architecture and backend.",
+              "body": "Published on Google Play and the Apple App Store and iterated across dozens of builds through a review-based branch workflow, with a second vendor-facing app sharing the same architecture and the same backend.\n\nBoth apps are light on automated tests, which is the honest gap: the layering makes them testable, and that potential is currently unspent.",
               "media": []
             }
           ],
@@ -915,40 +1101,48 @@
           "sections": [
             {
               "heading": "Overview",
-              "body": "A portfolio has to serve two audiences that want opposite things. Recruiters want the facts quickly; engineers want to poke at something. So this site offers three ways in — a direct normal mode, a motion-designed fun mode, and a terminal mode that is an actual shell — all rendered from one content source, so nothing can drift out of sync.",
+              "body": "A portfolio has to serve two audiences that want opposite things. Recruiters want the facts quickly. Engineers want to poke at something.\n\nSo this site offers three ways in — a direct normal mode, a motion-designed fun mode, and a terminal mode that is an actual shell — all rendered from one content source, so nothing can drift out of sync. Around 8,100 lines across 66 files, of which terminal mode alone is 3,274.",
               "media": []
             },
             {
-              "heading": "Three Modes",
-              "body": "The mode selector is the first thing you meet. Normal mode is a conventional, fast portfolio. Fun mode is a scrolling narrative with motion design. Terminal mode drops you into a prompt. Underneath, all three read the same content tree, and so does the downloadable CV, which is generated client-side — so the résumé can never disagree with the page.",
+              "heading": "One source, four surfaces",
+              "body": "Everything lives in a single content tree. All three modes read it, and so does the CV, which is generated client-side with jsPDF rather than being a separate uploaded file.\n\nThat last part matters more than it sounds: a portfolio whose downloadable résumé disagrees with the page it sits on is a very common and very avoidable failure. Here the two cannot disagree, because there is only one set of facts.\n\nAt runtime the app boots from a baked-in copy of that tree — instant first paint, works offline — then fetches the live version from Supabase and swaps it in. If Supabase is unreachable the bundled copy simply stays.",
               "media": []
             },
             {
-              "heading": "The Terminal",
-              "body": "Not a gimmick with three canned responses. It implements twenty-four commands over a virtual filesystem built from the site's own content.",
+              "heading": "The terminal",
+              "body": "Not a gimmick with three canned responses. Twenty-four commands over a virtual filesystem built from the site's own content.\n\nNavigation and reading are real: ls, cd, cat, head, tree, pwd, and a grep that searches file contents rather than names. The shell furniture is there too — help, per-command man pages, history, clear, echo, whoami, neofetch and a joke sudo. Two commands, fx and scene, drive the live 3D backdrop from the prompt.\n\nThe filesystem models two kinds of node. Text files render inline through cat; binary files carry a href and a size and are handled by open — so cat on a PDF does something sensible instead of dumping bytes at you.",
               "bullets": [
-                "Navigation and reading — ls, cd, cat, head, tree, pwd, grep across file contents, open for binaries",
-                "Shell furniture — help, man pages per command, history, clear, echo, whoami, neofetch, and a joke sudo",
-                "Scene control — fx and scene drive the live 3D backdrop from the prompt",
-                "The filesystem distinguishes text from binary nodes, so cat on a PDF does something sensible and open handles it instead",
-                "It rebuilds from the latest content before each render, so CMS edits appear without a redeploy",
-                "Output is word-wrapped to the terminal frame, and a sentinel line lets text output render a real contact button"
+                "Paths are normalised strings, so navigation behaves the way a shell user expects",
+                "The tree rebuilds from the latest content before each render, so CMS edits appear without a redeploy",
+                "Output is word-wrapped to the terminal frame — the kind of thing you only add after watching it look wrong",
+                "A sentinel line inside a text file is swapped by the renderer for a real contact button, so text output can contain an interactive element without the filesystem knowing anything about React"
               ],
               "media": []
             },
             {
-              "heading": "Performance",
-              "body": "The instinct with a large 3D dependency is to force it into its own vendor chunk. Doing that here made things worse: naming the chunk pulled three.js into the entry graph and forced roughly a megabyte onto the landing page. Leaving it to the bundler's default keeps it inside the lazily-loaded terminal chunk, so it is fetched only when someone actually opens the terminal. The service worker had to respect the same decision — the heavy 3D bundle is excluded from precaching and cached on first use instead, because precaching it would have quietly undone the lazy loading.",
+              "heading": "The chunk that got faster by being ignored",
+              "body": "The instinct with a large 3D dependency is to force it into its own vendor chunk. Doing that here made things measurably worse.\n\nNaming three.js, React Three Fiber and easy-3dkit as a manual chunk pulled them into the entry graph, so roughly a megabyte was statically imported and executed on the landing page. Left to the bundler's default behaviour, they stay inside the lazily-loaded terminal chunk and are fetched only when someone actually opens the terminal.\n\nOnly two chunks are named — the React runtime, which loads on every page anyway, and the animation library, which is dynamically imported by the mode pages. Both are named for long-term caching, not for size.\n\nThe reasoning is written into the config, so the optimisation cannot be helpfully undone by a future edit.",
               "media": []
             },
             {
-              "heading": "Under the Hood",
-              "body": "The site follows a feature-sliced structure with an explicit import direction. It boots from baked-in content for an instant first paint and works offline, then swaps in the live copy from Supabase — where an authenticated admin area, three migrations and three edge functions handle content editing, contact submissions and replies. The 3D backdrop runs on easy-3dkit, my own npm package, so the library and the site keep each other honest.",
+              "heading": "A service worker that respects lazy loading",
+              "body": "The same decision had to be made twice. The service worker precaches the app shell — styles, markup, icons, fonts and normal-sized scripts — but explicitly excludes the heavy 3D bundle, which is runtime-cached on first use instead.\n\nPrecaching it would have eagerly downloaded roughly 900 kilobytes at install time and quietly undone the lazy loading the bundler config worked to preserve. Deep links fall back to the app shell so navigation works offline, and the worker auto-updates with claim-and-skip-waiting so a deploy never serves stale content.",
+              "media": []
+            },
+            {
+              "heading": "The CMS nobody expects",
+              "body": "The site is not static. Behind it sits Supabase: three migrations covering an admin CMS schema, contact replies and outbound message composition, plus three edge functions for notifying on a new contact submission and sending replies.\n\nAn authenticated admin area edits every part of the content tree through structured forms — no raw JSON — with publish-time validation, a per-save history snapshot for undo, and media upload for case-study screenshots and demo clips.\n\nThe seed script that pushes content into the database carries a security note next to the code that needs it: it runs with the service-role key, which bypasses row-level security, so it must never be committed or shipped. Knowing that, and writing it where the next person will read it, is what prevents the most common way these projects leak.",
+              "media": []
+            },
+            {
+              "heading": "Dogfooding",
+              "body": "The live 3D backdrop runs on easy-3dkit — my own npm package — as a real dependency rather than vendored source.\n\nThat closes a loop in both directions. The site gets its visuals from the library; the library gets a consumer that exercises its published artifact, which is how packaging regressions surface before a stranger finds them.",
               "media": []
             },
             {
               "heading": "Outcome",
-              "body": "Fast, installable, and playful — the site you are on right now, with a hidden shell for the curious and a content pipeline that keeps every surface, including the CV, saying the same thing.",
+              "body": "Fast, installable and playful — the site you are on right now, with a hidden shell for the curious, a content pipeline that keeps every surface saying the same thing, and performance decisions documented where they were made rather than in a changelog nobody reads.",
               "media": []
             }
           ],

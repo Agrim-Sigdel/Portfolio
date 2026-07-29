@@ -1,28 +1,90 @@
 /*
- * Case-study detail page. Uses the global theme tokens (theme.css) so it works
- * in both light and dark, independent of the fun-mode scoped variables.
+ * Case-study detail page.
+ *
+ * Long-form article layout: a sticky sidebar (back link, section index, role)
+ * beside a single measured column of prose. Uses the global theme tokens from
+ * theme.css so it works in light and dark without a second palette.
+ *
+ * SPACING RULE — read this before adding a margin.
+ * Every gap on this page comes from one of the four --cs-flow-* tokens below,
+ * applied as a flex `gap` on the container. Blocks do NOT set their own bottom
+ * margins. The page used to do the opposite (a per-block margin of 1 / 2 / 2.25
+ * / 2.5 / 2.75 / 3 / 3.5 / 4rem), which meant the space before the first section
+ * changed depending on which optional blocks a project happened to have — no
+ * status pill, no links, no highlights or no gallery all shifted it. Spacing now
+ * lives on the parent, so it is identical no matter what is present or missing.
  */
 .case-study {
   min-height: 100dvh;
   background: var(--bg-black);
   color: var(--text-cream);
   font-family: var(--font-sans);
+
   --cs-accent: var(--accent-red);
+
+  /* the only four vertical-rhythm values on the page */
+  --cs-flow: 2.75rem;        /* between top-level blocks, incl. section↔section */
+  --cs-flow-tight: 0.9rem;   /* inside the hero, between paragraphs */
+  --cs-flow-inner: 1.35rem;  /* between a section's heading, prose, bullets, media */
+  --cs-flow-break: 2rem;     /* the deliberate pause above the prev/next footer */
+
+  --cs-measure: 68ch;        /* prose line length */
+  --cs-aside-w: 232px;
 }
 
-.cs-container {
-  max-width: 860px;
+/* ---- reading progress ----
+   Scaled rather than animated on width, so it stays on the compositor. */
+.cs-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 60;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--cs-accent), var(--accent-pink, var(--cs-accent)));
+}
+
+/* ---- shell ---- */
+.cs-shell {
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 2rem 1.5rem 6rem;
+  padding: 2.5rem 1.5rem 6rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
 }
 
-/* ---- top bar ---- */
-.cs-topbar {
+@media (min-width: 1024px) {
+  .cs-shell {
+    grid-template-columns: var(--cs-aside-w) minmax(0, 1fr);
+    gap: 3.5rem;
+  }
+}
+
+/* ---- sidebar ---- */
+.cs-aside-inner {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.5rem 0 2.5rem;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+@media (min-width: 1024px) {
+  /* Sticky goes on the grid ITEM, not on its child. `.cs-shell` sets
+     `align-items: start`, which shrinks this item to its content height — so a
+     sticky child inside it has no range to travel and just scrolls away. The
+     item's own containing block is the full-height grid area, so sticking here
+     works. `align-self: start` keeps it top-aligned rather than stretched. */
+  .cs-aside {
+    position: sticky;
+    top: 2.5rem;
+    align-self: start;
+    /* A long contents list scrolls inside the sidebar instead of pushing it
+       past the viewport, which would strand the last entries out of reach. */
+    max-height: calc(100dvh - 5rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
 }
 
 .cs-back {
@@ -38,6 +100,84 @@
 }
 .cs-back:hover { color: var(--cs-accent); }
 
+/* ---- section index ---- */
+.cs-toc-label,
+.cs-meta-label {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin: 0 0 0.75rem;
+}
+
+.cs-toc ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  /* One continuous rail behind the whole list; the active item paints its own
+     segment over it, so there's no jumping indicator to animate. */
+  border-left: 1px solid var(--border-color);
+}
+
+.cs-toc a {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.4rem 0 0.4rem 0.85rem;
+  margin-left: -1px;
+  border-left: 1px solid transparent;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  transition: color 0.18s ease, border-color 0.18s ease;
+}
+.cs-toc a:hover { color: var(--text-cream); }
+.cs-toc a.is-active {
+  color: var(--cs-accent);
+  border-left-color: var(--cs-accent);
+  font-weight: 600;
+}
+.cs-toc-num {
+  font-size: 0.66rem;
+  font-weight: 700;
+  padding-top: 0.15rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
+.cs-toc-text { min-width: 0; }
+
+.cs-aside-meta { display: flex; flex-direction: column; }
+.cs-meta-label { margin-bottom: 0.35rem; }
+.cs-meta-value { font-size: 0.88rem; font-weight: 600; line-height: 1.45; }
+
+/* Below the two-column breakpoint the index would be a wall of links between
+   the header and the first word, so it's dropped — the progress bar still shows
+   position, and the content is short enough to scroll. Role moves to the hero
+   meta row instead, so it appears exactly once at every width. */
+@media (max-width: 1023px) {
+  .cs-toc,
+  .cs-aside-meta { display: none; }
+}
+@media (min-width: 1024px) {
+  .cs-herometa-role { display: none; }
+  /* With the role gone the links sit alone, so drop the divider that separated
+     them from it. */
+  .cs-herometa { padding-top: 0.35rem; }
+}
+
+/* ---- article ----
+   The flex column that owns all vertical spacing (see the header note). */
+.cs-article {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cs-flow);
+  min-width: 0;
+}
+
 /* ---- work-in-progress notice ---- */
 .cs-wip {
   display: flex;
@@ -45,8 +185,7 @@
   flex-wrap: wrap;
   gap: 0.6rem 0.9rem;
   padding: 0.85rem 1.1rem;
-  margin-bottom: 2.5rem;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid color-mix(in srgb, #f5a623 45%, transparent);
   border-left: 3px solid #f5a623;
   background: color-mix(in srgb, #f5a623 12%, var(--bg-panel));
@@ -62,29 +201,31 @@
   border-radius: 999px;
   white-space: nowrap;
 }
-.cs-wip-text {
-  font-size: 0.88rem;
-  line-height: 1.5;
-  color: var(--text-cream);
-  opacity: 0.9;
-}
+.cs-wip-text { font-size: 0.88rem; line-height: 1.5; color: var(--text-cream); opacity: 0.9; }
 :root[data-theme='dark'] .cs-wip-badge { color: #ffcf7a; }
 
 /* ---- hero ---- */
+.cs-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cs-flow-tight);
+}
+
 .cs-eyebrow {
+  margin: 0;
   color: var(--cs-accent);
   text-transform: uppercase;
   letter-spacing: 0.18em;
   font-size: 0.72rem;
   font-weight: 700;
-  margin-bottom: 1rem;
 }
 
 .cs-title {
+  margin: 0;
   font-family: var(--font-serif);
-  font-size: clamp(2.2rem, 6vw, 3.6rem);
-  line-height: 1.05;
-  margin: 0 0 1rem;
+  font-size: clamp(2.15rem, 5.5vw, 3.4rem);
+  line-height: 1.06;
+  letter-spacing: -0.015em;
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -105,42 +246,37 @@
 }
 
 .cs-tagline {
-  font-size: clamp(1.05rem, 2.4vw, 1.3rem);
-  line-height: 1.5;
+  margin: 0;
+  font-size: clamp(1.05rem, 2.2vw, 1.24rem);
+  line-height: 1.55;
   color: var(--text-muted);
-  max-width: 60ch;
-  margin: 0 0 2rem;
+  max-width: 58ch;
 }
 
-/* ---- meta (role) + links ---- */
-.cs-meta {
+/* role + links, sharing one baseline under the tagline */
+.cs-herometa {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.5rem 2.5rem;
-  padding: 1.5rem 0;
-  border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 2.5rem;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  padding-top: 0.6rem;
 }
-.cs-meta-item { display: flex; flex-direction: column; gap: 0.3rem; }
-.cs-meta-label {
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--text-muted);
-  font-weight: 700;
+.cs-herometa-role {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-cream);
+  padding-right: 1.25rem;
+  border-right: 1px solid var(--border-color);
 }
-.cs-meta-value { font-size: 0.95rem; font-weight: 600; }
-
-.cs-links { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.cs-links { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 .cs-link {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.55rem 1.15rem;
+  padding: 0.5rem 1.05rem;
   border: 1px solid color-mix(in srgb, var(--cs-accent) 45%, transparent);
-  border-radius: 6px;
-  font-size: 0.8rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
   font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -150,81 +286,147 @@
 }
 .cs-link:hover {
   background: color-mix(in srgb, var(--cs-accent) 12%, transparent);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 /* ---- stack chips ---- */
-.cs-stack {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 3rem;
-}
+.cs-stack { display: flex; flex-wrap: wrap; gap: 0.45rem; }
 .cs-chip {
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   font-weight: 500;
-  padding: 0.35rem 0.8rem;
-  border-radius: 999px;
+  padding: 0.32rem 0.75rem;
+  border-radius: 6px;
   background: var(--bg-panel);
   border: 1px solid var(--border-color);
-  color: var(--text-cream);
+  color: var(--text-muted);
 }
 
 /* ---- highlights ---- */
 .cs-highlights {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-  margin-bottom: 3.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
+  gap: 1px;                       /* hairline rules between cards, not gutters */
+  background: var(--border-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
 }
 .cs-highlight {
-  padding: 1.25rem 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem 1.3rem;
   background: var(--bg-panel);
-  border: 1px solid var(--border-color);
-  border-left: 3px solid var(--cs-accent);
-  border-radius: 8px;
-  font-size: 0.92rem;
-  line-height: 1.5;
+}
+.cs-highlight p { margin: 0; font-size: 0.92rem; line-height: 1.55; }
+.cs-highlight-num {
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--cs-accent);
+  font-variant-numeric: tabular-nums;
 }
 
-/* ---- body sections ---- */
-.cs-section { margin-bottom: 2.75rem; }
+/* ---- body sections ----
+   Each section is its own flex column, so heading → prose → bullets → media are
+   spaced by rule rather than by whichever child carries a margin. No bottom
+   margin: the article's gap already separates one section from the next. */
+.cs-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cs-flow-inner);
+  margin: 0;
+  /* index.css sets a global `section { padding: 8rem 0 }` for fun mode's
+     full-height sections. That element selector also hits every section here —
+     256px of dead space each, which swamped the flow gap entirely and made the
+     rhythm impossible to control from this file. Reset it locally rather than
+     touching the global rule, which fun mode still depends on. */
+  padding: 0;
+  scroll-margin-top: 2.5rem;
+}
+
 .cs-section-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  margin: 0;
   font-family: var(--font-serif);
-  font-size: 1.5rem;
-  margin: 0 0 0.85rem;
+  font-size: clamp(1.35rem, 2.6vw, 1.6rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+.cs-section-num {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--cs-accent);
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+.cs-section-title { min-width: 0; }
+
+/* Anchor affordance: present for keyboard/touch, quiet until hover. */
+.cs-anchor {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.8rem;
+  opacity: 0;
+  transition: opacity 0.18s ease, color 0.18s ease;
+}
+.cs-section:hover .cs-anchor,
+.cs-anchor:focus-visible { opacity: 1; }
+.cs-anchor:hover { color: var(--cs-accent); }
+@media (hover: none) {
+  .cs-anchor { opacity: 0.45; }
+}
+
+/* Prose is its own column so multi-paragraph bodies breathe without the
+   heading→body gap growing to match. */
+.cs-section-prose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cs-flow-tight);
+  /* pulls prose closer to its heading than to the bullets/media below it */
+  margin-top: calc(var(--cs-flow-tight) - var(--cs-flow-inner));
 }
 .cs-section-body {
+  margin: 0;
+  max-width: var(--cs-measure);
   font-size: 1.02rem;
   line-height: 1.75;
   color: var(--text-cream);
   opacity: 0.92;
 }
+
 .cs-section-bullets {
-  margin: 0.75rem 0 0;
-  padding-left: 1.2rem;
+  margin: 0;
+  padding-left: 1.15rem;
+  max-width: var(--cs-measure);
   line-height: 1.7;
+  font-size: 0.98rem;
+  color: var(--text-cream);
+  opacity: 0.92;
 }
-.cs-section-bullets li { margin-bottom: 0.4rem; }
+.cs-section-bullets li { margin-bottom: 0.45rem; }
+.cs-section-bullets li:last-child { margin-bottom: 0; }
+.cs-section-bullets li::marker { color: var(--cs-accent); }
 
 /* ---- showcase media ----
-   Two-up on wide screens, single column on narrow. `auto-fit` with a min track
-   means one item stretches to fill the row rather than sitting half-width and
-   looking cropped, so no separate rule is needed for odd counts. */
+   auto-fit with a min track means a lone item stretches to fill the row rather
+   than sitting half-width and looking cropped. */
 .cs-media {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
   gap: 1rem;
-  margin: 1.5rem 0 0;
+  margin: 0;                       /* spacing comes from the parent flex gap */
 }
-.cs-media-gallery { margin: 2.25rem 0 3rem; }
-/* A lone item is usually the hero shot — let it run full width. */
 .cs-media-single { grid-template-columns: 1fr; }
 
 .cs-media-item {
   margin: 0;
   border: 1px solid var(--border-color);
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   background: var(--bg-panel);
 }
@@ -233,19 +435,15 @@
   display: block;
   width: 100%;
   height: auto;
-  /* Reserve a sensible box before the file loads so the page doesn't jump. */
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 10;           /* reserve the box so the page can't jump */
   object-fit: cover;
   background: var(--bg-panel);
 }
-/* Video keeps its own aspect ratio — cropping a demo clip hides the UI. */
-.cs-media-item video {
-  aspect-ratio: auto;
-  object-fit: contain;
-}
+/* Video keeps its own ratio — cropping a demo clip hides the UI being demoed. */
+.cs-media-item video { aspect-ratio: auto; object-fit: contain; }
 .cs-media-item figcaption {
   padding: 0.7rem 0.9rem;
-  font-size: 0.85rem;
+  font-size: 0.84rem;
   line-height: 1.5;
   color: var(--text-muted);
   border-top: 1px solid var(--border-color);
@@ -255,17 +453,17 @@
 .cs-nav {
   display: flex;
   gap: 1rem;
-  margin-top: 4rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--border-color);
   flex-wrap: wrap;
+  margin: 0;
+  padding-top: var(--cs-flow-break);
+  border-top: 1px solid var(--border-color);
 }
+.cs-nav-link,
+.cs-nav-spacer { flex: 1 1 45%; min-width: 200px; }
 .cs-nav-link {
-  flex: 1 1 45%;
-  min-width: 200px;
-  padding: 1.1rem 1.35rem;
+  padding: 1.1rem 1.3rem;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 10px;
   text-decoration: none;
   color: var(--text-cream);
   transition: border-color 0.2s ease, transform 0.2s ease;
@@ -274,7 +472,7 @@
 .cs-nav-link.next { text-align: right; }
 .cs-nav-dir {
   display: block;
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--text-muted);
@@ -282,3 +480,25 @@
   margin-bottom: 0.35rem;
 }
 .cs-nav-title { font-family: var(--font-serif); font-size: 1.05rem; }
+
+/* ---- narrow screens ----
+   Every gap derives from the four tokens, so scaling them is the whole mobile
+   spacing pass — no per-block overrides needed. */
+@media (max-width: 640px) {
+  .case-study {
+    --cs-flow: 2.25rem;
+    --cs-flow-inner: 1.15rem;
+    --cs-flow-break: 1.5rem;
+  }
+  .cs-shell { padding: 1.5rem 1.15rem 4rem; gap: 1.5rem; }
+  .cs-herometa-role { border-right: 0; padding-right: 0; }
+  .cs-nav-link.next { text-align: left; }
+  .cs-nav-spacer { display: none; }
+}
+
+/* ---- reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .cs-progress { display: none; }
+  .cs-link:hover,
+  .cs-nav-link:hover { transform: none; }
+}
