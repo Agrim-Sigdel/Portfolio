@@ -1,623 +1,26 @@
 {
   "common": {
-    "personal": {
-      "name": "Agrim Sigdel",
-      "firstName": "Agrim",
-      "tagline": "FULL-STACK DEVELOPER | AI RESEARCHER",
-      "intro": "I build things that work.",
-      "summary": "Versatile Full-Stack Developer with a strong foundation in modern AI, engineering production-ready applications using React/TypeScript and Python/Django. Adept at building scalable REST APIs, optimizing relational databases, and implementing clean architecture across web, mobile, and open-source platforms. I bridge the gap between complex AI models and user-centric applications.",
-      "areasOfExpertise": [
-        "TypeScript / React",
-        "Python / Django",
-        "Computer Vision",
-        "NLP / Transformers",
-        "Next.js / Tailwind",
-        "REST API Design",
-        "PostgreSQL / MySQL",
-        "Docker / CI-CD",
-        "Open Source"
-      ],
-      "shortSummary": "Full-Stack Developer & AI Researcher building production-ready applications with React, TypeScript, and Python/Django - and shipping open-source tools."
-    },
-    "contact": {
-      "email": "sigdelagrim35@gmail.com",
-      "location": "Kathmandu, Nepal",
-      "website": "agrimsigdel.com.np",
-      "github": "github.com/Agrim-Sigdel",
-      "githubUrl": "https://github.com/Agrim-Sigdel",
-      "linkedin": "https://www.linkedin.com/in/agrim-sigdel-34b532151/",
-      "linkedinUrl": "https://www.linkedin.com/in/agrim-sigdel-34b532151/"
-    },
     "media": {},
-    "education": [
-      {
-        "degree": "BSc. Computer Science and Information Technology (CSIT)",
-        "school": "Prime College, Tribhuvan University | Kathmandu, Nepal",
-        "year": "2022 – 2026"
-      }
-    ],
-    "experience": [
-      {
-        "role": "SOFTWARE DEVELOPER (FULL-STACK)",
-        "company": "Contractor Ops AI | Remote",
-        "period": "Apr 2026 – Present",
-        "description": [
-          "Engineer a high-performance mobile application using React Native and TypeScript, with strict adherence to component state-management best practices.",
-          "Refactor and optimize backend REST APIs for seamless compatibility, efficient serialization, and low-latency payloads between server and client.",
-          "Debug and resolve full-stack integration bottlenecks, improving database query handling and streamlining endpoints for real-time features."
-        ],
-        "links": []
-      },
-      {
-        "role": "FULL-STACK DEVELOPER",
-        "company": "Kingsoft Tech | On-site, Kathmandu",
-        "period": "Oct 2025 – Present",
-        "description": [
-          "Spearheaded full-stack development, optimization, and deployment for Feriaau and its multi-tenant CRM platform.",
-          "Owned the complete lifecycle - modular Python/Django backend services, robust REST APIs, and dynamic React.js/TypeScript interfaces.",
-          "Configured secure production servers and automated CI/CD pipelines, ensuring high availability and seamless code delivery.",
-          "Optimized PostgreSQL/MySQL schemas and queries to maximize application speed and multi-tenant isolation."
-        ],
-        "links": []
-      },
-      {
-        "role": "CREATIVE LEAD",
-        "company": "Prime College Graduation Committee | Kathmandu",
-        "period": "May 2024 – Sep 2024",
-        "description": [
-          "Led creative direction and brand guidelines for 625+ attendees, coordinating event planning and execution.",
-          "Managed cross-functional teams for visual and marketing materials, practicing agile task delegation."
-        ],
-        "links": []
-      },
-      {
-        "role": "FREELANCE DEVELOPER",
-        "company": "Self-Employed | Remote",
-        "period": "2023 – Present",
-        "description": [
-          "Designed, built, and shipped a range of client projects end-to-end - from responsive marketing websites to full-stack web applications.",
-          "Worked directly with clients to scope requirements, translate them into clean designs, and deliver production-ready code on schedule.",
-          "Handled the full delivery pipeline including frontend, backend, deployment, and post-launch maintenance across varied tech stacks."
-        ],
-        "links": []
-      }
-    ],
-    "research": [
-      {
-        "role": "Lead Researcher & First Author",
-        "period": "2024 – 2025",
-        "status": "Submitted for peer review",
-        "citation": "Sigdel, A., Thapa, S., Thapa Magar, B., & Gajurel, R.K. \"Cascaded AI Task Decomposition: A Generalizable Framework for Multi-Stage Computer Vision Pipelines Validated on Automated Number Plate Recognition for Nepali License Plates.\"",
-        "title": "Cascaded AI Task Decomposition (CATD)",
-        "summary": "A generalizable design pattern for multi-stage computer vision pipelines, validated on bi-scriptual Nepali license-plate recognition.",
-        "highlights": [
-          "Formalized the CATD framework as a generalizable design pattern for multi-stage CV pipelines with applications beyond ANPR.",
-          "Achieved 97.9% mAP50 plate localization and 98.9% mAP50 character recognition using custom-trained YOLOv11n and RT-DETR Base on 61-class bi-scriptual Nepali plates.",
-          "Built a two-dimensional cross-domain training strategy (1,380 Nepali + 1,127 Indian plates) enabling compositional zero-shot transfer (+24.5 pp improvement).",
-          "Engineered a three-stage cascaded pipeline (YOLOv8n → YOLOv11n → RT-DETR) reaching 90.4% end-to-end precision with 61%–73% compute reduction via intelligent vehicle gating.",
-          "Integrated the system as the computer-vision backbone of a smart-parking platform handling automated billing and real-time traffic analytics."
-        ],
-        "links": [
-          {
-            "label": "GitHub",
-            "url": "https://github.com/Agrim-Sigdel/CATD"
-          },
-          {
-            "label": "View Paper",
-            "url": "/CATD-Submission.pdf"
-          },
-          {
-            "label": "Download Paper",
-            "url": "/CATD-Submission.pdf",
-            "download": true
-          }
-        ]
-      }
-    ],
-    "projects": [
-      {
-        "id": 1,
-        "slug": "feriaau",
-        "title": "Feriaau",
-        "category": "Full-Stack · Web Platform",
-        "description": "Lead full-stack engineer for Feriaau - a production web platform built on a modular Python/Django backend with a dynamic React.js/TypeScript frontend, deployed on secure servers with automated CI/CD.",
-        "outcome": "Shipped and maintained in production with high availability and a streamlined release pipeline.",
-        "links": [
-          {
-            "label": "Live Site",
-            "url": "https://feriaau.com"
-          }
-        ],
-        "color": "#141414",
-        "caseStudy": {
-          "tagline": "A production web platform on a modular Django backend and a dynamic React/TypeScript frontend.",
-          "role": "Lead Full-Stack Engineer",
-          "stack": [
-            "Python",
-            "Django",
-            "Django REST Framework",
-            "React.js",
-            "TypeScript",
-            "PostgreSQL",
-            "MySQL",
-            "CI/CD",
-            "Linux / VPS"
-          ],
-          "highlights": [
-            "Shipped and maintained in production with high availability",
-            "Modular Django backend with a decoupled React/TypeScript SPA",
-            "Automated CI/CD release pipeline"
-          ],
-          "sections": [
-            {
-              "heading": "Overview",
-              "body": "Feriaau is a production web platform I lead as full-stack engineer. It pairs a modular Python/Django backend with a dynamic React.js/TypeScript frontend, deployed on secured servers behind an automated release pipeline. My focus here is the engineering: a clean, decoupled architecture that stays maintainable as the product grows."
-            },
-            {
-              "heading": "My Role",
-              "body": "As lead full-stack engineer I own the architecture across the stack — designing the REST API surface, structuring the React/TypeScript frontend, and setting up the deployment and CI/CD workflow that ships changes to production safely."
-            },
-            {
-              "heading": "Architecture",
-              "body": "The backend is organised as modular Django apps exposing versioned REST APIs, consumed by a single-page React/TypeScript client. That separation keeps the API reusable across surfaces (web and, later, mobile) and lets the frontend evolve independently of backend internals."
-            },
-            {
-              "heading": "Deployment & Reliability",
-              "body": "The platform runs on secured Linux servers with an automated CI/CD pipeline, so releases are repeatable and low-risk. The emphasis is on high availability and a streamlined path from commit to production."
-            },
-            {
-              "heading": "Outcome",
-              "body": "Shipped and maintained in production with high availability and a streamlined release pipeline."
-            }
-          ]
-        }
-      },
-      {
-        "id": 2,
-        "slug": "feriaau-crm",
-        "title": "Feriaau CRM",
-        "category": "Full-Stack · Multi-Tenant SaaS",
-        "description": "Multi-tenant CRM platform powering Feriaau's operations - robust REST APIs, optimized PostgreSQL/MySQL schemas, and strict tenant isolation across the data layer.",
-        "outcome": "Maximized application speed and secure multi-tenant isolation for concurrent organizations.",
-        "links": [
-          {
-            "label": "Live Site",
-            "url": "https://crm.feriaau.com"
-          }
-        ],
-        "color": "#0f0f0f",
-        "caseStudy": {
-          "tagline": "A multi-tenant CRM platform with strict tenant isolation across the data layer.",
-          "role": "Full-Stack Engineer — Backend & Data",
-          "stack": [
-            "Python",
-            "Django",
-            "Django REST Framework",
-            "PostgreSQL",
-            "MySQL",
-            "Multi-tenancy",
-            "REST APIs"
-          ],
-          "highlights": [
-            "Multi-tenant architecture with strict per-tenant data isolation",
-            "Optimised PostgreSQL / MySQL schemas",
-            "Robust REST APIs powering concurrent organizations"
-          ],
-          "sections": [
-            {
-              "heading": "Overview",
-              "body": "The Feriaau CRM is a multi-tenant SaaS platform that powers the operations side of Feriaau. The engineering centre of gravity is the data layer: robust REST APIs over optimised relational schemas, with strict isolation so multiple organizations share the same deployment without ever sharing data."
-            },
-            {
-              "heading": "My Role",
-              "body": "I worked on the backend and data layer — designing the REST APIs, modelling and optimising the relational schemas, and implementing the tenant-isolation strategy."
-            },
-            {
-              "heading": "Multi-Tenancy & Isolation",
-              "body": "The core challenge of any CRM is keeping each tenant's data provably separate while running on shared infrastructure. I implemented isolation across the data layer so every query is scoped to its tenant, preventing cross-tenant leakage by construction."
-            },
-            {
-              "heading": "Data Layer",
-              "body": "Schemas were designed and indexed around the access patterns the CRM relies on, and tuned across PostgreSQL and MySQL to keep queries fast as data grows per organization."
-            },
-            {
-              "heading": "Outcome",
-              "body": "Maximised application speed and secure multi-tenant isolation for concurrent organizations."
-            }
-          ]
-        }
-      },
-      {
-        "id": 3,
-        "slug": "feriaau-app",
-        "title": "Feriaau App",
-        "category": "Mobile · Flutter",
-        "description": "Contributor to the Feriaau mobile app - a cross-platform Flutter application for Feriaau users, sharing backend services and REST APIs with the web platform.",
-        "outcome": "Published on the Google Play Store and Apple App Store for iOS and Android.",
-        "links": [
-          {
-            "label": "Play Store",
-            "url": "https://play.google.com/store/apps/details?id=com.kingsoft.feriaau&pcampaignid=web_share"
-          },
-          {
-            "label": "App Store",
-            "url": "https://apps.apple.com/np/app/feriaau/id6764230718"
-          }
-        ],
-        "color": "#161616",
-        "caseStudy": {
-          "tagline": "A cross-platform Flutter app sharing backend services with the Feriaau web platform.",
-          "role": "Mobile Contributor",
-          "stack": [
-            "Flutter",
-            "Dart",
-            "REST APIs",
-            "iOS",
-            "Android"
-          ],
-          "highlights": [
-            "Published on Google Play and the Apple App Store",
-            "Single cross-platform Flutter codebase",
-            "Shares REST APIs with the web platform"
-          ],
-          "sections": [
-            {
-              "heading": "Overview",
-              "body": "The Feriaau app brings the platform to mobile as a single cross-platform Flutter codebase for iOS and Android. It reuses the same backend services and REST APIs as the web platform, so mobile and web stay consistent without duplicating the backend."
-            },
-            {
-              "heading": "My Role",
-              "body": "I contributed to the Flutter application — building UI and wiring it to the shared REST APIs."
-            },
-            {
-              "heading": "Cross-Platform Approach",
-              "body": "Using Flutter meant one Dart codebase targeting both iOS and Android, reusing the platform's existing REST API layer rather than standing up a separate mobile backend."
-            },
-            {
-              "heading": "Outcome",
-              "body": "Published on the Google Play Store and Apple App Store for iOS and Android."
-            }
-          ]
-        }
-      },
-      {
-        "id": 4,
-        "slug": "contractorops-ai",
-        "title": "ContractorOps AI App",
-        "category": "Mobile · AI · React Native",
-        "status": "In Development",
-        "description": "High-performance mobile application built with React Native and TypeScript for Contractor Ops AI, with refactored low-latency backend REST APIs and strict component state-management practices.",
-        "outcome": "Currently building the app: streamlining real-time application features and resolving full-stack integration bottlenecks across the stack.",
-        "links": [],
-        "color": "#101010",
-        "caseStudy": {
-          "tagline": "A high-performance React Native app with a refactored low-latency REST backend.",
-          "role": "Mobile / Full-Stack Engineer",
-          "stack": [
-            "React Native",
-            "TypeScript",
-            "REST APIs",
-            "State Management"
-          ],
-          "highlights": [
-            "React Native + TypeScript mobile app",
-            "Refactored low-latency backend REST APIs",
-            "Strict component state-management practices"
-          ],
-          "sections": [
-            {
-              "heading": "Overview",
-              "body": "ContractorOps AI is a mobile application I'm building with React Native and TypeScript. Alongside the app I refactored the backend REST APIs for lower latency, with a focus on real-time features and clean state management on the client."
-            },
-            {
-              "heading": "My Role",
-              "body": "I'm building the mobile app and refactoring the supporting REST APIs — tightening latency and resolving integration bottlenecks across the stack."
-            },
-            {
-              "heading": "Engineering Focus",
-              "body": "The client is written in React Native and TypeScript with strict, predictable state management. On the backend I refactored the REST APIs to cut latency, which is what makes the app's real-time features feel responsive."
-            },
-            {
-              "heading": "Status",
-              "body": "Currently in active development — streamlining real-time features and resolving full-stack integration bottlenecks."
-            }
-          ]
-        }
-      },
-      {
-        "id": 5,
-        "slug": "anpr-smart-parking",
-        "title": "ANPR + Smart Parking System",
-        "category": "AI · Computer Vision",
-        "description": "Three-stage cascaded computer-vision pipeline (YOLOv8n → YOLOv11n → RT-DETR) for bi-scriptual Nepali plate recognition, serving as the backbone of an automated smart-parking platform.",
-        "outcome": "90.4% end-to-end precision with 61%–73% compute reduction; powers automated billing and real-time traffic analytics.",
-        "links": [
-          {
-            "label": "GitHub",
-            "url": "https://github.com/Agrim-Sigdel/ANPR-Parking/"
-          },
-          {
-            "label": "Test the Workflow",
-            "url": "https://app.roboflow.com/workflows/embed/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ3b3JrZmxvd0lkIjoiTzZkaGFoSDIxTE83d0pwd0NqYmUiLCJ3b3Jrc3BhY2VJZCI6Im5UNzFtMmtJRzZXSFYxc3BMUlhKM2t3WmRRMTIiLCJ1c2VySWQiOiJuVDcxbTJrSUc2V0hWMXNwTFJYSjNrd1pkUTEyIiwiaWF0IjoxNzgxNjAyOTU1fQ.fqIJd1S66XN4rD7W6cV62nW8MTFP3Eugefpgr9JQtgc"
-          }
-        ],
-        "color": "#151515",
-        "caseStudy": {
-          "tagline": "A cascaded computer-vision pipeline for bi-scriptual Nepali plate recognition.",
-          "role": "Computer Vision Engineer",
-          "stack": [
-            "Python",
-            "YOLOv8n",
-            "YOLOv11n",
-            "RT-DETR",
-            "PyTorch",
-            "Roboflow",
-            "OpenCV"
-          ],
-          "highlights": [
-            "90.4% end-to-end precision",
-            "61%–73% compute reduction",
-            "Three-stage cascaded detection pipeline"
-          ],
-          "sections": [
-            {
-              "heading": "Overview",
-              "body": "This project is a three-stage cascaded computer-vision pipeline (YOLOv8n → YOLOv11n → RT-DETR) built to recognise bi-scriptual Nepali number plates, and it serves as the backbone of an automated smart-parking platform."
-            },
-            {
-              "heading": "The Problem",
-              "body": "Nepali plates mix scripts and appear in messy real-world conditions, which makes single-model recognition brittle. The goal was recognition that's accurate but also cheap enough to run live inside a parking system."
-            },
-            {
-              "heading": "Approach",
-              "body": "Rather than one heavy model, I cascaded three: a light YOLOv8n stage to localise, a YOLOv11n stage to refine, and RT-DETR for the hardest recognition step. Each stage only does the work the previous one couldn't — which is where the compute savings come from."
-            },
-            {
-              "heading": "Results",
-              "body": "The pipeline reaches 90.4% end-to-end precision while cutting compute by 61%–73% versus a monolithic approach, and it powers automated billing and real-time traffic analytics in the smart-parking platform."
-            },
-            {
-              "heading": "Try It",
-              "body": "The full detection workflow is runnable through the linked Roboflow workflow, and the source is on GitHub."
-            }
-          ]
-        }
-      },
-      {
-        "id": 6,
-        "slug": "reddit-sentiment-analysis",
-        "title": "Reddit Sentiment Analysis",
-        "category": "NLP · Deep Learning",
-        "description": "Deep NLP pipeline using fine-tuned BERT for nuanced emotion classification on large-scale Reddit data, integrated with LLM-based frontend interfaces.",
-        "outcome": "Nuanced multi-class emotion classification with advanced prompt-engineering integration.",
-        "links": [
-          {
-            "label": "GitHub",
-            "url": "https://github.com/Agrim-Sigdel/Sentiment-Analysis"
-          }
-        ],
-        "color": "#0d0d0d",
-        "caseStudy": {
-          "tagline": "A fine-tuned BERT pipeline for nuanced emotion classification on Reddit at scale.",
-          "role": "ML / NLP Engineer",
-          "stack": [
-            "Python",
-            "BERT",
-            "PyTorch",
-            "Hugging Face Transformers",
-            "NLP",
-            "LLM prompt engineering"
-          ],
-          "highlights": [
-            "Fine-tuned BERT for multi-class emotion classification",
-            "Large-scale Reddit dataset",
-            "LLM-integrated frontend interfaces"
-          ],
-          "sections": [
-            {
-              "heading": "Overview",
-              "body": "A deep NLP pipeline that uses a fine-tuned BERT model for nuanced, multi-class emotion classification on large-scale Reddit data, wired up to LLM-based frontend interfaces."
-            },
-            {
-              "heading": "Approach",
-              "body": "I fine-tuned BERT on Reddit data to move past coarse positive/negative sentiment toward nuanced emotion classes. The trained model is exposed through an interface layer that pairs it with LLM prompt-engineering for richer interaction."
-            },
-            {
-              "heading": "Engineering",
-              "body": "The pipeline covers the full path — large-scale data preparation, fine-tuning, and serving — so the emotion classifier can be queried directly from the frontend."
-            },
-            {
-              "heading": "Outcome",
-              "body": "Nuanced multi-class emotion classification with advanced prompt-engineering integration."
-            }
-          ]
-        }
-      },
-      {
-        "id": 7,
-        "slug": "easy-3dkit",
-        "title": "easy-3dkit",
-        "category": "Open Source · NPM Package",
-        "description": "Creator and maintainer of an open-source library of interactive 3D components for React, built natively on Three.js, React Three Fiber (R3F), and GSAP.",
-        "outcome": "Drop-in scroll-reactive surfaces, particle fields, instanced layouts, and post-processing - lightweight and production-ready.",
-        "links": [
-          {
-            "label": "NPM",
-            "url": "https://www.npmjs.com/package/easy-3dkit"
-          },
-          {
-            "label": "Live Docs",
-            "url": "https://3d-kit.netlify.app"
-          }
-        ],
-        "color": "#111",
-        "caseStudy": {
-          "tagline": "An open-source library of drop-in interactive 3D components for React.",
-          "role": "Creator & Maintainer",
-          "stack": [
-            "React",
-            "Three.js",
-            "React Three Fiber",
-            "GSAP",
-            "JavaScript",
-            "npm"
-          ],
-          "highlights": [
-            "Published open-source on npm with live docs",
-            "Built natively on Three.js, R3F and GSAP",
-            "Scroll-reactive surfaces, particle fields, instanced layouts, post-processing"
-          ],
-          "sections": [
-            {
-              "heading": "Overview",
-              "body": "easy-3dkit is an open-source library of interactive 3D components for React that I created and maintain. It's built natively on Three.js, React Three Fiber (R3F) and GSAP, and gives developers drop-in 3D surfaces without wiring up the boilerplate themselves."
-            },
-            {
-              "heading": "The Problem",
-              "body": "Adding real-time 3D to a React app usually means a lot of Three.js/R3F setup before anything appears on screen. I wanted components you could drop in and configure — not a scene graph you have to hand-build every time."
-            },
-            {
-              "heading": "What's Inside",
-              "body": "The kit ships scroll-reactive surfaces, particle fields, instanced layouts and post-processing effects — each a configurable React component that stays lightweight and production-ready."
-            },
-            {
-              "heading": "Real-World Use",
-              "body": "It powers the live backdrop behind this very portfolio's terminal mode, which doubles as a proving ground for the library."
-            },
-            {
-              "heading": "Outcome",
-              "body": "Drop-in scroll-reactive surfaces, particle fields, instanced layouts, and post-processing — lightweight and production-ready, published to npm with live docs."
-            }
-          ]
-        }
-      },
-      {
-        "id": 8,
-        "slug": "partweave",
-        "title": "Partweave",
-        "category": "Open Source · Developer Tooling · CLI",
-        "description": "Creator of an open-source full-stack project scaffolder - a TypeScript CLI that generates self-contained monorepos from only the components you pick (Django, Next.js, Expo, plus auth, database, Docker and CI/CD modules), resolving dependencies and rejecting incompatible selections upfront.",
-        "outcome": "'create-t3-app meets shadcn/ui' - deterministic template injection produces fully-owned, ready-to-run code; published to npm and extensible through a modules catalog.",
-        "links": [
-          {
-            "label": "GitHub",
-            "url": "https://github.com/Agrim-Sigdel/partweave"
-          },
-          {
-            "label": "NPM",
-            "url": "https://www.npmjs.com/package/partweave"
-          }
-        ],
-        "color": "#101010",
-        "caseStudy": {
-          "tagline": "A TypeScript CLI that scaffolds self-contained monorepos from only the parts you pick.",
-          "role": "Creator & Maintainer",
-          "stack": [
-            "TypeScript",
-            "Node.js",
-            "CLI",
-            "Django",
-            "Next.js",
-            "Expo",
-            "Docker",
-            "CI/CD",
-            "npm"
-          ],
-          "highlights": [
-            "\"create-t3-app meets shadcn/ui\"",
-            "Deterministic template injection — you fully own the code",
-            "Dependency resolution with upfront incompatibility checks"
-          ],
-          "sections": [
-            {
-              "heading": "Overview",
-              "body": "Partweave is an open-source full-stack project scaffolder — a TypeScript CLI that generates a self-contained monorepo from only the components you choose (Django, Next.js, Expo, plus auth, database, Docker and CI/CD modules). I describe it as 'create-t3-app meets shadcn/ui'."
-            },
-            {
-              "heading": "The Problem",
-              "body": "Starters either give you everything (and you delete half of it) or a fixed stack you can't deviate from. I wanted a scaffolder where you pick exactly the parts you need, get real code you fully own, and never fight incompatible selections after the fact."
-            },
-            {
-              "heading": "Approach",
-              "body": "Partweave uses deterministic template injection: instead of pulling in a runtime dependency, it writes fully-owned, ready-to-run code into your repo. A dependency resolver validates your selections upfront and rejects incompatible combinations before it generates anything."
-            },
-            {
-              "heading": "Architecture",
-              "body": "The generator is built around an extensible modules catalog — each module (a framework, auth, database, Docker, CI/CD) declares what it provides and what it needs, and the resolver weaves the compatible set into one coherent monorepo."
-            },
-            {
-              "heading": "Outcome",
-              "body": "Deterministic template injection produces fully-owned, ready-to-run code; published to npm and extensible through a modules catalog."
-            }
-          ]
-        }
-      },
-      {
-        "id": 9,
-        "slug": "personal-portfolio",
-        "title": "Personal Portfolio",
-        "category": "Web · React · Interactive 3D",
-        "description": "Designer and builder of my personal portfolio - a React/Vite site with Framer Motion motion design, a live Three.js/R3F backdrop powered by my own easy-3dkit, and an installable PWA. Ships a fully interactive terminal mode with a virtual filesystem and command parser as an alternate way to explore the site.",
-        "outcome": "Fast, installable, and playful - the site you're on right now, with a hidden shell for the curious.",
-        "links": [
-          {
-            "label": "Live Site",
-            "url": "https://agrimsigdel.com.np"
-          },
-          {
-            "label": "GitHub",
-            "url": "https://github.com/Agrim-Sigdel/Portfolio"
-          }
-        ],
-        "color": "#131313",
-        "caseStudy": {
-          "tagline": "The site you're on — React, live 3D, an installable PWA, and a hidden terminal.",
-          "role": "Designer & Developer",
-          "stack": [
-            "React",
-            "Vite",
-            "Framer Motion",
-            "Three.js",
-            "React Three Fiber",
-            "easy-3dkit",
-            "PWA",
-            "JavaScript"
-          ],
-          "highlights": [
-            "Installable PWA with a fast, lazy-loaded critical path",
-            "Three distinct modes: interactive, CV, and terminal",
-            "Live 3D backdrop powered by my own easy-3dkit"
-          ],
-          "sections": [
-            {
-              "heading": "Overview",
-              "body": "This portfolio is a React/Vite site I designed and built from scratch. It offers three ways to explore the same content: an interactive motion-designed portfolio, a clean CV view, and a fully interactive terminal — plus a live Three.js backdrop and an offline-capable PWA."
-            },
-            {
-              "heading": "Three Modes",
-              "body": "Visitors choose how they browse. 'Normal' is a Framer Motion interactive portfolio, 'CV' is a clean printable resume view, and 'Terminal' is a real shell with a virtual filesystem and command parser — all reading from a single content source of truth."
-            },
-            {
-              "heading": "The Terminal",
-              "body": "The terminal mode implements a virtual filesystem and command parser, so the same project and experience data can be explored via commands. It even carousels live easy-3dkit effects behind the prompt."
-            },
-            {
-              "heading": "Performance",
-              "body": "Each mode is its own lazy-loaded bundle, and heavy dependencies (framer-motion, three.js) are kept off the landing page's critical path so the mode selector loads fast. The site is an installable PWA that works offline."
-            },
-            {
-              "heading": "Under the Hood",
-              "body": "The live 3D backdrop is driven by easy-3dkit — my own open-source library — which makes this site both a portfolio and a live demo of that work."
-            },
-            {
-              "heading": "Outcome",
-              "body": "Fast, installable, and playful — the site you're on right now, with a hidden shell for the curious."
-            }
-          ]
-        }
-      }
-    ],
     "skills": {
+      "flatList": [
+        "TypeScript",
+        "React",
+        "React Native",
+        "Next.js",
+        "Tailwind",
+        "Python",
+        "Django",
+        "DRF",
+        "Computer Vision",
+        "YOLO / RT-DETR",
+        "NLP / BERT",
+        "PyTorch",
+        "PostgreSQL",
+        "MySQL",
+        "Docker",
+        "CI/CD",
+        "Git"
+      ],
       "categories": [
         {
           "name": "Frontend",
@@ -659,32 +62,991 @@
             "Server Configuration"
           ]
         }
-      ],
-      "flatList": [
-        "TypeScript",
-        "React",
-        "React Native",
-        "Next.js",
-        "Tailwind",
-        "Python",
-        "Django",
-        "DRF",
-        "Computer Vision",
-        "YOLO / RT-DETR",
-        "NLP / BERT",
-        "PyTorch",
-        "PostgreSQL",
-        "MySQL",
-        "Docker",
-        "CI/CD",
-        "Git"
       ]
-    }
+    },
+    "contact": {
+      "email": "sigdelagrim35@gmail.com",
+      "github": "github.com/Agrim-Sigdel",
+      "website": "agrimsigdel.com.np",
+      "linkedin": "https://www.linkedin.com/in/agrim-sigdel-34b532151/",
+      "location": "Kathmandu, Nepal",
+      "githubUrl": "https://github.com/Agrim-Sigdel",
+      "linkedinUrl": "https://www.linkedin.com/in/agrim-sigdel-34b532151/"
+    },
+    "personal": {
+      "name": "Agrim Sigdel",
+      "intro": "I build things that work.",
+      "summary": "Versatile Full-Stack Developer with a strong foundation in modern AI, engineering production-ready applications using React/TypeScript and Python/Django. Adept at building scalable REST APIs, optimizing relational databases, and implementing clean architecture across web, mobile, and open-source platforms. I bridge the gap between complex AI models and user-centric applications.",
+      "tagline": "FULL-STACK DEVELOPER | AI RESEARCHER ",
+      "firstName": "Agrim",
+      "shortSummary": "Full-Stack Developer & AI Researcher building production-ready applications with React, TypeScript, and Python/Django - and shipping open-source tools.",
+      "areasOfExpertise": [
+        "TypeScript / React",
+        "Python / Django",
+        "Computer Vision",
+        "NLP / Transformers",
+        "Next.js / Tailwind",
+        "REST API Design",
+        "PostgreSQL / MySQL",
+        "Docker / CI-CD",
+        "Open Source"
+      ]
+    },
+    "projects": [
+      {
+        "id": 1,
+        "slug": "feriaau",
+        "color": "#141414",
+        "links": [
+          {
+            "url": "https://feriaau.com",
+            "label": "Live Site"
+          }
+        ],
+        "title": "Feriaau",
+        "outcome": "Shipped and maintained in production with high availability and a streamlined release pipeline.",
+        "category": "Full-Stack · Web Platform",
+        "caseStudy": {
+          "wip": false,
+          "tagline": "A multi-vendor loyalty and commerce platform — 21 Django domain apps behind a React 19 SPA, shipped to production through a two-environment GitLab pipeline.",
+          "role": "Full-Stack Engineer — backend services, REST APIs, frontend, server configuration, CI/CD",
+          "stack": [
+            "Python",
+            "Django 5",
+            "Django REST Framework",
+            "Wagtail",
+            "Celery",
+            "Redis",
+            "PostgreSQL 15",
+            "React 19",
+            "TypeScript",
+            "Vite",
+            "TanStack Query",
+            "Tailwind",
+            "Docker",
+            "GitLab CI",
+            "Linux / VPS"
+          ],
+          "highlights": [
+            "21 Django domain apps · 22 versioned REST API modules",
+            "~88k lines of Python and ~143k lines of TypeScript across 2,000+ commits",
+            "Auto-deploy to staging, manual-gated release to production"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "Feriaau lets many independent vendors each run a real loyalty programme — storefront, catalogue, points, rewards, coupons, orders, staff accounts and their own branding — from one platform and one database. The backend is a modular Django monolith of 21 domain apps exposing versioned REST APIs; the frontend is a React 19 + TypeScript single-page app organised by audience rather than by component type. It runs in production at feriaau.com with a separate staging environment.",
+              "media": []
+            },
+            {
+              "heading": "My Role",
+              "body": "I work across the whole stack: designing the API surface app by app, building and structuring the React/TypeScript client, tuning the PostgreSQL schema and queries, configuring the production servers, and owning the CI/CD pipeline that ships changes. It is a team codebase — my scope is the architecture and the delivery path, not sole authorship.",
+              "media": []
+            },
+            {
+              "heading": "Architecture",
+              "body": "Three tiers, containerised. React talks to Django REST Framework over JWT; Django's domain layer sits behind a service layer over the ORM, with Wagtail alongside it for marketing content editors can change without a developer. PostgreSQL 15 and Redis 7 sit underneath, with Celery workers and a database-backed beat scheduler for asynchronous and scheduled work. Docker Compose runs seven services: database, backend, Redis, Celery worker, Celery beat, frontend and a React builder.",
+              "bullets": [
+                "Multi-vendor isolation by row scoping on the vendor foreign key, with the active vendor carried in an x-vendor-id header",
+                "Points are modelled per (user, vendor) pair with an append-only transaction ledger, so a balance is always reconstructible",
+                "Two Celery queues including a dead-letter queue, so permanently failed tasks land somewhere inspectable"
+              ],
+              "media": []
+            },
+            {
+              "heading": "Engineering Decisions",
+              "body": "Three choices did the most work:",
+              "bullets": [
+                "One standardised JSON renderer and exception handler, so the client has exactly one response contract instead of a per-endpoint guess",
+                "Business rules as global permission classes — inactive-vendor blocking, forced temporary-PIN change, and re-authentication for sensitive admin actions apply to every endpoint by default rather than being remembered per view",
+                "22 named throttle scopes with every rate read from an environment variable — after QA kept tripping login limits mid-suite, tuning stopped being a code deploy"
+              ],
+              "media": []
+            },
+            {
+              "heading": "Integrating an External POS",
+              "body": "The platform syncs bidirectionally with Atithi, an external restaurant POS. Rather than storing their identifiers on our own records, I built a dedicated Django app with five ID-mapping tables, a singleton configuration row carrying a master kill switch and per-flow toggles, and a JSON status map so their status vocabulary can be remapped without a code deploy. Outbound events go through Celery; inbound webhooks are logged in full. The integration can be switched off in a single field if their API misbehaves.",
+              "media": []
+            },
+            {
+              "heading": "Delivery & Reliability",
+              "body": "GitLab CI runs on a shell executor on our own server with a deliberately asymmetric model: pushing to the staging branch deploys automatically, while production requires a manual trigger. Deploy logic lives in versioned scripts rather than CI YAML, with local simulation compose files so the pipeline itself can be tested. API documentation is generated by drf-spectacular and served behind a login; a profiling hook can be switched on per environment.",
+              "media": []
+            },
+            {
+              "heading": "Outcome",
+              "body": "Shipped and maintained in production across staging and production environments, with a documented 16-section developer handbook covering architecture, data model, APIs, security, performance, testing and an extension guide — so the platform stays workable by people who did not build it.",
+              "media": []
+            }
+          ],
+          "media": []
+        },
+        "description": "Lead full-stack engineer for Feriaau - a production web platform built on a modular Python/Django backend with a dynamic React.js/TypeScript frontend, deployed on secure servers with automated CI/CD."
+      },
+      {
+        "id": 10,
+        "slug": "peeq",
+        "title": "peeq",
+        "category": "AI · Commerce · Next.js",
+        "status": "In Development",
+        "color": "#141414",
+        "description": "Founder and full-stack engineer of peeq - a virtual try-on shopping platform for Nepal. Shoppers see a garment on themselves before buying; shops get a catalogue, an in-store kiosk and an online storefront, including made-to-order pieces nobody has photographed.",
+        "outcome": "A three-sided platform with plans, metering, local payment gateways and an admin console - one build that runs offline on localStorage or multi-tenant on Postgres.",
+        "links": [
+          {
+            "label": "Live Site",
+            "url": "https://peeq.fashion"
+          }
+        ],
+        "caseStudy": {
+          "wip": false,
+          "tagline": "Virtual try-on commerce for Nepal — you see it on you before you buy, including garments nobody has photographed yet.",
+          "role": "Founder & Full-Stack Engineer",
+          "stack": [
+            "Next.js 15",
+            "React 19",
+            "TypeScript",
+            "Supabase",
+            "PostgreSQL",
+            "Row-Level Security",
+            "fal.ai FASHN",
+            "OpenAI gpt-image-2",
+            "Khalti",
+            "eSewa",
+            "Leaflet",
+            "PWA"
+          ],
+          "highlights": [
+            "One build runs offline on localStorage or multi-tenant on Postgres — no environment branching",
+            "Four-layer AI cost control: result cache, per-IP limits, daily cap, atomic per-shop metering",
+            "Made-to-order renders: a fabric stitched into a cut nobody has photographed"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "Nepali fashion commerce runs on Instagram and TikTok with checkout by direct message — no catalogue, no trust, no returns process. The thing stopping people buying clothes online is not price, it is not knowing how something will look on them. peeq puts virtual try-on at the centre of the shopping experience: a shopper takes a photo, picks a piece, and sees it on themselves. Shops get a catalogue, an in-store kiosk and an online storefront; the kiosk is the wedge into physical shops that a pure-online competitor does not have.",
+              "media": []
+            },
+            {
+              "heading": "My Role",
+              "body": "I designed and built the product end to end — the shopper, vendor and admin surfaces, the AI pipeline and its cost controls, the Postgres schema and its 24 migrations, the payment integrations, and the product plan the whole thing is built against.",
+              "media": []
+            },
+            {
+              "heading": "Architecture",
+              "body": "Next.js 15 App Router with server-rendered storefront and product pages for shareable link cards, Supabase for Postgres, Auth, Storage and row-level security, and fifteen API routes that keep every provider key server-side. The decision that shaped everything else is a single storage adapter with two backends behind one interface.",
+              "bullets": [
+                "Without Supabase env vars the whole app runs on localStorage — zero setup, works offline, which is how it gets demoed on a laptop inside a shop",
+                "With them set, the same UI runs multi-tenant against Postgres, Storage and RLS. No code branches on environment",
+                "Renders live in a private bucket and are served through signed URLs re-signed on every read"
+              ],
+              "media": []
+            },
+            {
+              "heading": "The Try-On Pipeline",
+              "body": "Two finishes sit behind one shopper-facing choice, and the model names are deliberately never exposed to the UI so providers stay swappable. A quick finish runs fal.ai's FASHN v1.6 — a dedicated try-on model, seconds. A studio finish runs an OpenAI gpt-image-2 image edit — slower, finer, and shared with the vendor's counter bench. Studio falls back to quick when no key is configured, and content moderation runs on the shopper photo before generation.",
+              "media": []
+            },
+            {
+              "heading": "Making the Economics Work",
+              "body": "Every generation costs money, so cost control is architecture rather than an afterthought:",
+              "bullets": [
+                "Results are cached on a hash of person, garment and category — repeat try-ons are free and do not even consume rate-limit quota",
+                "Per-IP limits (30 generations per 10 minutes) and a global daily cap so a distributed abuser cannot drain the account",
+                "Per-shop plan allowances metered atomically in Postgres, reserved before the call and refunded on failure, and fail-closed on any database error",
+                "The server only ever uses the shop catalogue's own image URL — arbitrary URLs from the client are ignored"
+              ],
+              "media": []
+            },
+            {
+              "heading": "Made to Order",
+              "body": "Most of a catalogue is a photograph of something hanging in the back. A tailoring shop sells something else: cloth plus a promise. Pick this fabric, have it stitched into that cut — nobody has photographed the result, because it does not exist until someone orders it. So peeq models fabrics and cuts separately and renders the pairing, but only for combinations a vendor deliberately authored and priced. A render like that contains no person, so it caches forever and is shared by every shopper: cost scales with the combinations a shop chose to sell, not with traffic.",
+              "media": []
+            },
+            {
+              "heading": "The Ghost-Mannequin Lock",
+              "body": "A made-to-order render becomes the garment input to try-on. If it comes back on a model — or a mannequin with a shaped bust and hips — that silhouette is baked into the garment image and try-on drags it onto the shopper, who then sees a body that is not theirs and orders a garment cut for it. So: no person, no face, no shaped torso, ever, stated in the prompt as absence rather than instruction. It happens to also be the format try-on models are trained on, so the constraint that protects body fidelity improves fit quality at the same time.",
+              "media": []
+            },
+            {
+              "heading": "Product Surface",
+              "body": "Beyond the try-on itself, the platform carries the parts a demo does not have:",
+              "bullets": [
+                "Plans, subscriptions, payments and plan requests, with Khalti and eSewa integrated server-side",
+                "An admin console with a shop approval queue, billing inbox and operations views",
+                "Vendor analytics with a 30-day chart, per-garment history and CSV export, plus a leads inbox",
+                "Per-garment QR hanger tags — a shopper scans a tag and that garment tries itself on, on their own phone",
+                "A consent gate before the camera, a photo-never-saved policy, and an installable PWA kiosk for shop tablets"
+              ],
+              "media": []
+            },
+            {
+              "heading": "Outcome",
+              "body": "A working three-sided platform built toward launch: vendors can list, price, meter and get paid; shoppers can try on and order; and the made-to-order path lets a tailoring shop sell a garment that does not exist yet. Payment gateways are integrated and verifiable on their sandbox endpoints, pending go-live.",
+              "media": []
+            }
+          ],
+          "media": []
+        }
+      },
+      {
+        "id": 8,
+        "slug": "partweave",
+        "color": "#101010",
+        "links": [
+          {
+            "url": "https://github.com/Agrim-Sigdel/partweave",
+            "label": "GitHub"
+          },
+          {
+            "url": "https://www.npmjs.com/package/partweave",
+            "label": "NPM"
+          }
+        ],
+        "title": "Partweave",
+        "outcome": "'create-t3-app meets shadcn/ui' - deterministic template injection produces fully-owned, ready-to-run code; published to npm and extensible through a modules catalog.",
+        "category": "Open Source · Developer Tooling · CLI",
+        "caseStudy": {
+          "wip": false,
+          "tagline": "A full-stack scaffolder that resolves capabilities, not packages — pick the parts you want and get a monorepo wired together, with code you own.",
+          "role": "Creator & Maintainer",
+          "stack": [
+            "TypeScript",
+            "Node 20+",
+            "pnpm workspaces",
+            "Django",
+            "Next.js",
+            "Expo",
+            "GitHub Actions",
+            "npm"
+          ],
+          "highlights": [
+            "7 commands · 12 modules · 6 build targets · ~7k lines of CLI",
+            "Capability-keyed dependency resolution rejects impossible stacks before writing a byte",
+            "Idempotent anchor injection — one mechanism across Python, TypeScript, JSON and YAML"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "Every new full-stack project starts with the same two days: wire a Django server, wire a Next.js app, wire an Expo app, connect them, add auth, a database, Docker, CI. Existing scaffolders give you either a fixed stack or a blank page. Partweave generates only the parts you pick, wires them together, and hands you the code — there is no runtime dependency on the generator. Its own README calls it create-t3-app meets shadcn/ui.",
+              "media": []
+            },
+            {
+              "heading": "The Problem",
+              "body": "A generator that only runs once is half a tool. The hard parts are deciding which combinations are legal, injecting wiring into five different file formats, and being safe to run again on a project that already exists.",
+              "media": []
+            },
+            {
+              "heading": "Capabilities, Not Packages",
+              "body": "Every component declares itself as data in a module manifest: which targets it contributes to, which apps it requires, which modules it conflicts with, which capability it provides, and the lines it injects. The key move is that dependencies are expressed as capabilities. The auth module does not require Postgres — it requires a database. Swap in a different database module that provides the same capability and auth keeps working untouched.",
+              "bullets": [
+                "Conjunctive requirements (all of these apps) and disjunctive ones (a web or mobile client)",
+                "Two modules providing the same capability conflict automatically",
+                "A module that would contribute to none of the selected apps is rejected rather than installed as a silent no-op",
+                "Environment keys are routed to the right app's env file by prefix"
+              ],
+              "media": []
+            },
+            {
+              "heading": "Injection Without a Parser",
+              "body": "Generated scaffolds carry anchor comments; modules declare lines and the engine injects them at the matching anchor. Injection is idempotent — a line already present is skipped — and preserves the anchor's indentation. This is deliberately not AST manipulation: one injector works identically across Python settings files, TypeScript providers, package manifests and Dockerfiles, where the alternative was five language-specific transformers. Because it is idempotent, adding a component to an existing project later is safe.",
+              "media": []
+            },
+            {
+              "heading": "Determinism",
+              "body": "Modules can also declare soft joins — wiring applied only when some other selected module provides a given capability. Those are keyed by capability and applied in a separate pass, so the output is identical regardless of the order modules are resolved in. Non-deterministic output is the worst possible bug in a code generator, so it has its own test suite alongside tests for manifest validation, requirement evaluation, the injection engine and root generation.",
+              "media": []
+            },
+            {
+              "heading": "Ergonomics",
+              "body": "Seven commands, including the ones you only write after using generators in anger: plan for a dry run, doctor to diagnose a generated project, explore to browse the catalogue, and extract to turn existing code back into a module. Package managers are detected with fallbacks, so it works whether or not pnpm and uv are installed.",
+              "media": []
+            },
+            {
+              "heading": "Outcome",
+              "body": "Published to npm and runnable with a single npx command, with a documented module contract and an authoring guide so the catalogue can grow by dropping a folder in. The README states the scope limit honestly up front: it scaffolds one opinionated stack today, and pluggable frameworks are on the roadmap rather than in the box.",
+              "media": []
+            }
+          ],
+          "media": []
+        },
+        "description": "Creator of an open-source full-stack project scaffolder - a TypeScript CLI that generates self-contained monorepos from only the components you pick (Django, Next.js, Expo, plus auth, database, Docker and CI/CD modules), resolving dependencies and rejecting incompatible selections upfront."
+      },
+      {
+        "id": 7,
+        "slug": "easy-3dkit",
+        "color": "#111",
+        "links": [
+          {
+            "url": "https://www.npmjs.com/package/easy-3dkit",
+            "label": "NPM"
+          },
+          {
+            "url": "https://3d-kit.netlify.app",
+            "label": "Live Docs"
+          }
+        ],
+        "title": "easy-3dkit",
+        "outcome": "Drop-in scroll-reactive surfaces, particle fields, instanced layouts, and post-processing - lightweight and production-ready.",
+        "category": "Open Source · NPM Package",
+        "caseStudy": {
+          "wip": false,
+          "tagline": "50+ interactive 3D effects for React from a handful of components — with the packaging discipline to make them safe to install.",
+          "role": "Creator & Maintainer",
+          "stack": [
+            "TypeScript",
+            "three.js",
+            "React Three Fiber",
+            "drei",
+            "GSAP",
+            "Vite",
+            "Vitest",
+            "Changesets",
+            "npm"
+          ],
+          "highlights": [
+            "21 components, 22 surface materials and 11 instance layouts across six families",
+            "Peer-dependency design avoids the classic duplicate three.js failure",
+            "Docs site builds against the published bundle, not the source"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "Adding 3D to a React site is disproportionately hard for what is usually a background effect: three.js, R3F, drei, a camera rig, a render loop, resize handling, a WebGL fallback, reduced-motion handling, and shader knowledge. easy-3dkit collapses that to a Stage and a component — and ships a documentation site, a live gallery and its own create-app so a working project is one command away.",
+              "media": []
+            },
+            {
+              "heading": "The Problem",
+              "body": "A component library is a promise you cannot take back. Every export is API surface, every dependency is something you impose on the consumer's bundle, and packaging mistakes only show up after publishing. So the library is designed around its boundary rather than its features.",
+              "media": []
+            },
+            {
+              "heading": "What's Inside",
+              "body": "Three layers behind a single public entry file. An engine layer owns the canvas, camera, easing and failure handling — WebGL availability detection, an error boundary and a fallback. A hooks layer exposes reusable reactive inputs like pointer position, scroll progress and the user's reduced-motion preference. A component layer holds six master families.",
+              "bullets": [
+                "Rather than 50 components, master components take variant objects — an interactive surface takes a material, an instanced grid takes a layout",
+                "That yields 22 surface effects and 11 instanced arrangements from two components",
+                "The variant type, the standard uniform set and the shader chunks are all exported, so a user can author a 23rd effect without forking"
+              ],
+              "media": []
+            },
+            {
+              "heading": "Packaging Decisions",
+              "body": "The whole 3D stack is declared as peer dependencies rather than bundled, because shipping three.js would give a consumer two copies with separate module registries — the most common and most confusing failure in the R3F ecosystem. Post-processing lives on its own export subpath so the main entry never references an optional peer, which means users who do not want it never have to install it.",
+              "media": []
+            },
+            {
+              "heading": "Release Engineering",
+              "body": "Publishing is guarded rather than manual:",
+              "bullets": [
+                "The docs site can build against the published bundle instead of the source, catching missing exports and bad paths before a user does",
+                "Separate checks verify the packed tarball, measure bundle size, smoke-test with and without WebGL, and verify server-side rendering compatibility",
+                "A test asserts the public export surface, so removing an export cannot happen by accident",
+                "Reduced-motion behaviour has its own test — a 3D library that ignores it makes some users unwell"
+              ],
+              "media": []
+            },
+            {
+              "heading": "Real-World Use",
+              "body": "The library powers the live backdrop on this site, which is also how packaging regressions get caught early: the consumer and the author are the same person, and the consumer builds against the published artifact.",
+              "media": []
+            },
+            {
+              "heading": "Outcome",
+              "body": "A published, versioned package with a live gallery, a scaffolding command, changelog discipline through Changesets, and a public API designed to be extended rather than forked.",
+              "media": []
+            }
+          ],
+          "media": []
+        },
+        "description": "Creator and maintainer of an open-source library of interactive 3D components for React, built natively on Three.js, React Three Fiber (R3F), and GSAP."
+      },
+      {
+        "id": 2,
+        "slug": "kingsoft-crm",
+        "color": "#d6d6d6",
+        "links": [
+          {
+            "url": "https://crm.feriaau.com",
+            "label": "Live Site"
+          }
+        ],
+        "title": "Kingsoft CRM",
+        "outcome": "Tenant isolation enforced in four layers, with a self-authored security audit separating what is provably safe from what still needs a database backstop.",
+        "category": "Full-Stack · Multi-Tenant SaaS",
+        "caseStudy": {
+          "wip": false,
+          "tagline": "A shared-table multi-tenant CRM — 26 tenant-scoped models, a soft-delete cascade engine, and a self-authored isolation audit.",
+          "role": "Backend Engineer",
+          "stack": [
+            "Python",
+            "Django 5.2",
+            "Django REST Framework",
+            "SimpleJWT",
+            "PostgreSQL 15",
+            "Redis 7",
+            "Celery",
+            "Docker",
+            "MinIO",
+            "GitLab CI"
+          ],
+          "highlights": [
+            "50 models across 5 apps; 26 of them cannot be saved without a tenant",
+            "Soft delete that reproduces real cascade, set-null and protect semantics",
+            "Self-directed isolation audit that found three divergent tenant resolvers"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "A CRM where multiple organisations share one deployment and one database but can never see each other's rows — contacts, deals, tickets, tasks, meetings, invoices and commissions, with roles, permissions, invitations, two-factor auth and audit logging underneath. This is a different problem from a multi-vendor marketplace: there, a leak is a UX bug; here, it is a breach.",
+              "media": []
+            },
+            {
+              "heading": "My Role",
+              "body": "Backend and platform: the tenancy model, the RBAC layer, the soft-delete engine, the API surface, and the security review of my own isolation model. The interface is delivered as server-rendered Django templates with a hand-rolled SPA-fragment loader rather than a JavaScript framework — the app is form and table heavy, and fragments reuse the same permission context the API already computes.",
+              "media": []
+            },
+            {
+              "heading": "Multi-Tenancy",
+              "body": "Shared table with an organisation foreign key, enforced in layers. Middleware resolves the current organisation from the URL slug, a header or the session and validates membership before anything downstream reads it. A tenant base model auto-fills the organisation from request context on save and raises rather than persisting a row it cannot scope. Scoped managers filter querysets, and every permission check runs against the validated organisation and membership pair.",
+              "bullets": [
+                "26 business models inherit the tenant base class — an unscoped write fails loudly at the ORM boundary",
+                "Role permissions are cached and explicitly invalidated, rather than joined on every check",
+                "Record-level ownership sits on top of role-level permissions",
+                "Navigation is data — sidebar sections, items and actions are database rows, so it is per-organisation configuration"
+              ],
+              "media": []
+            },
+            {
+              "heading": "The Soft-Delete Engine",
+              "body": "Django's usual soft-delete patterns do not cascade, so soft-deleting a parent leaves active children pointing at a deleted row. I built a collector that walks relations, computes the closure of rows to soft-delete, and then applies real deletion semantics to it: cascade children are soft-deleted with the parent, set-null referrers are nulled only if they are not themselves in the closure, protect is checked before anything is written, models excluded from soft deletion are left untouched, and re-deleting an already-deleted row is a no-op.",
+              "media": []
+            },
+            {
+              "heading": "Auditing My Own Isolation",
+              "body": "While migrating the browser SPA from token storage to session cookies, the fetch layer began sending two different organisation headers — which surfaced that the app had three independently-resolved notions of the current organisation, with different source orders and different validation. I traced every path and wrote it up: the primary data paths are provably safe, because list, retrieve and create all require a validated organisation and membership pair. But the row-level security the app advertised did not exist — a per-request database setting was being executed and read by nothing. The audit separates what is proven safe from what is header-trusted, and lays out a phased remediation: unify on the validated resolver, then add real database policies as a backstop.",
+              "media": []
+            },
+            {
+              "heading": "Outcome",
+              "body": "A CRM running the operations behind Feriaau, with tenant isolation enforced in four layers, deletion that stays consistent across 26 related models, and a written security review that says plainly which guarantees are application-level and which are not.",
+              "media": []
+            }
+          ],
+          "media": []
+        },
+        "description": "Multi-tenant CRM platform powering Feriaau's operations - a Django/DRF backend with shared-table tenant isolation, a cached RBAC layer, and a soft-delete engine that reproduces real cascade semantics across 26 tenant-scoped models."
+      },
+      {
+        "id": 5,
+        "slug": "anpr-smart-parking",
+        "color": "#151515",
+        "links": [
+          {
+            "url": "https://github.com/Agrim-Sigdel/ANPR-Parking/",
+            "label": "GitHub"
+          },
+          {
+            "url": "https://app.roboflow.com/workflows/embed/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ3b3JrZmxvd0lkIjoiTzZkaGFoSDIxTE83d0pwd0NqYmUiLCJ3b3Jrc3BhY2VJZCI6Im5UNzFtMmtJRzZXSFYxc3BMUlhKM2t3WmRRMTIiLCJ1c2VySWQiOiJuVDcxbTJrSUc2V0hWMXNwTFJYSjNrd1pkUTEyIiwiaWF0IjoxNzgxNjAyOTU1fQ.fqIJd1S66XN4rD7W6cV62nW8MTFP3Eugefpgr9JQtgc",
+            "label": "Test the Workflow"
+          }
+        ],
+        "title": "ANPR + Smart Parking System",
+        "outcome": "97.1% / 97.8% mAP@50 on the held-out test set and an estimated 90.4% end-to-end precision, with 61%–73% compute reduction via intelligent vehicle gating.",
+        "category": "AI · Computer Vision",
+        "caseStudy": {
+          "wip": false,
+          "tagline": "A three-stage cascaded vision pipeline that reads bi-scriptual Nepali plates — and the parking platform it runs inside.",
+          "role": "Lead Researcher & Engineer",
+          "stack": [
+            "Python",
+            "PyTorch",
+            "YOLOv8n",
+            "YOLOv11n",
+            "RF-DETR",
+            "OpenCV",
+            "ByteTrack",
+            "FastAPI",
+            "MongoDB",
+            "WebSockets",
+            "Next.js 14",
+            "TypeScript",
+            "Docker"
+          ],
+          "highlights": [
+            "97.1% mAP@50 plate localisation, 97.8% mAP@50 character recognition on the test set",
+            "61–73% compute reduction by gating the expensive model behind a cheap one",
+            "Reads a plate once per vehicle, not once per frame"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "A parking facility needs to know which vehicle entered, when, which one left, and what to charge. Manual logbooks at comparable facilities in Kathmandu carry a meaningful transcription error rate, worse at night and worse for embossed plates. This system replaces the logbook using the cameras that are already there: it recognises the plate at entry, opens a session, recognises it again at exit, and computes the bill — over standard RTSP, with no hardware modification.",
+              "media": []
+            },
+            {
+              "heading": "The Problem",
+              "body": "Nepali plates stack several hard problems on each other. The character set is bi-scriptual, which means 61 classes rather than the Latin-only set most ANPR work assumes. Embossed surfaces produce specular glare that defeats edge-based OCR. Monsoon light varies enormously. And a single model asked to find a vehicle in a full frame and read a twelve-pixel glyph is optimising objectives at incompatible spatial scales.",
+              "media": []
+            },
+            {
+              "heading": "Approach",
+              "body": "Split the compound problem into three specialised models, each working on a progressively tighter crop. A pre-trained YOLOv8n gates every frame on whether a vehicle is present. A custom-trained YOLOv11n localises the plate inside the vehicle crop. An RF-DETR Base recogniser reads characters inside the plate crop across 61 classes, with regex validation and a left-to-right sort assembling the final string.",
+              "bullets": [
+                "Each stage strips background clutter before handing off, which the ablation measures as a 13.2 percentage-point gain",
+                "The heavy recogniser only runs when the cheap detector confirms a vehicle, cutting effective compute by 61–73% depending on traffic",
+                "Frames are sampled rather than exhausted, and a tracker gives each vehicle a persistent identity so its plate is read once and cached, not re-read hundreds of times"
+              ],
+              "media": []
+            },
+            {
+              "heading": "Results",
+              "body": "On the held-out test set the plate localiser reaches 97.1% mAP@50 and the character recogniser 97.8% mAP@50. End-to-end precision is estimated at 90.4% by combining the measured per-stage precisions — an estimate rather than a measurement, and one whose independence assumption is mildly optimistic, since a partially cropped vehicle makes the next stage more likely to fail too. A dedicated held-out benchmark of true embossed plates is the stated next step.",
+              "media": []
+            },
+            {
+              "heading": "The Data Problem",
+              "body": "There is essentially no public dataset of Nepali embossed plates, so the target domain could not be sampled directly. Instead the problem was decomposed into two learnable factors sourced separately: 1,380 Nepali traditional flat plates carrying the script and layout, and 1,127 Indian embossed plates carrying the surface texture and specular behaviour. Augmented to 9,366 images with 21,648 hand-annotated character boxes, the recogniser generalises to Nepali embossed plates it never saw in training — worth 24.5 percentage points over a single-domain baseline under specular reflection.",
+              "media": []
+            },
+            {
+              "heading": "The Platform",
+              "body": "The pipeline is the vision backbone of a parking system built on FastAPI and MongoDB with a Next.js dashboard. It ingests RTSP, streams annotated video to operators over HLS and MJPEG, pushes live detections over WebSockets, coordinates entry and exit into billable sessions, and adapts stream quality and processing load independently. Circuit breakers wrap the inference path so a hosted-model outage degrades to pass-through video instead of stalling every camera, and mock detectors let the API, session and streaming layers be tested without a GPU.",
+              "media": []
+            },
+            {
+              "heading": "Outcome",
+              "body": "A prototype platform doing automated billing and traffic analytics off existing camera infrastructure, and a framework paper — Cascaded AI Task Decomposition — accepted subject to minor revision, in which this system is the validation case rather than the contribution.",
+              "media": []
+            }
+          ],
+          "media": []
+        },
+        "description": "Three-stage cascaded computer-vision pipeline (YOLOv8n → YOLOv11n → RF-DETR Base) for bi-scriptual Nepali plate recognition, serving as the backbone of an automated smart-parking platform."
+      },
+      {
+        "id": 6,
+        "slug": "reddit-sentiment-analysis",
+        "color": "#0d0d0d",
+        "links": [
+          {
+            "url": "https://github.com/Agrim-Sigdel/Sentiment-Analysis",
+            "label": "GitHub"
+          }
+        ],
+        "title": "Reddit Sentiment Analysis",
+        "outcome": "Seven-emotion distributions averaged post to subreddit, so leaderboards measure community mood rather than comment volume.",
+        "category": "NLP · Deep Learning",
+        "caseStudy": {
+          "wip": false,
+          "tagline": "Community-level emotion analysis with two inference engines — one on the server, one running entirely in your browser.",
+          "role": "Creator",
+          "stack": [
+            "Python",
+            "Flask",
+            "Celery",
+            "Redis",
+            "PostgreSQL",
+            "SQLAlchemy",
+            "PRAW",
+            "HuggingFace Transformers",
+            "Transformers.js",
+            "ONNX",
+            "WebAssembly",
+            "Chart.js",
+            "Docker"
+          ],
+          "highlights": [
+            "Two inference paths behind one UI — server batch and zero-cost in-browser",
+            "Scores are means of probability distributions, so mood is ranked and not volume",
+            "Scheduled tracking turns one-off analysis into a time series"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "\"Is this subreddit angry?\" has no good answer available. Sentiment tools give positive or negative on a single text; emotion at the level of a community, tracked over time and comparable across communities, needs aggregation rules someone has to actually decide. This platform analyses posts, comments and whole subreddits into a seven-emotion distribution, tracks the top communities on a schedule, and ranks them on leaderboards.",
+              "media": []
+            },
+            {
+              "heading": "Approach",
+              "body": "Every prediction is a probability distribution over seven emotions that sums to one. A post score is the weighted mean of its title, its body and up to fifty comments; a subreddit score is the mean of its posts. The decision that matters is means rather than totals: summing made every score scale with comment volume, so the leaderboard was effectively ranking subreddits by how busy they were instead of by mood. Averaging puts a ten-thousand-comment community and a two-hundred-comment one on the same scale.",
+              "media": []
+            },
+            {
+              "heading": "Two Engines",
+              "body": "The same analysis runs two ways, and the user picks:",
+              "bullets": [
+                "A cloud engine — a DistilRoBERTa emotion classifier trained on GoEmotions, running in a Celery worker, used for whole-subreddit batch work and the scheduled tracker",
+                "A browser engine — an ONNX GoEmotions model executed by Transformers.js on WebAssembly inside a Web Worker, weights downloaded to IndexedDB on first use, so interactive analysis costs nothing and the text never leaves the device",
+                "The browser model's 28 labels are bucketed into the server's seven, so the interface renders one shape either way",
+                "The docs state plainly that the two engines are different models over different label sets, so their numbers are only comparable within an engine"
+              ],
+              "media": []
+            },
+            {
+              "heading": "Engineering",
+              "body": "Flask enqueues work with Celery over Redis and the interface polls a task-status endpoint; Celery Beat re-analyses top subreddits on an interval, which is what makes the historical trend charts possible. Analyses are stored as one row per post with the full nested comment scores as JSON, plus aggregate snapshots with the seven emotions as indexed float columns — because those get sorted and averaged for leaderboards, and JSON does not index portably.",
+              "bullets": [
+                "The model and Reddit client are constructed lazily and warmed only in worker processes — building them at import time put a copy of the weights in every web worker",
+                "Text cleaning strips URLs, quoted parents and control characters but deliberately leaves casing, punctuation and emoji alone, because those carry the signal a transformer was trained on",
+                "Because punctuation survives cleaning, template output must stay escaped — the preprocessing decision is traced through to its templating consequence in the docs",
+                "The leaderboard query avoids Postgres-only syntax so the same code runs against the SQLite fallback used locally and in tests",
+                "Tests stub the model pipeline, so the suite runs in about a second and never downloads weights"
+              ],
+              "media": []
+            },
+            {
+              "heading": "Outcome",
+              "body": "A containerised platform that batch-analyses subreddits on a schedule, offers instant analysis at zero marginal inference cost, and reports community mood on a scale that does not reward being loud.",
+              "media": []
+            }
+          ],
+          "media": []
+        },
+        "description": "Dual-engine emotion analysis over Reddit at scale - a GoEmotions transformer served asynchronously via Celery for whole-subreddit batch work, plus the same class of model running entirely in the browser on WebAssembly for zero-cost interactive analysis."
+      },
+      {
+        "id": 4,
+        "slug": "contractorops-ai",
+        "color": "#101010",
+        "links": [],
+        "title": "ContractorOps AI App",
+        "status": "In Development",
+        "outcome": "Currently building the app: streamlining real-time application features and resolving full-stack integration bottlenecks across the stack.",
+        "category": "Mobile · AI · React Native",
+        "caseStudy": {
+          "wip": false,
+          "tagline": "A field CRM for contractors — an Expo client that cannot render an authenticated screen before it knows who you are.",
+          "role": "Software Developer (Full-Stack)",
+          "stack": [
+            "React Native",
+            "Expo SDK 54",
+            "TypeScript",
+            "expo-router",
+            "TanStack Query",
+            "zod",
+            "expo-secure-store",
+            "FastAPI",
+            "PostgreSQL"
+          ],
+          "highlights": [
+            "~56k lines of TypeScript across 283 files, strict mode throughout",
+            "Four layered error boundaries — nothing white-screens and nothing fails silently",
+            "Client types generated from the backend's OpenAPI schema"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "Contractors run their business from a truck: leads, quotes, proposals, projects, crews, invoices and a calendar, on a phone, often on bad signal, often without remembering a password. ContractorOps is the field CRM for that. The mobile app is a pure API client with no backend code in it, talking to a separate FastAPI service.",
+              "media": []
+            },
+            {
+              "heading": "My Role",
+              "body": "Building the mobile application and refactoring the backend REST APIs it consumes — reshaping payloads and serialisation for low-latency mobile use, and resolving the integration bottlenecks between the two.",
+              "media": []
+            },
+            {
+              "heading": "Engineering Focus",
+              "body": "The layering rule is that route files are declarations, not screens — a route is a one-line re-export of a screen that lives in a feature folder. Routes are the URL tree; screens are code, and a route file cannot accumulate logic because there is nowhere to put it. Server state flows through TanStack Query; the UI is a small in-house design system rather than a third-party kit, because a heavy kit would fight the bespoke design.",
+              "bullets": [
+                "Headless hooks own behaviour, state and accessibility; themed views map variants to design tokens, so no call site holds a raw font size or hex",
+                "Environment configuration is validated with zod at startup and fails loudly, rather than on the first network call",
+                "Client types are generated from the backend's OpenAPI schema, so client and server cannot drift silently"
+              ],
+              "media": []
+            },
+            {
+              "heading": "The Bootstrap Problem",
+              "body": "The classic cold-start bug is that the tab tree mounts before authentication resolves, so every data hook fires without a token, gets rejected, and the user sees skeletons everywhere. Two mechanisms rule it out. Tokens are read once from secure storage into an in-memory mirror, so the request path attaches them synchronously and never awaits the keychain. And while authentication or fonts are still resolving, the router is not mounted at all — only a launch screen is — so the authenticated tree literally cannot exist to fire a request. A font load error counts as ready, so a missing font can never wedge startup.",
+              "media": []
+            },
+            {
+              "heading": "Failing Well on Bad Signal",
+              "body": "Four layers, each with a designated job:",
+              "bullets": [
+                "A root error boundary turns a render crash into a friendly retry instead of a redbox",
+                "Global query and mutation handlers route failures centrally, and retries fire only for network and server errors — never for a 4xx, where retrying is itself the bug",
+                "Connectivity is bridged into the query client, so requests pause offline and resume on reconnect behind a visible banner",
+                "Every failure is normalised into one typed error shape, so the UI never touches a raw fetch error"
+              ],
+              "media": []
+            },
+            {
+              "heading": "Auth Under Concurrency",
+              "body": "When an access token expires, several in-flight requests fail at once. Each firing its own refresh would rotate the token out from under the others, so refreshes are single-flight: concurrent failures share one in-flight refresh, then each original request retries exactly once. If the refresh fails, tokens are cleared, the session drops and the query cache is cleared — so the next session never sees the previous one's cached data.",
+              "media": []
+            },
+            {
+              "heading": "Status",
+              "body": "In active development. Recent work spans quote generation and materials search, proposals, project financials and attachments, crew and calendar surfaces, lead generation campaigns, and an in-app assistant that streams over server-sent events with a buffered fallback.",
+              "media": []
+            }
+          ],
+          "media": []
+        },
+        "description": "High-performance React Native + TypeScript application for Contractor Ops AI, backed by a FastAPI service - with refactored low-latency REST payloads, single-flight token refresh, and four layers of error handling for use on unreliable field connections."
+      },
+      {
+        "id": 3,
+        "slug": "feriaau-app",
+        "color": "#161616",
+        "links": [
+          {
+            "url": "https://play.google.com/store/apps/details?id=com.kingsoft.feriaau&pcampaignid=web_share",
+            "label": "Play Store"
+          },
+          {
+            "url": "https://apps.apple.com/np/app/feriaau/id6764230718",
+            "label": "App Store"
+          }
+        ],
+        "title": "Feriaau App",
+        "outcome": "Published on the Google Play Store and Apple App Store for iOS and Android.",
+        "category": "Mobile · Flutter",
+        "caseStudy": {
+          "wip": false,
+          "tagline": "Two shipped Flutter apps — a consumer loyalty app on both stores, and a vendor companion — over one REST API.",
+          "role": "Mobile Contributor",
+          "stack": [
+            "Flutter",
+            "Dart",
+            "BLoC / Cubit",
+            "GetIt",
+            "Injectable",
+            "Dio",
+            "go_router",
+            "Hive",
+            "Firebase Messaging",
+            "iOS",
+            "Android"
+          ],
+          "highlights": [
+            "Consumer app live on Google Play and the App Store, past its 46th build",
+            "Clean Architecture with a strict layering rule across both apps",
+            "Offline-tolerant cache, rich push notifications and in-app update prompts"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "A loyalty platform that only works in a browser does not work. Customers earn points at a physical counter and want to check a balance, scan a QR code or redeem a reward on their phone in seconds. Staff need to place an order at the till. Two audiences, two apps, one backend — both consuming the same REST APIs as the Feriaau web platform, so mobile and web never drift.",
+              "media": []
+            },
+            {
+              "heading": "My Role",
+              "body": "Contributor on the consumer application alongside the wider mobile team — building feature UI and wiring it to the shared REST APIs — and builder of the vendor-side companion app.",
+              "media": []
+            },
+            {
+              "heading": "Architecture",
+              "body": "Both apps use the same layering, which is what lets one person move between them. A core layer holds cross-cutting concerns: the API client and interceptors, token storage, the refresh service, dependency injection, theming, routing and shared widgets. Each feature is then split into a domain half (models and repository interfaces) and a presentation half (BLoCs or Cubits, pages and widgets).",
+              "bullets": [
+                "Presentation never touches services directly — it dispatches to a BLoC, which calls a repository interface whose implementation is injected",
+                "Consumer app: fourteen features including rewards, points, coupons, cart, vendor discovery, scanner and notifications",
+                "Vendor app: a focused set around authentication, orders and notifications, using code-generated dependency injection since it was expected to grow",
+                "Repository results are returned as explicit success-or-failure values rather than thrown exceptions"
+              ],
+              "media": []
+            },
+            {
+              "heading": "Beyond the Basics",
+              "body": "The consumer app carries the things a shipped product needs:",
+              "bullets": [
+                "QR scanning to earn and redeem, plus generated codes for display",
+                "Vendor discovery on a clustered map, because a pin per vendor degrades badly at scale",
+                "An offline-tolerant local cache, shimmer skeletons and cached images for perceived speed",
+                "Rich push notifications — which required downloading and caching notification imagery before the local notification can render it",
+                "PDF invoice generation and printing, infinite feeds, and an in-app update prompt so users are not stranded on old builds against a moving API"
+              ],
+              "media": []
+            },
+            {
+              "heading": "A Detail Worth Keeping",
+              "body": "The app originally opened with a custom animated splash built in Flutter. But a Flutter-rendered splash cannot appear until the engine boots, so users saw a blank frame first. It was replaced with the native splash the OS renders before Dart runs. Deleting the flashiest code path because it measurably hurt perceived start-up is the sort of change that only shows up in the numbers.",
+              "media": []
+            },
+            {
+              "heading": "Outcome",
+              "body": "Published on Google Play and the Apple App Store, iterated across dozens of builds through a review-based branch workflow, with a second vendor-facing app sharing the same architecture and backend.",
+              "media": []
+            }
+          ],
+          "media": []
+        },
+        "description": "Contributor to the Feriaau mobile app - a cross-platform Flutter application built on Clean Architecture and BLoC, sharing backend services and REST APIs with the web platform, alongside a second vendor-facing Flutter app."
+      },
+      {
+        "id": 9,
+        "slug": "personal-portfolio",
+        "color": "#131313",
+        "links": [
+          {
+            "url": "https://agrimsigdel.com.np",
+            "label": "Live Site"
+          },
+          {
+            "url": "https://github.com/Agrim-Sigdel/Portfolio",
+            "label": "GitHub"
+          }
+        ],
+        "title": "Personal Portfolio",
+        "outcome": "Fast, installable, and playful - the site you're on right now, with a hidden shell for the curious.",
+        "category": "Web · React · Interactive 3D",
+        "caseStudy": {
+          "wip": false,
+          "tagline": "One content source, three interfaces — including a real shell with a virtual filesystem.",
+          "role": "Designer & Developer",
+          "stack": [
+            "React 19",
+            "Vite",
+            "Framer Motion",
+            "React Router",
+            "Three.js",
+            "React Three Fiber",
+            "easy-3dkit",
+            "Supabase",
+            "Workbox",
+            "jsPDF"
+          ],
+          "highlights": [
+            "Normal, fun and terminal modes rendered from a single content source",
+            "24 shell commands over a virtual filesystem built from that same content",
+            "Installable PWA with caching tuned so the 3D bundle stays lazy"
+          ],
+          "sections": [
+            {
+              "heading": "Overview",
+              "body": "A portfolio has to serve two audiences that want opposite things. Recruiters want the facts quickly; engineers want to poke at something. So this site offers three ways in — a direct normal mode, a motion-designed fun mode, and a terminal mode that is an actual shell — all rendered from one content source, so nothing can drift out of sync.",
+              "media": []
+            },
+            {
+              "heading": "Three Modes",
+              "body": "The mode selector is the first thing you meet. Normal mode is a conventional, fast portfolio. Fun mode is a scrolling narrative with motion design. Terminal mode drops you into a prompt. Underneath, all three read the same content tree, and so does the downloadable CV, which is generated client-side — so the résumé can never disagree with the page.",
+              "media": []
+            },
+            {
+              "heading": "The Terminal",
+              "body": "Not a gimmick with three canned responses. It implements twenty-four commands over a virtual filesystem built from the site's own content.",
+              "bullets": [
+                "Navigation and reading — ls, cd, cat, head, tree, pwd, grep across file contents, open for binaries",
+                "Shell furniture — help, man pages per command, history, clear, echo, whoami, neofetch, and a joke sudo",
+                "Scene control — fx and scene drive the live 3D backdrop from the prompt",
+                "The filesystem distinguishes text from binary nodes, so cat on a PDF does something sensible and open handles it instead",
+                "It rebuilds from the latest content before each render, so CMS edits appear without a redeploy",
+                "Output is word-wrapped to the terminal frame, and a sentinel line lets text output render a real contact button"
+              ],
+              "media": []
+            },
+            {
+              "heading": "Performance",
+              "body": "The instinct with a large 3D dependency is to force it into its own vendor chunk. Doing that here made things worse: naming the chunk pulled three.js into the entry graph and forced roughly a megabyte onto the landing page. Leaving it to the bundler's default keeps it inside the lazily-loaded terminal chunk, so it is fetched only when someone actually opens the terminal. The service worker had to respect the same decision — the heavy 3D bundle is excluded from precaching and cached on first use instead, because precaching it would have quietly undone the lazy loading.",
+              "media": []
+            },
+            {
+              "heading": "Under the Hood",
+              "body": "The site follows a feature-sliced structure with an explicit import direction. It boots from baked-in content for an instant first paint and works offline, then swaps in the live copy from Supabase — where an authenticated admin area, three migrations and three edge functions handle content editing, contact submissions and replies. The 3D backdrop runs on easy-3dkit, my own npm package, so the library and the site keep each other honest.",
+              "media": []
+            },
+            {
+              "heading": "Outcome",
+              "body": "Fast, installable, and playful — the site you are on right now, with a hidden shell for the curious and a content pipeline that keeps every surface, including the CV, saying the same thing.",
+              "media": []
+            }
+          ],
+          "media": []
+        },
+        "description": "Designer and builder of my personal portfolio - a React/Vite site with Framer Motion motion design, a live Three.js/R3F backdrop powered by my own easy-3dkit, and an installable PWA. Ships a fully interactive terminal mode with a virtual filesystem and command parser as an alternate way to explore the site."
+      }
+    ],
+    "research": [
+      {
+        "role": "Lead Researcher & First Author",
+        "links": [
+          {
+            "url": "https://github.com/Agrim-Sigdel/CATD",
+            "label": "GitHub"
+          },
+          {
+            "url": "/CATD-Submission.pdf",
+            "label": "View Paper"
+          },
+          {
+            "url": "/CATD-Submission.pdf",
+            "label": "Download Paper",
+            "download": true
+          }
+        ],
+        "title": "Cascaded AI Task Decomposition (CATD)",
+        "period": "2025 – 2026",
+        "status": "Accepted subject to minor revision — NCCS, June 2026",
+        "summary": "A generalizable design pattern for multi-stage computer vision pipelines, validated on bi-scriptual Nepali license-plate recognition.",
+        "citation": "Sigdel, A., Thapa, S., Thapa Magar, B., & Gajurel, R.K. \"Cascaded AI Task Decomposition: A Generalizable Framework for Multi-Stage Computer Vision Pipelines Validated on Automated Number Plate Recognition for Nepali License Plates.\"",
+        "highlights": [
+          "Formalized the CATD framework as a generalizable design pattern for multi-stage CV pipelines with applications beyond ANPR.",
+          "Achieved 97.1% mAP@50 plate localization and 97.8% mAP@50 character recognition on the held-out test set, using custom-trained YOLOv11n and RF-DETR Base across 61 bi-scriptual Nepali plate classes.",
+          "Built a two-dimensional cross-domain training strategy (1,380 Nepali flat + 1,127 Indian embossed plates) enabling compositional zero-shot transfer to embossed plates absent from training (+24.5 pp under specular reflection).",
+          "Engineered a three-stage cascaded pipeline (YOLOv8n → YOLOv11n → RF-DETR Base) with an estimated 90.4% end-to-end precision and 61%–73% compute reduction via intelligent vehicle gating.",
+          "Integrated the system as the computer-vision backbone of a smart-parking platform handling automated billing and real-time traffic analytics."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "year": "2022 – 2026",
+        "degree": "BSc. Computer Science and Information Technology (CSIT)",
+        "school": "Prime College, Tribhuvan University | Kathmandu, Nepal"
+      }
+    ],
+    "experience": [
+      {
+        "role": "SOFTWARE DEVELOPER (FULL-STACK)",
+        "links": [],
+        "period": "jan 2026 – Present",
+        "company": "Contractor Ops AI | Remote",
+        "description": [
+          "Engineer a high-performance mobile application using React Native and TypeScript, with strict adherence to component state-management best practices.",
+          "Refactor and optimize backend REST APIs for seamless compatibility, efficient serialization, and low-latency payloads between server and client.",
+          "Debug and resolve full-stack integration bottlenecks, improving database query handling and streamlining endpoints for real-time features."
+        ]
+      },
+      {
+        "role": "FULL-STACK DEVELOPER",
+        "links": [],
+        "period": "Oct 2025 – Present",
+        "company": "Kingsoft Tech | On-site, Kathmandu",
+        "description": [
+          "Spearheaded full-stack development, optimization, and deployment for Feriaau and its multi-tenant CRM platform.",
+          "Owned the complete lifecycle - modular Python/Django backend services, robust REST APIs, and dynamic React.js/TypeScript interfaces.",
+          "Configured secure production servers and automated CI/CD pipelines, ensuring high availability and seamless code delivery.",
+          "Optimized PostgreSQL/MySQL schemas and queries to maximize application speed and multi-tenant isolation."
+        ]
+      },
+      {
+        "role": "CREATIVE LEAD",
+        "links": [],
+        "period": "May 2024 – Sep 2024",
+        "company": "Prime College Graduation Committee | Kathmandu",
+        "description": [
+          "Led creative direction and brand guidelines for 625+ attendees, coordinating event planning and execution.",
+          "Managed cross-functional teams for visual and marketing materials, practicing agile task delegation."
+        ]
+      },
+      {
+        "role": "FREELANCE DEVELOPER",
+        "links": [],
+        "period": "2023 – Present",
+        "company": "Self-Employed | Remote",
+        "description": [
+          "Designed, built, and shipped a range of client projects end-to-end - from responsive marketing websites to full-stack web applications.",
+          "Worked directly with clients to scope requirements, translate them into clean designs, and deliver production-ready code on schedule.",
+          "Handled the full delivery pipeline including frontend, backend, deployment, and post-launch maintenance across varied tech stacks."
+        ]
+      }
+    ]
   },
   "funMode": {
     "hero": {
-      "greeting": "Hi, I'm",
       "action": "I build things that work.",
+      "greeting": "Hi, I’m ",
       "specialization": [
         "Computer Vision",
         "NLP"
@@ -697,11 +1059,8 @@
     }
   },
   "terminalMode": {
-    "welcome": {
-      "border": "╔══════════════════════════════════════════════════════════════════╗\n║                                                                  ║\n║           Welcome to {name}'s Portfolio Terminal          ║\n║                                                                  ║\n╚══════════════════════════════════════════════════════════════════╝",
-      "helpHint": "Type 'help' to see available commands.\nType 'menu' to see all sections."
-    },
     "help": {
+      "footer": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nTip: Use arrow keys (↑↓) to navigate command history.",
       "header": "Available Commands:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
       "commands": [
         "  menu              Show main menu with all sections",
@@ -726,8 +1085,11 @@
         "  maximize          Toggle fullscreen mode",
         "  fun               Switch to FUN mode",
         "  normal            Switch to NORMAL mode"
-      ],
-      "footer": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nTip: Use arrow keys (↑↓) to navigate command history."
+      ]
+    },
+    "welcome": {
+      "border": "╔══════════════════════════════════════════════════════════════════╗\n║                                                                  ║\n║           Welcome to {name}'s Portfolio Terminal          ║\n║                                                                  ║\n╚══════════════════════════════════════════════════════════════════╝",
+      "helpHint": "Type 'help' to see available commands.\nType 'menu' to see all sections."
     }
   }
 }

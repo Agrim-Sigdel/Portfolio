@@ -52,3 +52,28 @@ export async function deleteMedia(name) {
   const { error } = await bucket().remove([name]);
   if (error) throw new Error(error.message);
 }
+
+/* ── Case-study showcase assets ──────────────────────────────────────────
+ * Screenshots and clips uploaded from the Projects editor land in the same
+ * flat bucket as everything else, so the Media tab still lists them with one
+ * list() call. Collisions are avoided by name rather than by folder: the slug
+ * namespaces the file to its project and a timestamp makes replacing a
+ * screenshot a new object (never a silent overwrite of one still in use).
+ */
+
+/** `true` for files we render in a <video>, `false` for <img>. */
+export const isVideoFile = (file) => (file?.type ?? '').startsWith('video/');
+
+/** Storage-safe, readable, collision-proof name for a case-study asset. */
+export function caseStudyAssetPath(slug, file) {
+  const clean = (file?.name ?? 'asset')
+    .toLowerCase()
+    .replace(/[^a-z0-9.]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(-60); // keep the tail: the extension matters more than a long prefix
+  return `cs-${slug || 'project'}-${Date.now()}-${clean}`;
+}
+
+/* Videos are served straight from the bucket, so an oversized upload is slow
+ * for every visitor, not just the upload. Warn past this; don't block. */
+export const LARGE_ASSET_BYTES = 8 * 1024 * 1024;

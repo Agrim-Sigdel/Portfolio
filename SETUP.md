@@ -122,6 +122,20 @@ create policy "contact admin update"
 - Name: `media`
 - **Public** bucket: ON (so image URLs load on the site)
 
+> **Case-study showcase media.** The Projects editor uploads screenshots and demo
+> clips into this same bucket, named `cs-<slug>-<timestamp>-<file>` so the bucket
+> stays flat and the Media tab lists everything with one call. Two things to check
+> if a video upload fails:
+>
+> - **File size limit** — set it on the bucket (Storage → `media` → Settings). The
+>   default is small relative to video; ~50 MB is plenty for compressed demo clips.
+> - **Allowed MIME types** — leave empty (any type). If you restrict it, include
+>   `video/mp4` and `video/webm` alongside the image types.
+>
+> Clips are served straight from the bucket to visitors, so compress before
+> uploading — the editor warns above 8 MB. MP4 (H.264) plays everywhere; WebM is
+> smaller but not universal on older Safari.
+
 Then add write policies (SQL Editor):
 
 ```sql

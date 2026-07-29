@@ -2,20 +2,28 @@ import React from 'react';
 import {
   TextField,
   TextAreaField,
+  CheckboxField,
   StringListField,
   LinkListEditor,
   ObjectListEditor,
+  MediaListEditor,
 } from './fields';
 import { slugify } from './adminUtils';
 
 /*
  * Projects editor — the deepest section: each project carries a nested
- * caseStudy (stack, highlights, prose sections) that renders at /work/:slug.
+ * caseStudy (stack, highlights, showcase media, prose sections) that renders
+ * at /work/:slug.
  *
  * Slug behaviour: typing a title auto-fills the slug while the slug is still
  * "following" the title (empty, or equal to slugify(previous title)). Once
  * edited by hand it stops following. Slugs map to routes, so validation blocks
  * publishing empty/duplicate ones (see validate.js).
+ *
+ * Media lives at two levels on purpose: a gallery on the case study (the
+ * project's showcase, shown up top) and an optional list per section (a
+ * screenshot next to the prose it illustrates). Uploads name themselves after
+ * the slug, so renaming a project doesn't move files that are already live.
  */
 
 const emptyCaseStudy = () => ({
@@ -23,10 +31,11 @@ const emptyCaseStudy = () => ({
   role: '',
   stack: [],
   highlights: [],
+  media: [],
   sections: [],
 });
 
-export default function ProjectsEditor({ value, onChange }) {
+export default function ProjectsEditor({ value, onChange, onBusy }) {
   const projects = Array.isArray(value) ? value : [];
 
   const makeNew = () => ({
@@ -110,20 +119,52 @@ export default function ProjectsEditor({ value, onChange }) {
               <h3 className="admin-subhead">Case study (/work/{item.slug || '…'})</h3>
               <TextField label="Tagline" value={cs.tagline} onChange={(v) => patchCs({ tagline: v })} />
               <TextField label="Role" value={cs.role} onChange={(v) => patchCs({ role: v })} />
+              {/* The banner shows unless wip is explicitly false, so an untouched
+                  or newly added case study is a draft by default. */}
+              <CheckboxField
+                label="Show the “work in progress” banner"
+                checked={cs.wip !== false}
+                onChange={(on) => patchCs({ wip: on ? true : false })}
+                hint="On = readers are told the write-up is still being drafted. Turn off once it's finished."
+              />
               <StringListField label="Stack (one per line)" items={cs.stack} onChange={(v) => patchCs({ stack: v })} />
               <StringListField label="Highlights (one per line)" items={cs.highlights} onChange={(v) => patchCs({ highlights: v })} />
+
+              <MediaListEditor
+                label="Showcase gallery"
+                items={cs.media}
+                onChange={(v) => patchCs({ media: v })}
+                slug={item.slug}
+                onBusy={onBusy}
+                hint="Screenshots and demo clips for this project, shown near the top of the case study. The first image also becomes the social share card."
+              />
+
               <div className="admin-field">
                 <span>Sections</span>
                 <ObjectListEditor
                   items={cs.sections}
                   onChange={(v) => patchCs({ sections: v })}
                   itemTitle={(s) => s.heading || 'New section'}
-                  makeNew={() => ({ heading: '', body: '' })}
+                  makeNew={() => ({ heading: '', body: '', bullets: [], media: [] })}
                   addLabel="+ Add section"
                   renderItem={(sec, patchSec) => (
                     <>
                       <TextField label="Heading" value={sec.heading} onChange={(v) => patchSec({ heading: v })} />
                       <TextAreaField label="Body" value={sec.body} onChange={(v) => patchSec({ body: v })} rows={5} />
+                      <StringListField
+                        label="Bullets (one per line)"
+                        items={sec.bullets}
+                        onChange={(v) => patchSec({ bullets: v })}
+                        hint="Optional list rendered under the body — good for decisions, features or trade-offs."
+                      />
+                      <MediaListEditor
+                        label="Section media"
+                        items={sec.media}
+                        onChange={(v) => patchSec({ media: v })}
+                        slug={item.slug}
+                        onBusy={onBusy}
+                        hint="Optional — a screenshot or clip shown with this section."
+                      />
                     </>
                   )}
                 />

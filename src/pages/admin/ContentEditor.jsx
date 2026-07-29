@@ -106,7 +106,16 @@ export default function ContentEditor() {
       return <MediaManager content={content} setField={setField} onBusy={setMediaBusy} />;
     }
     const { path, Component } = SECTIONS.find((s) => s.key === active);
-    return <Component value={getPath(content, path)} onChange={(v) => setField(path, v)} />;
+    // onBusy is only consumed by editors that upload (Projects' media lists);
+    // the rest ignore it. It gates Publish so a half-finished upload can't be
+    // published as a broken URL.
+    return (
+      <Component
+        value={getPath(content, path)}
+        onChange={(v) => setField(path, v)}
+        onBusy={setMediaBusy}
+      />
+    );
   };
 
   return (

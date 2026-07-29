@@ -342,6 +342,53 @@
 .admin-hint { display: block; margin-top: 5px; font-size: 12px; font-style: normal; color: var(--ad-hint); }
 .admin-break { word-break: break-all; }
 
+/* Checkbox on its own line (the inline .admin-check is for inside .admin-row). */
+.admin-check-block { white-space: normal; font-size: 13px; color: var(--ad-text); }
+
+/* ---- showcase media editor ---- */
+.admin-media-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px;
+  margin-bottom: 8px;
+  border: 1px solid var(--ad-border);
+  border-radius: 10px;
+  background: var(--ad-input-bg);
+}
+.admin-media-thumb {
+  flex: 0 0 96px;
+  width: 96px;
+  height: 72px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--ad-btn-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+}
+.admin-media-thumb img,
+.admin-media-thumb video { width: 100%; height: 100%; object-fit: cover; }
+/* Grow so the URL row and the alt/caption inputs share one column. */
+.admin-media-fields { flex: 1 1 auto; min-width: 0; }
+.admin-media-fields > input[type='text'] { width: 100%; margin-bottom: 6px; }
+.admin-media-fields .admin-row { margin-bottom: 6px; }
+.admin-media-fields select {
+  flex: 0 0 auto;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--ad-border-strong);
+  background: var(--ad-input-bg);
+  color: var(--ad-text);
+  font: inherit;
+}
+
+@media (max-width: 560px) {
+  .admin-media-item { flex-direction: column; }
+  .admin-media-thumb { width: 100%; flex-basis: auto; height: 140px; }
+}
+
 /* ---- publish validation errors ---- */
 .admin-error-list {
   margin: 8px 0 16px;

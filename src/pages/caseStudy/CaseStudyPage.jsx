@@ -19,6 +19,56 @@ const fade = (delay = 0) => ({
   transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1], delay },
 });
 
+/*
+ * Showcase media — [{type, url, alt, caption, poster?}], uploaded from the
+ * admin's Projects editor. Used twice: once as the project gallery under the
+ * highlights, and once per section for a shot beside the prose it explains.
+ *
+ * Videos are muted/looping/inline and carry `controls`, so they read as silent
+ * demo clips but stay operable by keyboard. Nothing autoplays: an unprompted
+ * moving image is hostile on a text page and burns data on mobile. `preload`
+ * is metadata-only for the same reason — a case study can carry several clips
+ * and none of them should download until asked for.
+ */
+const MediaGrid = ({ items, className = '' }) => {
+  const list = (items ?? []).filter((m) => m && m.url);
+  if (!list.length) return null;
+
+  return (
+    <div className={`cs-media${list.length === 1 ? ' cs-media-single' : ''} ${className}`.trim()}>
+      {list.map((m, i) => (
+        <figure className="cs-media-item" key={`${m.url}-${i}`}>
+          {m.type === 'video' ? (
+            <video
+              src={m.url}
+              poster={m.poster || undefined}
+              controls
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label={m.alt || m.caption || 'Project demo clip'}
+            />
+          ) : (
+            <img src={m.url} alt={m.alt || ''} loading="lazy" decoding="async" />
+          )}
+          {m.caption && <figcaption>{m.caption}</figcaption>}
+        </figure>
+      ))}
+    </div>
+  );
+};
+
+/** First still image across the case study — used as the social share card. */
+const shareImage = (caseStudy) => {
+  const pools = [caseStudy?.media, ...(caseStudy?.sections ?? []).map((s) => s.media)];
+  for (const pool of pools) {
+    const hit = (pool ?? []).find((m) => m?.url && m.type !== 'video');
+    if (hit) return hit.url;
+  }
+  return undefined;
+};
+
 const CaseStudyPage = () => {
   useContent(); // re-render when content changes
   const { projectSlug } = useParams();
@@ -45,6 +95,7 @@ const CaseStudyPage = () => {
         title={`${title} — Case Study · Agrim Sigdel`}
         description={tagline || project.pitch}
         url={`https://agrimsigdel.com.np/work/${project.slug}`}
+        image={shareImage(caseStudy)}
       />
 
       <div className="cs-container">
@@ -121,6 +172,13 @@ const CaseStudyPage = () => {
           </motion.div>
         )}
 
+        {/* showcase gallery */}
+        {caseStudy.media && caseStudy.media.length > 0 && (
+          <motion.div {...fade(0.3)}>
+            <MediaGrid items={caseStudy.media} className="cs-media-gallery" />
+          </motion.div>
+        )}
+
         {/* body sections */}
         {sections && sections.map((section) => (
           <motion.section
@@ -138,6 +196,7 @@ const CaseStudyPage = () => {
                 {section.bullets.map((b, bi) => <li key={bi}>{b}</li>)}
               </ul>
             )}
+            <MediaGrid items={section.media} />
           </motion.section>
         ))}
 

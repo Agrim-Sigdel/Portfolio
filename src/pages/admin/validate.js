@@ -12,6 +12,22 @@ const checkLinks = (links, where, errors) => {
   });
 };
 
+/*
+ * Showcase media. A URL-less entry renders as a broken box, so it blocks
+ * publishing. Missing alt text on an image doesn't break anything visually but
+ * makes the page unreadable to a screen reader, so it blocks too — it is one
+ * field, and the alternative is that it never gets filled in.
+ */
+const checkMedia = (media, where, errors) => {
+  (media ?? []).forEach((m, i) => {
+    const at = `${where}: media #${i + 1}`;
+    if (!m?.url?.trim()) errors.push(`${at} has no URL — upload a file or remove the entry.`);
+    else if (m.type !== 'video' && !m.alt?.trim()) {
+      errors.push(`${at} is an image with no alt text — describe it for screen readers.`);
+    }
+  });
+};
+
 export function validateContent(content) {
   const errors = [];
   const { experience = [], education = [], research = [], projects = [], skills } = content.common ?? {};
@@ -23,8 +39,10 @@ export function validateContent(content) {
     else if (!SLUG_RE.test(p.slug)) errors.push(`${label}: slug "${p.slug}" must be lowercase letters/numbers separated by dashes.`);
     if (!Number.isInteger(p.id)) errors.push(`${label}: id must be an integer.`);
     checkLinks(p.links, label, errors);
+    checkMedia(p.caseStudy?.media, `${label} → gallery`, errors);
     (p.caseStudy?.sections ?? []).forEach((s, si) => {
       if (!s.heading?.trim()) errors.push(`${label}: case-study section #${si + 1} has no heading.`);
+      checkMedia(s.media, `${label} → section "${s.heading || si + 1}"`, errors);
     });
   });
 

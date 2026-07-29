@@ -1,5 +1,11 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { moveItem } from './adminUtils';
+import {
+  uploadMedia,
+  caseStudyAssetPath,
+  isVideoFile,
+  LARGE_ASSET_BYTES,
+} from './adminMedia';
 
 /*
  * Generic controlled field components for the admin editor.
@@ -21,6 +27,18 @@ export function TextField({ label, value, onChange, placeholder, hint }) {
       />
       {hint && <em className="admin-hint">{hint}</em>}
     </label>
+  );
+}
+
+export function CheckboxField({ label, checked, onChange, hint }) {
+  return (
+    <div className="admin-field">
+      <label className="admin-check admin-check-block">
+        <input type="checkbox" checked={Boolean(checked)} onChange={(e) => onChange(e.target.checked)} />
+        <span>{label}</span>
+      </label>
+      {hint && <em className="admin-hint">{hint}</em>}
+    </div>
   );
 }
 
@@ -122,6 +140,170 @@ export function LinkListEditor({ label, links, onChange, withDownloadFlag = fals
       >
         + Add link
       </button>
+    </div>
+  );
+}
+
+/*
+ * Showcase media editor — [{type, url, alt, caption, poster?}].
+ *
+ * Two ways in: upload a file (straight to the public `media` bucket, named
+ * cs-<slug>-<timestamp>-<file>) or paste a URL for something already hosted.
+ * `type` is detected from the file's MIME type on upload and stays editable,
+ * because a pasted URL can't be sniffed.
+ *
+ * Alt text is prompted for rather than optional: these render as <img> on a
+ * public page, and a screenshot with no alt is invisible to a screen reader.
+ * Videos are muted + loop + playsInline by default (see CaseStudyPage) so they
+ * behave like a silent demo clip, which is what a project showcase wants.
+ */
+export function MediaListEditor({ label, items, onChange, slug, onBusy, hint }) {
+  const list = Array.isArray(items) ? items : [];
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const inputRef = useRef(null);
+
+  const patch = (i, part) => onChange(list.map((m, mi) => (mi === i ? { ...m, ...part } : m)));
+
+  const remove = (i) => {
+    // Only the reference is dropped — the file stays in the bucket, so a
+    // mis-click is recoverable from the Media tab.
+    if (window.confirm('Remove this item from the case study? (The uploaded file stays in Media.)')) {
+      onChange(list.filter((_, mi) => mi !== i));
+    }
+  };
+
+  const working = (on) => {
+    setBusy(on);
+    onBusy?.(on);
+  };
+
+  const onPick = async (files) => {
+    const picked = Array.from(files ?? []);
+    if (!picked.length) return;
+    working(true);
+    setError('');
+    try {
+      const added = [];
+      for (const file of picked) {
+        const url = await uploadMedia(file, caseStudyAssetPath(slug, file));
+        added.push({
+          type: isVideoFile(file) ? 'video' : 'image',
+          url,
+          alt: '',
+          caption: '',
+        });
+      }
+      onChange([...list, ...added]);
+      const heavy = picked.filter((f) => f.size > LARGE_ASSET_BYTES);
+      if (heavy.length) {
+        setError(
+          `Uploaded, but ${heavy.length} file${heavy.length > 1 ? 's are' : ' is'} over 8 MB — ` +
+            'these are served straight from storage, so compress before publishing.'
+        );
+      }
+    } catch (e) {
+      setError(`Upload failed: ${e.message}`);
+    } finally {
+      working(false);
+      if (inputRef.current) inputRef.current.value = '';
+    }
+  };
+
+  return (
+    <div className="admin-field">
+      <span>{label}</span>
+      {hint && <em className="admin-hint">{hint}</em>}
+
+      {list.map((m, i) => {
+        const isVideo = m.type === 'video';
+        return (
+          <div className="admin-media-item" key={i}>
+            <div className="admin-media-thumb">
+              {m.url ? (
+                isVideo ? (
+                  <video src={m.url} muted playsInline preload="metadata" />
+                ) : (
+                  <img src={m.url} alt={m.alt || ''} loading="lazy" />
+                )
+              ) : (
+                <span className="admin-muted">no URL</span>
+              )}
+            </div>
+
+            <div className="admin-media-fields">
+              <div className="admin-row">
+                <select
+                  value={isVideo ? 'video' : 'image'}
+                  onChange={(e) => patch(i, { type: e.target.value })}
+                  aria-label="Media type"
+                >
+                  <option value="image">Image</option>
+                  <option value="video">Video</option>
+                </select>
+                <input
+                  type="text"
+                  className="admin-row-grow"
+                  placeholder="https://… (or upload below)"
+                  value={m.url ?? ''}
+                  onChange={(e) => patch(i, { url: e.target.value })}
+                />
+                <button type="button" className="admin-btn admin-btn-sm" title="Move up" disabled={i === 0} onClick={() => onChange(moveItem(list, i, i - 1))}>↑</button>
+                <button type="button" className="admin-btn admin-btn-sm" title="Move down" disabled={i === list.length - 1} onClick={() => onChange(moveItem(list, i, i + 1))}>↓</button>
+                <button type="button" className="admin-btn admin-btn-sm admin-btn-danger" title="Remove" onClick={() => remove(i)}>✕</button>
+              </div>
+
+              <input
+                type="text"
+                placeholder={isVideo ? 'Description (for screen readers)' : 'Alt text — describe the screenshot'}
+                value={m.alt ?? ''}
+                onChange={(e) => patch(i, { alt: e.target.value })}
+              />
+              <input
+                type="text"
+                placeholder="Caption (optional — shown under the media)"
+                value={m.caption ?? ''}
+                onChange={(e) => patch(i, { caption: e.target.value })}
+              />
+              {isVideo && (
+                <input
+                  type="text"
+                  placeholder="Poster image URL (optional — first frame shown before play)"
+                  value={m.poster ?? ''}
+                  onChange={(e) => patch(i, { poster: e.target.value })}
+                />
+              )}
+              {!m.alt && (
+                <em className="admin-hint">⚠ No alt text — add one so this is described to screen readers.</em>
+              )}
+            </div>
+          </div>
+        );
+      })}
+
+      <div className="admin-actions">
+        <label className={`admin-btn admin-btn-sm${busy ? ' admin-btn-disabled' : ''}`}>
+          {busy ? 'Uploading…' : '+ Upload image / video'}
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/*,video/*"
+            multiple
+            hidden
+            disabled={busy}
+            onChange={(e) => onPick(e.target.files)}
+          />
+        </label>
+        <button
+          type="button"
+          className="admin-btn admin-btn-sm"
+          disabled={busy}
+          onClick={() => onChange([...list, { type: 'image', url: '', alt: '', caption: '' }])}
+        >
+          + Add by URL
+        </button>
+      </div>
+      {error && <p className="admin-error" role="alert">{error}</p>}
     </div>
   );
 }

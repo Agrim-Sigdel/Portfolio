@@ -207,6 +207,50 @@
 }
 .cs-section-bullets li { margin-bottom: 0.4rem; }
 
+/* ---- showcase media ----
+   Two-up on wide screens, single column on narrow. `auto-fit` with a min track
+   means one item stretches to fill the row rather than sitting half-width and
+   looking cropped, so no separate rule is needed for odd counts. */
+.cs-media {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 0;
+}
+.cs-media-gallery { margin: 2.25rem 0 3rem; }
+/* A lone item is usually the hero shot — let it run full width. */
+.cs-media-single { grid-template-columns: 1fr; }
+
+.cs-media-item {
+  margin: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-panel);
+}
+.cs-media-item img,
+.cs-media-item video {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Reserve a sensible box before the file loads so the page doesn't jump. */
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  background: var(--bg-panel);
+}
+/* Video keeps its own aspect ratio — cropping a demo clip hides the UI. */
+.cs-media-item video {
+  aspect-ratio: auto;
+  object-fit: contain;
+}
+.cs-media-item figcaption {
+  padding: 0.7rem 0.9rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-color);
+}
+
 /* ---- footer nav (prev / next) ---- */
 .cs-nav {
   display: flex;
