@@ -11,6 +11,7 @@ const Terminal = lazy(() => import('./features/terminalMode/ui/Terminal'));
 const FunModePage = lazy(() => import('./pages/funMode/FunModePage'));
 const NormalModePage = lazy(() => import('./pages/normalMode/NormalModePage'));
 const CaseStudyPage = lazy(() => import('./pages/caseStudy/CaseStudyPage'));
+const AllProjectsPage = lazy(() => import('./pages/allProjects/AllProjectsPage'));
 
 // Hidden admin surface — not linked anywhere public. Access is gated by Supabase
 // auth + RLS, not by the obscurity of the route.
@@ -67,6 +68,7 @@ function App() {
     <Routes>
       <Route path="/" element={<SelectorRoute />} />
       <Route path="/admin" element={<AdminRoute />} />
+      <Route path="/work" element={<AllProjectsRoute />} />
       <Route path="/work/:projectSlug" element={<CaseStudyRoute />} />
       <Route path="/:slug" element={<ModeRoute />} />
       {/* Unknown path -> back to the selector */}
@@ -160,6 +162,33 @@ function AdminRoute() {
         <AdminPage />
       </Suspense>
     </ErrorBoundary>
+  );
+}
+
+/* ----------------------------------- the all-projects archive ('/work') */
+function AllProjectsRoute() {
+  const { theme } = useTheme();
+
+  // Like case studies, respects the visitor's light/dark preference.
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    document.body.style.overflow = 'auto';
+    window.scrollTo(0, 0);
+  }, []);
+
+  return (
+    <div className="App">
+      <ErrorBoundary>
+        <Suspense fallback={<ModeLoader />}>
+          <MotionProvider>
+            <AllProjectsPage />
+          </MotionProvider>
+        </Suspense>
+      </ErrorBoundary>
+    </div>
   );
 }
 

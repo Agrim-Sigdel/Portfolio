@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiGithub, FiLinkedin, FiMail, FiGlobe, FiSend, FiArrowRight } from 'react-icons/fi';
 import { useContent } from '../../../shared/lib/contentStore';
@@ -42,6 +42,21 @@ const DOORS = [
 // how long the door-open grow plays before navigation (must stay a touch
 // shorter than the CSS flex-grow transition so the cut never feels abrupt)
 const OPEN_MS = 430;
+
+// Terminal mode is hidden on phones — same breakpoint the triptych CSS uses
+// to stack the doors. Tracked reactively so rotating a tablet updates it.
+const PHONE_QUERY = '(max-width: 720px)';
+
+function useIsPhone() {
+  const [isPhone, setIsPhone] = useState(() => window.matchMedia(PHONE_QUERY).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(PHONE_QUERY);
+    const onChange = (e) => setIsPhone(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  return isPhone;
+}
 
 /* ---- per-door decorative art (all aria-hidden by the wrapper) ---- */
 
@@ -98,6 +113,12 @@ export default function ModeTriptych() {
   const [contactOpen, setContactOpen] = useState(false);
   const timerRef = useRef(null);
 
+  const isPhone = useIsPhone();
+  const doors = useMemo(
+    () => (isPhone ? DOORS.filter((d) => d.id !== 'terminal') : DOORS),
+    [isPhone]
+  );
+
   useEffect(() => () => clearTimeout(timerRef.current), []);
 
   const beginOpen = useCallback(
@@ -120,19 +141,19 @@ export default function ModeTriptych() {
     beginOpen(door);
   };
 
-  /* digits 1-3 jump straight through a door */
+  /* digit keys jump straight through a visible door */
   useEffect(() => {
     const onKey = (e) => {
       if (contactOpen || e.metaKey || e.ctrlKey || e.altKey) return;
       const idx = ['1', '2', '3'].indexOf(e.key);
-      if (idx === -1) return;
+      if (idx === -1 || idx >= doors.length) return;
       const t = e.target;
       if (t?.closest?.('input, textarea, select, [contenteditable="true"]')) return;
-      beginOpen(DOORS[idx]);
+      beginOpen(doors[idx]);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [beginOpen, contactOpen]);
+  }, [beginOpen, contactOpen, doors]);
 
   return (
     <main className={`tri-root ${opening ? 'is-opening' : ''}`}>
@@ -143,7 +164,7 @@ export default function ModeTriptych() {
       </header>
 
       <nav className="tri-doors" aria-label="Choose how to view this site">
-        {DOORS.map((door, i) => (
+        {doors.map((door, i) => (
           <Link
             key={door.id}
             to={door.to}
@@ -196,7 +217,7 @@ export default function ModeTriptych() {
           <span>Contact</span>
         </button>
         <p className="tri-hint">
-          press <kbd>1</kbd>–<kbd>3</kbd> to jump straight in
+          press <kbd>1</kbd>–<kbd>{doors.length}</kbd> to jump straight in
         </p>
       </footer>
 

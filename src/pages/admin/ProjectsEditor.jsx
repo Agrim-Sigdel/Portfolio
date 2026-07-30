@@ -43,6 +43,7 @@ export default function ProjectsEditor({ value, onChange, onBusy }) {
     slug: '',
     title: '',
     category: '',
+    featured: false,
     description: '',
     outcome: '',
     color: '#141414',
@@ -95,6 +96,12 @@ export default function ProjectsEditor({ value, onChange, onBusy }) {
                 value={item.status}
                 onChange={(v) => patch({ status: v })}
                 placeholder="In development"
+              />
+              <CheckboxField
+                label="Featured on homepage"
+                checked={item.featured}
+                onChange={(v) => patch({ featured: v })}
+                hint="Featured projects appear in the homepage work grid; everything else only shows on /work (All projects)."
               />
               <TextAreaField label="Description" value={item.description} onChange={(v) => patch({ description: v })} rows={3} />
               <TextAreaField label="Outcome" value={item.outcome} onChange={(v) => patch({ outcome: v })} rows={2} />

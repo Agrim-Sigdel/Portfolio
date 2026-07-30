@@ -13,12 +13,22 @@ export const getProjectsData = () =>
     title: p.title,
     category: p.category,
     status: p.status || null,
+    featured: !!p.featured,
     pitch: p.description,
     outcome: p.outcome,
     links: p.links || [],
     color: p.color || '#111',
     caseStudy: p.caseStudy || null,
   }));
+
+// The short list shown on the homepage work grid. Projects flagged `featured`
+// in the admin win; if none are flagged (e.g. content seeded before the flag
+// existed), fall back to the first four so the grid never renders empty.
+export const getFeaturedProjects = () => {
+  const all = getProjectsData();
+  const flagged = all.filter((p) => p.featured);
+  return flagged.length > 0 ? flagged : all.slice(0, 4);
+};
 
 // Look up a single project's case study by its URL slug.
 export const getProjectBySlug = (slug) =>

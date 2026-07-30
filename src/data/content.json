@@ -129,7 +129,7 @@
           ],
           "highlights": [
             "21 Django domain apps · 22 versioned REST API modules",
-            "~88k lines of Python and ~143k lines of TypeScript across 2,000+ commits",
+            "One response envelope across every endpoint — success and failure share one shape",
             "Auto-deploy to staging, manual-gated release to production"
           ],
           "sections": [
@@ -140,7 +140,7 @@
             },
             {
               "heading": "Scale & Shape",
-              "body": "The numbers matter mostly because they set the constraint the architecture had to answer: this is too large to hold in your head, so structure has to do the remembering.",
+              "body": "Twenty-one Django domain apps behind twenty-two versioned REST API modules. At that scale the codebase is too large to hold in your head, so structure has to do the remembering.",
               "bullets": [
                 "2,061 commits across a team, on a stage → main branch model with merge requests",
                 "~87,700 lines of Python across 503 files, excluding migrations",
@@ -209,9 +209,17 @@
               "media": []
             }
           ],
-          "media": []
+          "media": [
+            {
+              "alt": "feriaau landing page",
+              "url": "https://wmzywhhrsapfhywdiyig.supabase.co/storage/v1/object/public/media/screenshot-2026-07-29-at-15-37-18.png",
+              "type": "image",
+              "caption": ""
+            }
+          ]
         },
-        "description": "Lead full-stack engineer for Feriaau - a production web platform built on a modular Python/Django backend with a dynamic React.js/TypeScript frontend, deployed on secure servers with automated CI/CD."
+        "description": "Lead full-stack engineer for Feriaau - a production web platform built on a modular Python/Django backend with a dynamic React.js/TypeScript frontend, deployed on secure servers with automated CI/CD.",
+        "featured": true
       },
       {
         "id": 10,
@@ -254,7 +262,7 @@
           "sections": [
             {
               "heading": "Overview",
-              "body": "Nepali fashion commerce runs on Instagram and TikTok with checkout by direct message — no catalogue, no trust, no returns process. The thing stopping people buying clothes online is not price; it is not knowing how something will look on them.\n\npeeq puts virtual try-on at the centre of shopping. A shopper takes a photo, picks a piece, and sees it on themselves. Shops get a catalogue, an in-store kiosk and an online storefront. And for tailoring shops, peeq can show a garment that does not exist yet — a fabric rendered into a cut nobody has photographed.\n\nNext.js 15 App Router, React 19, TypeScript strict, Supabase for Postgres, Auth, Storage and row-level security. Around 22,750 lines across 102 files, 77 commits, 24 migrations, 15 API routes.",
+              "body": "Nepali fashion commerce runs on Instagram and TikTok with checkout by direct message — no catalogue, no trust, no returns process. The thing stopping people buying clothes online is not price; it is not knowing how something will look on them.\n\npeeq puts virtual try-on at the centre of shopping. A shopper takes a photo, picks a piece, and sees it on themselves. Shops get a catalogue, an in-store kiosk and an online storefront. And for tailoring shops, peeq can show a garment that does not exist yet — a fabric rendered into a cut nobody has photographed.\n\nNext.js 15 App Router, React 19, TypeScript strict, Supabase for Postgres, Auth, Storage and row-level security — 24 migrations and 15 API routes.",
               "media": []
             },
             {
@@ -341,7 +349,8 @@
             }
           ],
           "media": []
-        }
+        },
+        "featured": true
       },
       {
         "id": 8,
@@ -375,14 +384,14 @@
             "npm"
           ],
           "highlights": [
-            "7 commands · 12 modules · 6 build targets · ~7k lines of CLI",
+            "7 commands · 12 modules · 6 build targets",
             "Capability-keyed dependency resolution rejects impossible stacks before writing a byte",
             "Idempotent anchor injection — one mechanism across Python, TypeScript, JSON and YAML"
           ],
           "sections": [
             {
               "heading": "Overview",
-              "body": "Every new full-stack project starts with the same two days: wire a Django server, wire a Next.js app, wire an Expo app, connect them, add auth, a database, Docker, CI. Existing scaffolders give you either a fixed stack you must take whole, or a blank page.\n\nPartweave generates only the parts you pick, wires them together, and hands you the code — there is no runtime dependency on the generator afterwards. Its own README describes it as create-t3-app meets shadcn/ui: choose your stack, then own what lands in your repo.\n\nAround 7,200 lines of TypeScript across 38 files in the CLI, seven commands, twelve modules, six build targets, published to npm and runnable with a single npx invocation.",
+              "body": "Every new full-stack project starts with the same two days: wire a Django server, wire a Next.js app, wire an Expo app, connect them, add auth, a database, Docker, CI. Existing scaffolders give you either a fixed stack you must take whole, or a blank page.\n\nPartweave generates only the parts you pick, wires them together, and hands you the code — there is no runtime dependency on the generator afterwards. Its own README describes it as create-t3-app meets shadcn/ui: choose your stack, then own what lands in your repo.\n\nA TypeScript CLI of seven commands, twelve modules and six build targets, published to npm and runnable with a single npx invocation.",
               "media": []
             },
             {
@@ -459,7 +468,8 @@
           ],
           "media": []
         },
-        "description": "Creator of an open-source full-stack project scaffolder - a TypeScript CLI that generates self-contained monorepos from only the components you pick (Django, Next.js, Expo, plus auth, database, Docker and CI/CD modules), resolving dependencies and rejecting incompatible selections upfront."
+        "description": "Creator of an open-source full-stack project scaffolder - a TypeScript CLI that generates self-contained monorepos from only the components you pick (Django, Next.js, Expo, plus auth, database, Docker and CI/CD modules), resolving dependencies and rejecting incompatible selections upfront.",
+        "featured": true
       },
       {
         "id": 7,
@@ -501,7 +511,7 @@
           "sections": [
             {
               "heading": "Overview",
-              "body": "Adding 3D to a React site is disproportionately hard for what is usually a background effect. You need three.js, React Three Fiber, drei, a camera rig, a render loop, resize handling, a WebGL-unavailable fallback, reduced-motion handling, and enough shader knowledge to write the thing you actually wanted.\n\neasy-3dkit collapses that to a Stage and a component. It ships a documentation site, a live gallery, and its own create-app so a working project is one command away.\n\nAround 14,800 lines of TypeScript across 119 files, exposing 50+ effects across six families through 81 exports from a single entry file.",
+              "body": "Adding 3D to a React site is disproportionately hard for what is usually a background effect. You need three.js, React Three Fiber, drei, a camera rig, a render loop, resize handling, a WebGL-unavailable fallback, reduced-motion handling, and enough shader knowledge to write the thing you actually wanted.\n\neasy-3dkit collapses that to a Stage and a component. It ships a documentation site, a live gallery, and its own create-app so a working project is one command away.\n\nWritten in TypeScript, it exposes 50+ effects across six families through 81 exports from a single entry file.",
               "media": []
             },
             {
@@ -572,12 +582,13 @@
           ],
           "media": []
         },
-        "description": "Creator and maintainer of an open-source library of interactive 3D components for React, built natively on Three.js, React Three Fiber (R3F), and GSAP."
+        "description": "Creator and maintainer of an open-source library of interactive 3D components for React, built natively on Three.js, React Three Fiber (R3F), and GSAP.",
+        "featured": true
       },
       {
         "id": 2,
         "slug": "kingsoft-crm",
-        "color": "#d6d6d6",
+        "color": "#141414",
         "links": [
           {
             "url": "https://crm.feriaau.com",
@@ -611,7 +622,7 @@
           "sections": [
             {
               "heading": "Overview",
-              "body": "A CRM where multiple organisations share one deployment and one database but can never see each other's rows — contacts, deals, tickets, tasks, meetings, invoices and commissions, with roles, permissions, invitations, two-factor authentication and audit logging underneath.\n\nDjango 5.2 with DRF and SimpleJWT on PostgreSQL 15 and Redis 7, containerised, with Celery and Flower for background work and MinIO for object storage. Five apps, roughly 50 models, 320 commits.\n\nThis is a different problem from a multi-vendor marketplace. There, a leak between vendors is a UX bug. Here, a leak between tenants is a breach.",
+              "body": "A CRM where multiple organisations share one deployment and one database but can never see each other's rows — contacts, deals, tickets, tasks, meetings, invoices and commissions, with roles, permissions, invitations, two-factor authentication and audit logging underneath.\n\nDjango 5.2 with DRF and SimpleJWT on PostgreSQL 15 and Redis 7, containerised, with Celery and Flower for background work and MinIO for object storage. Five apps, roughly 50 models.\n\nThis is a different problem from a multi-vendor marketplace. There, a leak between vendors is a UX bug. Here, a leak between tenants is a breach.",
               "media": []
             },
             {
@@ -664,7 +675,8 @@
           ],
           "media": []
         },
-        "description": "Multi-tenant CRM platform powering Feriaau's operations - a Django/DRF backend with shared-table tenant isolation, a cached RBAC layer, and a soft-delete engine that reproduces real cascade semantics across 26 tenant-scoped models."
+        "description": "Multi-tenant CRM platform powering Feriaau's operations - a Django/DRF backend with shared-table tenant isolation, a cached RBAC layer, and a soft-delete engine that reproduces real cascade semantics across 26 tenant-scoped models.",
+        "featured": false
       },
       {
         "id": 5,
@@ -751,7 +763,7 @@
             },
             {
               "heading": "From pipeline to platform",
-              "body": "The deployed system is FastAPI with MongoDB via an async driver, a Next.js 14 dashboard, and around 28,000 lines of Python against 22,800 of TypeScript.\n\nEighteen backend services handle stream management, two- and three-stage detection pipelines, session coordination, adaptive processing, adaptive quality, HLS and MJPEG streaming with detection overlays, WebSocket fan-out, circuit breaking and webhooks. Sixteen REST route modules cover auth, users, cameras, sessions, detections, pricing, analytics, dashboards, uploads and webhooks.\n\nNotably, both a two-stage and a three-stage pipeline ship, switchable from the admin dashboard. The research configuration maximises accuracy; the deployed one trades a little for latency and cost. Which is correct depends on the site.",
+              "body": "The deployed system is FastAPI with MongoDB via an async driver and a Next.js 14 dashboard.\n\nEighteen backend services handle stream management, two- and three-stage detection pipelines, session coordination, adaptive processing, adaptive quality, HLS and MJPEG streaming with detection overlays, WebSocket fan-out, circuit breaking and webhooks. Sixteen REST route modules cover auth, users, cameras, sessions, detections, pricing, analytics, dashboards, uploads and webhooks.\n\nNotably, both a two-stage and a three-stage pipeline ship, switchable from the admin dashboard. The research configuration maximises accuracy; the deployed one trades a little for latency and cost. Which is correct depends on the site.",
               "media": []
             },
             {
@@ -772,7 +784,8 @@
           ],
           "media": []
         },
-        "description": "Three-stage cascaded computer-vision pipeline (YOLOv8n → YOLOv11n → RF-DETR Base) for bi-scriptual Nepali plate recognition, serving as the backbone of an automated smart-parking platform."
+        "description": "Three-stage cascaded computer-vision pipeline (YOLOv8n → YOLOv11n → RF-DETR Base) for bi-scriptual Nepali plate recognition, serving as the backbone of an automated smart-parking platform.",
+        "featured": false
       },
       {
         "id": 6,
@@ -864,7 +877,8 @@
           ],
           "media": []
         },
-        "description": "Dual-engine emotion analysis over Reddit at scale - a GoEmotions transformer served asynchronously via Celery for whole-subreddit batch work, plus the same class of model running entirely in the browser on WebAssembly for zero-cost interactive analysis."
+        "description": "Dual-engine emotion analysis over Reddit at scale - a GoEmotions transformer served asynchronously via Celery for whole-subreddit batch work, plus the same class of model running entirely in the browser on WebAssembly for zero-cost interactive analysis.",
+        "featured": false
       },
       {
         "id": 4,
@@ -891,14 +905,14 @@
             "PostgreSQL"
           ],
           "highlights": [
-            "~56k lines of TypeScript across 283 files, strict mode throughout",
+            "Single-flight token refresh — concurrent expiries can't kill the session",
             "Four layered error boundaries — nothing white-screens and nothing fails silently",
             "Client types generated from the backend's OpenAPI schema"
           ],
           "sections": [
             {
               "heading": "Overview",
-              "body": "Contractors run their business from a truck: leads, quotes, proposals, projects, crews, invoices and a calendar — on a phone, often on bad signal, often without remembering a password.\n\nContractorOps is the field CRM for that. The mobile app is a pure API client with no backend code in it, talking to a separate FastAPI service on PostgreSQL. Expo SDK 54, React Native 0.81, React 19, TypeScript in strict mode: around 56,100 lines across 283 files.",
+              "body": "Contractors run their business from a truck: leads, quotes, proposals, projects, crews, invoices and a calendar — on a phone, often on bad signal, often without remembering a password.\n\nContractorOps is the field CRM for that. The mobile app is a pure API client with no backend code in it, talking to a separate FastAPI service on PostgreSQL. Expo SDK 54, React Native 0.81, React 19, TypeScript in strict mode.",
               "media": []
             },
             {
@@ -957,7 +971,8 @@
           ],
           "media": []
         },
-        "description": "High-performance React Native + TypeScript application for Contractor Ops AI, backed by a FastAPI service - with refactored low-latency REST payloads, single-flight token refresh, and four layers of error handling for use on unreliable field connections."
+        "description": "High-performance React Native + TypeScript application for Contractor Ops AI, backed by a FastAPI service - with refactored low-latency REST payloads, single-flight token refresh, and four layers of error handling for use on unreliable field connections.",
+        "featured": false
       },
       {
         "id": 3,
@@ -994,14 +1009,14 @@
             "Android"
           ],
           "highlights": [
-            "Consumer app live on Google Play and the App Store, past its 46th build",
+            "Consumer app live on Google Play and the App Store",
             "Clean Architecture with a strict layering rule across both apps",
             "Offline-tolerant cache, rich push notifications and in-app update prompts"
           ],
           "sections": [
             {
               "heading": "Overview",
-              "body": "A loyalty platform that only works in a browser does not work. Customers earn points at a physical counter and want to check a balance, scan a QR code or redeem a reward on their phone in seconds. Staff at the till need to place an order and print an invoice without leaving it.\n\nTwo audiences, two Flutter apps, one REST API — the same backend the Feriaau web platform uses, so mobile and web never drift apart.\n\nThe consumer app is published on Google Play and the App Store, past its 46th build across 568 commits and roughly 47,000 lines of Dart. The vendor companion is smaller and newer.",
+              "body": "A loyalty platform that only works in a browser does not work. Customers earn points at a physical counter and want to check a balance, scan a QR code or redeem a reward on their phone in seconds. Staff at the till need to place an order and print an invoice without leaving it.\n\nTwo audiences, two Flutter apps, one REST API — the same backend the Feriaau web platform uses, so mobile and web never drift apart.\n\nThe consumer app is published on Google Play and the App Store. The vendor companion is smaller and newer.",
               "media": []
             },
             {
@@ -1022,7 +1037,7 @@
             },
             {
               "heading": "Different DI for different ages",
-              "body": "The two apps deliberately differ on dependency injection, and the difference is the point.\n\nThe consumer app — fourteen features, 294 files, already stable — uses hand-written service-locator registrations. The vendor app, started later and expected to grow, uses the same locator with code generation on top, so registrations cannot drift from constructors.\n\nNeither app pays for machinery it does not need. Codegen earns its keep when the surface is still moving; on a settled codebase it is a build step for no benefit.",
+              "body": "The two apps deliberately differ on dependency injection, and the difference is the point.\n\nThe consumer app — fourteen features, already stable — uses hand-written service-locator registrations. The vendor app, started later and expected to grow, uses the same locator with code generation on top, so registrations cannot drift from constructors.\n\nNeither app pays for machinery it does not need. Codegen earns its keep when the surface is still moving; on a settled codebase it is a build step for no benefit.",
               "media": []
             },
             {
@@ -1058,7 +1073,8 @@
           ],
           "media": []
         },
-        "description": "Contributor to the Feriaau mobile app - a cross-platform Flutter application built on Clean Architecture and BLoC, sharing backend services and REST APIs with the web platform, alongside a second vendor-facing Flutter app."
+        "description": "Contributor to the Feriaau mobile app - a cross-platform Flutter application built on Clean Architecture and BLoC, sharing backend services and REST APIs with the web platform, alongside a second vendor-facing Flutter app.",
+        "featured": false
       },
       {
         "id": 9,
@@ -1101,7 +1117,7 @@
           "sections": [
             {
               "heading": "Overview",
-              "body": "A portfolio has to serve two audiences that want opposite things. Recruiters want the facts quickly. Engineers want to poke at something.\n\nSo this site offers three ways in — a direct normal mode, a motion-designed fun mode, and a terminal mode that is an actual shell — all rendered from one content source, so nothing can drift out of sync. Around 8,100 lines across 66 files, of which terminal mode alone is 3,274.",
+              "body": "A portfolio has to serve two audiences that want opposite things. Recruiters want the facts quickly. Engineers want to poke at something.\n\nSo this site offers three ways in — a direct normal mode, a motion-designed fun mode, and a terminal mode that is an actual shell — all rendered from one content source, so nothing can drift out of sync.",
               "media": []
             },
             {
@@ -1148,7 +1164,8 @@
           ],
           "media": []
         },
-        "description": "Designer and builder of my personal portfolio - a React/Vite site with Framer Motion motion design, a live Three.js/R3F backdrop powered by my own easy-3dkit, and an installable PWA. Ships a fully interactive terminal mode with a virtual filesystem and command parser as an alternate way to explore the site."
+        "description": "Designer and builder of my personal portfolio - a React/Vite site with Framer Motion motion design, a live Three.js/R3F backdrop powered by my own easy-3dkit, and an installable PWA. Ships a fully interactive terminal mode with a virtual filesystem and command parser as an alternate way to explore the site.",
+        "featured": false
       }
     ],
     "research": [
