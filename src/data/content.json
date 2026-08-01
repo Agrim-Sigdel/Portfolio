@@ -142,9 +142,6 @@
               "heading": "Scale & Shape",
               "body": "Twenty-one Django domain apps behind twenty-two versioned REST API modules. At that scale the codebase is too large to hold in your head, so structure has to do the remembering.",
               "bullets": [
-                "2,061 commits across a team, on a stage → main branch model with merge requests",
-                "~87,700 lines of Python across 503 files, excluding migrations",
-                "~143,500 lines of TypeScript across 733 files",
                 "21 Django domain apps · 22 versioned api/v1 URL modules",
                 "70+ page directories on the frontend, split by audience: public, user, admin, superadmin, vendor"
               ],

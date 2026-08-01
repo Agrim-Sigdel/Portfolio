@@ -45,7 +45,7 @@ const ProjectCard = ({ project, index = 0 }) => (
             </h3>
 
             <div style={{ marginBottom: '2rem' }}>
-                <h4 style={{ fontSize: '0.9rem', opacity: 0.7, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Challenge</h4>
+                <h4 style={{ fontSize: '0.9rem', opacity: 0.7, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Overview</h4>
                 <p style={{ color: 'var(--text-cream)', lineHeight: 1.6 }}>{project.pitch}</p>
             </div>
 
