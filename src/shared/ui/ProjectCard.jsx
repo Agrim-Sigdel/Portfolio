@@ -1,21 +1,28 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FiExternalLink, FiArrowRight } from 'react-icons/fi';
+import { useTheme } from '../lib/ThemeContext';
 
 /*
  * ProjectCard — one project tile, shared by the fun-mode WorkGrid (featured
  * four) and the /work all-projects page so the two always render identically.
  * Presentation only; expects the shape produced by getProjectsData().
  */
-const ProjectCard = ({ project, index = 0 }) => (
-    <motion.div
+const ProjectCard = ({ project, index = 0 }) => {
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
+    const MotionDiv = motion.div;
+
+    return (
+        <MotionDiv
         initial={{ y: 50, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         viewport={{ once: true, margin: '-50px' }}
         transition={{ duration: 0.6, delay: index * 0.1 }}
         style={{
             padding: '3rem 2.5rem',
-            backgroundColor: project.color,
+            backgroundColor: isLight ? 'var(--bg-panel)' : project.color,
+            border: isLight ? '1px solid var(--border-color, #e5e5e5)' : '1px solid transparent',
             borderRadius: '8px',
             position: 'relative',
             overflow: 'hidden'
@@ -108,7 +115,8 @@ const ProjectCard = ({ project, index = 0 }) => (
                 </div>
             )}
         </div>
-    </motion.div>
-);
+    </MotionDiv>
+    );
+};
 
 export default ProjectCard;
