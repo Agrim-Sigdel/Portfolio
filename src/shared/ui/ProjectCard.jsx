@@ -21,7 +21,7 @@ const ProjectCard = ({ project, index = 0 }) => {
         transition={{ duration: 0.6, delay: index * 0.1 }}
         style={{
             padding: '3rem 2.5rem',
-            backgroundColor: isLight ? 'var(--bg-panel)' : project.color,
+            backgroundColor: 'var(--bg-panel)',
             border: isLight ? '1px solid var(--border-color, #e5e5e5)' : '1px solid transparent',
             borderRadius: '8px',
             position: 'relative',

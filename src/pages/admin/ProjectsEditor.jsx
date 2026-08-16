@@ -105,22 +105,7 @@ export default function ProjectsEditor({ value, onChange, onBusy }) {
               />
               <TextAreaField label="Description" value={item.description} onChange={(v) => patch({ description: v })} rows={3} />
               <TextAreaField label="Outcome" value={item.outcome} onChange={(v) => patch({ outcome: v })} rows={2} />
-              <label className="admin-field">
-                <span>Card color</span>
-                <span className="admin-color-row">
-                  <input
-                    type="color"
-                    value={/^#[0-9a-fA-F]{6}$/.test(item.color ?? '') ? item.color : '#141414'}
-                    onChange={(e) => patch({ color: e.target.value })}
-                  />
-                  <input
-                    type="text"
-                    value={item.color ?? ''}
-                    placeholder="#141414"
-                    onChange={(e) => patch({ color: e.target.value })}
-                  />
-                </span>
-              </label>
+
               <LinkListEditor label="Links" links={item.links} onChange={(v) => patch({ links: v })} />
 
               <h3 className="admin-subhead">Case study (/work/{item.slug || '…'})</h3>
