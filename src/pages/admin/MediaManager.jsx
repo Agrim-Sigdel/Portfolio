@@ -35,6 +35,7 @@ export default function MediaManager({ content, setField, onBusy }) {
       const url = await uploadMedia(file, CV_STORAGE_PATH);
       setField('common.media', { ...(content.common.media ?? {}), cvUrl: `${url}?v=${Date.now()}` });
     } catch (e) {
+      console.error('CV upload error:', e);
       setError(`CV upload failed: ${e.message}`);
     } finally {
       busy(false);

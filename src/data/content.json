@@ -19,7 +19,11 @@
         "MySQL",
         "Docker",
         "CI/CD",
-        "Git"
+        "Git",
+        "AWS (EC2, IAM)",
+        "Grafana",
+        "Loki",
+        "Framer Motion"
       ],
       "categories": [
         {
@@ -59,7 +63,10 @@
             "Docker",
             "CI/CD Pipelines",
             "Git / GitHub / GitLab",
-            "Server Configuration"
+            "Server Configuration",
+            "AWS (EC2, IAM)",
+            "Grafana",
+            "Loki"
           ]
         }
       ]
@@ -216,7 +223,8 @@
           ]
         },
         "description": "Lead full-stack engineer for Feriaau - a production web platform built on a modular Python/Django backend with a dynamic React.js/TypeScript frontend, deployed on secure servers with automated CI/CD.",
-        "featured": true
+        "featured": true,
+        "showInResume": false
       },
       {
         "id": 10,
@@ -347,7 +355,8 @@
           ],
           "media": []
         },
-        "featured": true
+        "featured": true,
+        "showInResume": false
       },
       {
         "id": 8,
@@ -466,7 +475,10 @@
           "media": []
         },
         "description": "Creator of an open-source full-stack project scaffolder - a TypeScript CLI that generates self-contained monorepos from only the components you pick (Django, Next.js, Expo, plus auth, database, Docker and CI/CD modules), resolving dependencies and rejecting incompatible selections upfront.",
-        "featured": true
+        "featured": true,
+        "showInResume": true,
+        "resumeRole": "Creator",
+        "resumeDescription": "Creator of an open-source full-stack TypeScript CLI that generates self-contained monorepos with deterministic template injection (Django, Next.js, Expo, Auth, Docker)."
       },
       {
         "id": 7,
@@ -580,7 +592,10 @@
           "media": []
         },
         "description": "Creator and maintainer of an open-source library of interactive 3D components for React, built natively on Three.js, React Three Fiber (R3F), and GSAP.",
-        "featured": true
+        "featured": true,
+        "showInResume": true,
+        "resumeRole": "Creator & Maintainer",
+        "resumeDescription": "Creator and maintainer of an open-source library providing interactive 3D components for React, built natively on Three.js, React Three Fiber (R3F), and GSAP."
       },
       {
         "id": 2,
@@ -673,7 +688,8 @@
           "media": []
         },
         "description": "Multi-tenant CRM platform powering Feriaau's operations - a Django/DRF backend with shared-table tenant isolation, a cached RBAC layer, and a soft-delete engine that reproduces real cascade semantics across 26 tenant-scoped models.",
-        "featured": false
+        "featured": false,
+        "showInResume": false
       },
       {
         "id": 5,
@@ -782,7 +798,8 @@
           "media": []
         },
         "description": "Three-stage cascaded computer-vision pipeline (YOLOv8n → YOLOv11n → RF-DETR Base) for bi-scriptual Nepali plate recognition, serving as the backbone of an automated smart-parking platform.",
-        "featured": false
+        "featured": false,
+        "showInResume": false
       },
       {
         "id": 6,
@@ -875,7 +892,10 @@
           "media": []
         },
         "description": "Dual-engine emotion analysis over Reddit at scale - a GoEmotions transformer served asynchronously via Celery for whole-subreddit batch work, plus the same class of model running entirely in the browser on WebAssembly for zero-cost interactive analysis.",
-        "featured": false
+        "featured": false,
+        "showInResume": true,
+        "resumeRole": "Developer",
+        "resumeDescription": "Deep NLP pipeline using fine-tuned BERT for nuanced emotion classification on large-scale Reddit data, integrated with LLM-based frontend interfaces."
       },
       {
         "id": 4,
@@ -969,7 +989,8 @@
           "media": []
         },
         "description": "High-performance React Native + TypeScript application for Contractor Ops AI, backed by a FastAPI service - with refactored low-latency REST payloads, single-flight token refresh, and four layers of error handling for use on unreliable field connections.",
-        "featured": false
+        "featured": false,
+        "showInResume": false
       },
       {
         "id": 3,
@@ -1071,7 +1092,8 @@
           "media": []
         },
         "description": "Contributor to the Feriaau mobile app - a cross-platform Flutter application built on Clean Architecture and BLoC, sharing backend services and REST APIs with the web platform, alongside a second vendor-facing Flutter app.",
-        "featured": false
+        "featured": false,
+        "showInResume": false
       },
       {
         "id": 9,
@@ -1162,37 +1184,32 @@
           "media": []
         },
         "description": "Designer and builder of my personal portfolio - a React/Vite site with Framer Motion motion design, a live Three.js/R3F backdrop powered by my own easy-3dkit, and an installable PWA. Ships a fully interactive terminal mode with a virtual filesystem and command parser as an alternate way to explore the site.",
-        "featured": false
+        "featured": false,
+        "showInResume": false
       }
     ],
     "research": [
       {
-        "role": "Lead Researcher & First Author",
+        "role": "Lead Researcher & Developer",
         "links": [
+          {
+            "url": "https://www.nepjol.info/index.php/nccsrj/article/view/99783/75407",
+            "label": "Read Published Paper"
+          },
           {
             "url": "https://github.com/Agrim-Sigdel/CATD",
             "label": "GitHub"
-          },
-          {
-            "url": "/CATD-Submission.pdf",
-            "label": "View Paper"
-          },
-          {
-            "url": "/CATD-Submission.pdf",
-            "label": "Download Paper",
-            "download": true
           }
         ],
         "title": "Cascaded AI Task Decomposition (CATD)",
-        "period": "2025 – 2026",
-        "status": "Accepted subject to minor revision — NCCS, June 2026",
+        "period": "2024–2025",
+        "status": "Published",
         "summary": "A generalizable design pattern for multi-stage computer vision pipelines, validated on bi-scriptual Nepali license-plate recognition.",
-        "citation": "Sigdel, A., Thapa, S., Thapa Magar, B., & Gajurel, R.K. \"Cascaded AI Task Decomposition: A Generalizable Framework for Multi-Stage Computer Vision Pipelines Validated on Automated Number Plate Recognition for Nepali License Plates.\"",
+        "citation": "Gajurel, R. K., Sigdel, A., Magar, B. T., & Thapa, S. (2026). Cascaded AI Task Decomposition: A Generalizable Framework for Multi-Stage Computer Vision Pipeline Validated on Automatic Number Plate Recognition for Nepali License Plates. National College of Computer Studies Research Journal, 5(1), 137-167.",
         "highlights": [
-          "Formalized the CATD framework as a generalizable design pattern for multi-stage CV pipelines with applications beyond ANPR.",
-          "Achieved 97.1% mAP@50 plate localization and 97.8% mAP@50 character recognition on the held-out test set, using custom-trained YOLOv11n and RF-DETR Base across 61 bi-scriptual Nepali plate classes.",
-          "Built a two-dimensional cross-domain training strategy (1,380 Nepali flat + 1,127 Indian embossed plates) enabling compositional zero-shot transfer to embossed plates absent from training (+24.5 pp under specular reflection).",
-          "Engineered a three-stage cascaded pipeline (YOLOv8n → YOLOv11n → RF-DETR Base) with an estimated 90.4% end-to-end precision and 61%–73% compute reduction via intelligent vehicle gating.",
+          "Achieved 97.1% mAP@50 plate localization and 97.8% mAP@50 character recognition using custom-trained YOLOv11n and RT-DETR Base on 61-class bi-scriptual Nepali plates.",
+          "Built a two-dimensional cross-domain training strategy (1,380 Nepali + 1,127 Indian plates) enabling compositional zero-shot transfer (+24.5 pp improvement).",
+          "Engineered a three-stage cascaded pipeline (YOLOv8n → YOLOv11n → RT-DETR) reaching 90.4% end-to-end precision with 61%-73% compute reduction via intelligent vehicle gating.",
           "Integrated the system as the computer-vision backbone of a smart-parking platform handling automated billing and real-time traffic analytics."
         ]
       }
@@ -1208,18 +1225,19 @@
       {
         "role": "SOFTWARE DEVELOPER (FULL-STACK)",
         "links": [],
-        "period": "jan 2026 – Present",
+        "period": "Jan 2026 – Present",
         "company": "Contractor Ops AI | Remote",
         "description": [
-          "Engineer a high-performance mobile application using React Native and TypeScript, with strict adherence to component state-management best practices.",
-          "Refactor and optimize backend REST APIs for seamless compatibility, efficient serialization, and low-latency payloads between server and client.",
-          "Debug and resolve full-stack integration bottlenecks, improving database query handling and streamlining endpoints for real-time features."
+          "Engineer a high-performance mobile application using React Native and TypeScript, developing and shipping diverse full-stack features across the entire application stack.",
+          "Deploy and manage backend & AI services on AWS EC2, utilizing AWS IAM to securely manage roles and access permissions.",
+          "Implement centralized system monitoring and observability by configuring log draining to Grafana via Loki.",
+          "Debug and resolve full-stack integration bottlenecks, optimizing database query handling, efficient serialization, and low-latency payloads between server and client."
         ]
       },
       {
         "role": "FULL-STACK DEVELOPER",
         "links": [],
-        "period": "Oct 2025 – Present",
+        "period": "Oct 2025 – Jul 2026",
         "company": "Kingsoft Tech | On-site, Kathmandu",
         "description": [
           "Spearheaded full-stack development, optimization, and deployment for Feriaau and its multi-tenant CRM platform.",
@@ -1244,9 +1262,10 @@
         "period": "2023 – Present",
         "company": "Self-Employed | Remote",
         "description": [
-          "Designed, built, and shipped a range of client projects end-to-end - from responsive marketing websites to full-stack web applications.",
-          "Worked directly with clients to scope requirements, translate them into clean designs, and deliver production-ready code on schedule.",
-          "Handled the full delivery pipeline including frontend, backend, deployment, and post-launch maintenance across varied tech stacks."
+          "Designed, built, and shipped a range of client projects end-to-end, including responsive marketing websites and comprehensive full-stack web applications for diverse clients.",
+          "Developed bespoke CRMs and tailored internal business management tools utilizing React, TypeScript, and Python/Django to streamline client workflows and automate operational processes.",
+          "Architected scalable REST APIs and optimized database schemas to support multi-tenant data structures and real-time features for custom freelance applications.",
+          "Handled the full delivery pipeline including frontend development, secure backend infrastructure, cloud deployment, and post-launch maintenance across varied tech stacks."
         ]
       }
     ]

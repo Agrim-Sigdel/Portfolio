@@ -41,7 +41,7 @@ const readFnError = async (error) => {
   try {
     const body = await error?.context?.json();
     if (body?.error) return body.error;
-  } catch { /* fall through to the generic message */ }
+  } catch (e) { console.error('Failed to parse Edge Function error context:', e); }
   return error?.message || 'Send failed';
 };
 

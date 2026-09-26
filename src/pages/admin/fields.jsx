@@ -203,6 +203,7 @@ export function MediaListEditor({ label, items, onChange, slug, onBusy, hint }) 
         );
       }
     } catch (e) {
+      console.error('Media upload error:', e);
       setError(`Upload failed: ${e.message}`);
     } finally {
       working(false);

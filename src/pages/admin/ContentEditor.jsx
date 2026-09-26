@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { loadContent, publishContent } from './adminContent';
 import { getPath, setPath, downloadJson } from './adminUtils';
 import { validateContent } from './validate';
@@ -48,6 +48,7 @@ export default function ContentEditor() {
   const [status, setStatus] = useState({ type: 'idle', msg: '' });
   const [errors, setErrors] = useState([]);
   const [mediaBusy, setMediaBusy] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     (async () => {
@@ -62,6 +63,16 @@ export default function ContentEditor() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    if (!dirty) return;
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [dirty]);
 
   const setField = (path, value) => {
     setContent((c) => setPath(c, path, value));
@@ -82,9 +93,47 @@ export default function ContentEditor() {
       await publishContent(content);
       setDirty(false);
       setStatus({ type: 'ok', msg: 'Published — the live site now shows these changes.' });
+      import('react-hot-toast').then(({ default: toast }) => toast.success('Published successfully!'));
     } catch (e) {
+      console.error('Publish error:', e);
       setStatus({ type: 'error', msg: `Publish failed: ${e.message}` });
+      import('react-hot-toast').then(({ default: toast }) => toast.error(`Publish failed: ${e.message}`));
     }
+  };
+
+  const handleImportClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleImportFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (dirty) {
+      if (!window.confirm('You have unsaved changes. Are you sure you want to overwrite them with this import?')) {
+        e.target.value = ''; // Reset input
+        return;
+      }
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const json = JSON.parse(event.target.result);
+        setContent(json);
+        setDirty(true);
+        setStatus({ type: 'ok', msg: 'JSON imported successfully. Click Publish to save.' });
+        import('react-hot-toast').then(({ default: toast }) => toast.success('JSON imported. Click Publish to save.'));
+      } catch (err) {
+        console.error('Import parse error:', err);
+        setStatus({ type: 'error', msg: 'Invalid JSON file format.' });
+        import('react-hot-toast').then(({ default: toast }) => toast.error('Failed to import: Invalid JSON.'));
+      }
+      e.target.value = ''; // Reset input so the same file can be selected again
+    };
+    reader.readAsText(file);
   };
 
   const publishing = status.type === 'busy';
@@ -123,6 +172,20 @@ export default function ContentEditor() {
       <div className="admin-editorbar">
         {status.msg && <span className={`admin-status admin-status-${status.type}`}>{status.msg}</span>}
         {dirty && !publishing && <span className="admin-status admin-status-dirty">Unsaved changes</span>}
+        <button
+          className="admin-btn"
+          onClick={handleImportClick}
+          title="Import a content.json file to replace the current content."
+        >
+          Import JSON
+        </button>
+        <input
+          type="file"
+          accept=".json,application/json"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          onChange={handleImportFile}
+        />
         <button
           className="admin-btn"
           onClick={() => downloadJson(content, 'content.json')}

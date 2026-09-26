@@ -87,7 +87,8 @@ export default function MediaPanel() {
       await navigator.clipboard.writeText(url);
       setCopied(url);
       setTimeout(() => setCopied(''), 1500);
-    } catch {
+    } catch (e) {
+      console.error('Clipboard copy failed:', e);
       window.prompt('Copy this URL:', url);
     }
   };

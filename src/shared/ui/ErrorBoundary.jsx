@@ -7,14 +7,21 @@ import React from 'react';
  * caches a rejected lazy() import, so re-rendering alone won't refetch it.
  */
 export default class ErrorBoundary extends React.Component {
-  state = { hasError: false };
+  state = { hasError: false, error: null };
 
-  static getDerivedStateFromError() {
-    return { hasError: true };
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
 
   render() {
     if (!this.state.hasError) return this.props.children;
+    
+    const isDev = import.meta.env.DEV;
+
     return (
       <main
         style={{
@@ -35,22 +42,59 @@ export default class ErrorBoundary extends React.Component {
         <p style={{ margin: 0, opacity: 0.75, fontSize: '0.9rem' }}>
           This usually happens on a flaky connection or after a new deploy.
         </p>
-        <button
-          type="button"
-          onClick={() => window.location.reload()}
-          style={{
-            padding: '10px 22px',
-            borderRadius: '8px',
-            border: '1px solid #ff4c2b',
-            background: 'transparent',
-            color: '#ff4c2b',
-            fontSize: '0.9rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-          }}
-        >
-          Reload
-        </button>
+
+        {isDev && this.state.error && (
+          <pre
+            style={{
+              textAlign: 'left',
+              background: 'rgba(255, 76, 43, 0.1)',
+              border: '1px solid rgba(255, 76, 43, 0.3)',
+              padding: '16px',
+              borderRadius: '8px',
+              overflow: 'auto',
+              maxWidth: '90%',
+              fontSize: '0.8rem',
+              color: '#ffb0a3'
+            }}
+          >
+            {this.state.error.toString()}
+          </pre>
+        )}
+
+        <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '10px 22px',
+              borderRadius: '8px',
+              border: '1px solid #ff4c2b',
+              background: 'transparent',
+              color: '#ff4c2b',
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            Reload
+          </button>
+          <button
+            type="button"
+            onClick={() => window.location.href = '/'}
+            style={{
+              padding: '10px 22px',
+              borderRadius: '8px',
+              border: '1px solid #333',
+              background: '#1a1a1a',
+              color: '#f5f5f5',
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            Go to Homepage
+          </button>
+        </div>
       </main>
     );
   }

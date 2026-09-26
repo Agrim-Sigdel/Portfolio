@@ -100,8 +100,11 @@ export default function ContactForm({ variant = 'fun', className = '', onSent })
       setStatus('sent');
       setForm(EMPTY);
       setTouched({});
+      import('react-hot-toast').then(({ default: toast }) => toast.success('Message sent!'));
       onSent?.();
-    } catch {
+    } catch (e) {
+      console.error('ContactForm submit error:', e);
+      import('react-hot-toast').then(({ default: toast }) => toast.error('Failed to send automatically. Opening your email app instead.'));
       // Fallback: open the visitor's mail client pre-filled so they can still reach out.
       const subject = `Portfolio contact from ${form.name || 'someone'}`;
       const phoneLine = form.phone ? `Phone: ${form.phone}\n` : '';

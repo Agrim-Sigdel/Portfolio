@@ -63,7 +63,11 @@ const DownloadButton = ({
           setTimeout(() => URL.revokeObjectURL(url), 4000);
           finish();
         })
-        .catch(() => setState('idle')); // let the visitor retry on failure
+        .catch((e) => {
+          console.error('Download failed:', e);
+          import('react-hot-toast').then(({ default: toast }) => toast.error('Download failed. Please try again.'));
+          setState('idle');
+        }); // let the visitor retry on failure
       return;
     }
 

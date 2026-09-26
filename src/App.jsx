@@ -3,6 +3,8 @@ import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-do
 import { useTheme } from './shared/lib/ThemeContext';
 import ModeTriptych from './features/modeSelection/ui/ModeTriptych';
 import ErrorBoundary from './shared/ui/ErrorBoundary';
+import NotFound from './shared/ui/NotFound';
+import { Toaster } from 'react-hot-toast';
 import './pages/funMode/funMode.css';
 import './App.css';
 
@@ -65,15 +67,18 @@ function ModeLoader() {
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<SelectorRoute />} />
-      <Route path="/admin" element={<AdminRoute />} />
-      <Route path="/work" element={<AllProjectsRoute />} />
-      <Route path="/work/:projectSlug" element={<CaseStudyRoute />} />
-      <Route path="/:slug" element={<ModeRoute />} />
-      {/* Unknown path -> back to the selector */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <Toaster position="bottom-right" toastOptions={{ style: { background: '#1c1c1c', color: '#f5f5f5', border: '1px solid #303030' } }} />
+      <Routes>
+        <Route path="/" element={<SelectorRoute />} />
+        <Route path="/admin" element={<AdminRoute />} />
+        <Route path="/work" element={<AllProjectsRoute />} />
+        <Route path="/work/:projectSlug" element={<CaseStudyRoute />} />
+        <Route path="/:slug" element={<ModeRoute />} />
+        {/* Unknown path -> back to the selector */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
   );
 }
 

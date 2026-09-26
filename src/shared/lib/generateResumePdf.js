@@ -133,6 +133,24 @@ export async function generateResumePdf() {
     void rightW;
   };
 
+  // Role/Sub-title on the left, location on the right, italicized
+  const subHead = (leftRaw, rightRaw) => {
+    const left = clean(leftRaw);
+    const right = rightRaw ? clean(rightRaw) : rightRaw;
+    
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(9.5);
+    doc.setTextColor(DARK[0], DARK[1], DARK[2]);
+    
+    doc.text(left, MARGIN, y);
+    
+    if (right) {
+      const rightTextW = doc.getTextWidth(right);
+      doc.text(right, PAGE_W - MARGIN - rightTextW, y);
+    }
+    y += lineHeight(9.5) + 0.6;
+  };
+
   /* ---------- Header ---------- */
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(21);
@@ -177,8 +195,9 @@ export async function generateResumePdf() {
   /* ---------- Work Experience ---------- */
   section('Work Experience');
   experience.forEach((exp) => {
-    entryHead(exp.role, exp.period);
-    write(exp.company, { size: 9, style: 'italic', color: MUTED, gapAfter: 1 });
+    const [companyName, location] = exp.company.split('|').map(s => s ? s.trim() : '');
+    entryHead(companyName, exp.period);
+    subHead(exp.role, location);
     bullets(exp.description);
     y += 1.6;
   });
@@ -187,31 +206,31 @@ export async function generateResumePdf() {
   if (research && research.length) {
     section('Research & Publications');
     research.forEach((r) => {
-      entryHead(r.title, r.status);
-      write(`${r.role} · ${r.period}`, { size: 9, style: 'italic', color: MUTED, gapAfter: 1 });
-      if (r.citation) write(r.citation, { size: 8.6, color: MUTED, gapAfter: 1 });
-      bullets(r.highlights);
+      entryHead(r.title, r.period);
+      subHead(r.role);
+      const highlights = r.citation ? [`Publication: ${r.citation}`, ...r.highlights] : r.highlights;
+      bullets(highlights);
       y += 1.6;
     });
   }
 
   /* ---------- Projects & Open Source ---------- */
   section('Projects & Open Source');
-  projects.forEach((proj) => {
-    entryHead(
-      proj.status ? `${proj.title}  (${proj.status})` : proj.title,
-      proj.category
-    );
-    bullets([proj.description, proj.outcome]);
+  projects.filter(p => p.showInResume).forEach((proj) => {
+    entryHead(proj.title);
+    subHead(proj.resumeRole);
+    bullets([proj.resumeDescription]);
     y += 1.6;
   });
 
   /* ---------- Education ---------- */
   section('Education');
   education.forEach((edu) => {
-    entryHead(edu.degree, edu.year);
-    write(edu.school, { size: 9, color: MUTED, gapAfter: 1 });
+    const [schoolName, location] = edu.school.split('|').map(s => s ? s.trim() : '');
+    entryHead(schoolName, edu.year);
+    subHead(edu.degree, location);
   });
+
 
   return {
     blob: doc.output('blob'),
