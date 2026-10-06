@@ -47,8 +47,8 @@ export default class ErrorBoundary extends React.Component {
           <pre
             style={{
               textAlign: 'left',
-              background: 'rgba(255, 76, 43, 0.1)',
-              border: '1px solid rgba(255, 76, 43, 0.3)',
+              background: 'rgba(161, 97, 97, 0.1)',
+              border: '1px solid rgba(161, 97, 97, 0.3)',
               padding: '16px',
               borderRadius: '8px',
               overflow: 'auto',
@@ -68,9 +68,9 @@ export default class ErrorBoundary extends React.Component {
             style={{
               padding: '10px 22px',
               borderRadius: '8px',
-              border: '1px solid #ff4c2b',
+              border: '1px solid #a16161',
               background: 'transparent',
-              color: '#ff4c2b',
+              color: '#a16161',
               fontSize: '0.9rem',
               fontWeight: 600,
               cursor: 'pointer',

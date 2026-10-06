@@ -58,7 +58,7 @@ function ModeLoader() {
           height: 36,
           borderRadius: '50%',
           border: '3px solid rgba(245,245,245,0.2)',
-          borderTopColor: '#ff4c2b',
+          borderTopColor: '#a16161',
         }}
       />
     </div>

@@ -45,9 +45,9 @@
 }
 .cf-input::placeholder { color: rgba(245, 245, 245, 0.55); }
 .cf-input:focus {
-  border-color: var(--accent-red, #ff4c2b);
+  border-color: var(--accent-red, #a16161);
   background: rgba(255, 255, 255, 0.06);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-red, #ff4c2b) 22%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-red, #a16161) 22%, transparent);
 }
 
 .cf-textarea {
@@ -65,8 +65,8 @@
 }
 
 .cf-submit {
-  background: var(--accent-red, #ff4c2b);
-  border: 2px solid var(--accent-red, #ff4c2b);
+  background: var(--accent-red, #a16161);
+  border: 2px solid var(--accent-red, #a16161);
   color: #fff;
   padding: 1rem 2.5rem;
   font-size: 1rem;
@@ -75,11 +75,11 @@
   border-radius: 3rem;
   cursor: pointer;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
-  box-shadow: 0 10px 30px rgba(255, 76, 43, 0.3);
+  box-shadow: 0 10px 30px rgba(161, 97, 97, 0.3);
 }
 .cf-submit:hover {
   transform: scale(1.05);
-  box-shadow: 0 15px 40px rgba(255, 76, 43, 0.5);
+  box-shadow: 0 15px 40px rgba(161, 97, 97, 0.5);
 }
 
 .cf-input--error,
@@ -108,7 +108,7 @@
   font-size: 0.9rem;
   color: var(--text-muted, #888);
 }
-.cf-sent a { color: var(--accent-red, #ff4c2b); text-decoration: underline; }
+.cf-sent a { color: var(--accent-red, #a16161); text-decoration: underline; }
 
 /* Light-mode overrides. The contact form is portaled into the modal at <body>,
    so the fun-mode token cascade doesn't reach it — theme it directly off the
@@ -121,15 +121,15 @@
 }
 [data-theme='light'] .cf-input::placeholder { color: #9aa8a4; }
 [data-theme='light'] .cf-input:focus {
-  border-color: var(--accent-red, #ff4c2b);
+  border-color: var(--accent-red, #a16161);
   background: #fff;
 }
 [data-theme='light'] .cf-sent { color: #5a6b66; }
 
 /* CTA button that opens the shared contact modal (fun mode). */
 .cf-cta {
-  background: var(--accent-red, #ff4c2b);
-  border: 2px solid var(--accent-red, #ff4c2b);
+  background: var(--accent-red, #a16161);
+  border: 2px solid var(--accent-red, #a16161);
   color: #fff;
   padding: 1.1rem 3rem;
   font-size: 1.05rem;
@@ -138,11 +138,11 @@
   border-radius: 3rem;
   cursor: pointer;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
-  box-shadow: 0 10px 30px rgba(255, 76, 43, 0.3);
+  box-shadow: 0 10px 30px rgba(161, 97, 97, 0.3);
 }
 .cf-cta:hover {
   transform: scale(1.05);
-  box-shadow: 0 15px 40px rgba(255, 76, 43, 0.5);
+  box-shadow: 0 15px 40px rgba(161, 97, 97, 0.5);
 }
 
 @media (max-width: 560px) {

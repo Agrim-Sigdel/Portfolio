@@ -82,7 +82,7 @@
 }
 .cm-fun .cm-sub { color: rgba(245, 240, 232, 0.6); }
 .cm-fun .cm-close { color: rgba(245, 240, 232, 0.6); }
-.cm-fun .cm-close:hover { background: rgba(255, 76, 43, 0.15); color: #ff4c2b; }
+.cm-fun .cm-close:hover { background: rgba(161, 97, 97, 0.15); color: #a16161; }
 
 /* Fun mode follows the user's light/dark preference (data-theme on <html>).
    The modal is portaled to <body>, so we theme it directly off that attribute. */
@@ -97,7 +97,7 @@
 [data-theme='light'] .cm-fun .cm-title { color: #0a1413; }
 [data-theme='light'] .cm-fun .cm-sub { color: #5a6b66; }
 [data-theme='light'] .cm-fun .cm-close { color: #8a9a95; }
-[data-theme='light'] .cm-fun .cm-close:hover { background: rgba(255, 76, 43, 0.12); color: #ff4c2b; }
+[data-theme='light'] .cm-fun .cm-close:hover { background: rgba(161, 97, 97, 0.12); color: #a16161; }
 
 /* ----------------------------------------------------------------- CV ----- */
 .cm-cv {

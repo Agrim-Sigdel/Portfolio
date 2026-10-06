@@ -40,7 +40,7 @@ const AllProjectsPage = () => {
                         fontWeight: 700,
                         letterSpacing: '0.05em',
                         textTransform: 'uppercase',
-                        color: 'var(--accent, #ff4c2b)',
+                        color: 'var(--accent, #a16161)',
                         textDecoration: 'none'
                     }}
                 >

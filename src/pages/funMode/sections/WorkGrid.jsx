@@ -68,8 +68,8 @@ const WorkGrid = () => {
                             fontWeight: 700,
                             letterSpacing: '0.05em',
                             textTransform: 'uppercase',
-                            color: 'var(--accent, #ff4c2b)',
-                            border: '1px solid rgba(255, 76, 43, 0.4)',
+                            color: 'var(--accent, #a16161)',
+                            border: '1px solid rgba(161, 97, 97, 0.4)',
                             textDecoration: 'none'
                         }}
                     >

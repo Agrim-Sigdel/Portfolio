@@ -36,14 +36,14 @@ const Footer = ({ onResetMode }) => {
                         className="font-serif"
                         style={{
                             fontSize: 'clamp(3rem, 7vw, 6rem)',
-                            marginBottom: '4rem',
+                            marginBottom: '2rem',
                             lineHeight: 1.1,
                             maxWidth: '900px',
-                            margin: '0 auto 4rem',
+                            margin: '0 auto 2rem',
                             color: '#f5f0e8'
                         }}
                     >
-                        Have a project in mind? <br /> <span className="text-accent" style={{ fontStyle: 'italic' }}>Let's make it happen.</span>
+                        Have a project in mind? <br /> <span className="text-accent" style={{ fontWeight: 'bold', fontStyle: 'italic', fontFamily: 'cursive' }}>Let's make it happen.</span>
                     </h2>
                 </div>
 

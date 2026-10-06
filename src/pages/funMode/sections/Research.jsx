@@ -15,13 +15,13 @@ const researchLinkStyle = {
     alignItems: 'center',
     gap: '0.5rem',
     padding: '0.6rem 1.3rem',
-    border: '1px solid rgba(255, 76, 43, 0.4)',
+    border: '1px solid rgba(161, 97, 97, 0.4)',
     borderRadius: '4px',
     fontSize: '0.85rem',
     fontWeight: 600,
     letterSpacing: '0.03em',
     textTransform: 'uppercase',
-    color: 'var(--accent, #ff4c2b)',
+    color: 'var(--accent, #a16161)',
     textDecoration: 'none'
 };
 
@@ -108,7 +108,7 @@ const Research = () => {
                                 letterSpacing: '0.05em',
                                 textTransform: 'uppercase',
                                 color: 'var(--accent-red)',
-                                border: '1px solid rgba(255, 76, 43, 0.4)',
+                                border: '1px solid rgba(161, 97, 97, 0.4)',
                                 borderRadius: '999px',
                                 padding: '0.35rem 0.9rem'
                             }}

@@ -43,7 +43,7 @@ const Hero = () => {
                             style={{ display: 'inline-block' }}
                         >
 
-                            {hero.greeting} <span className="text-accent" style={{ fontWeight: 400, fontStyle: 'italic' }}>{common.personal.firstName}</span>.
+                            {hero.greeting} <span className="text-accent" style={{ fontWeight: 'bold', fontStyle: 'italic', fontFamily: 'cursive' }}>{common.personal.firstName}</span>.
                         </motion.span>
                         <br />
                         <motion.span

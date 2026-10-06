@@ -82,13 +82,13 @@ const Experience = () => {
                                             alignItems: 'center',
                                             gap: '0.4rem',
                                             padding: '0.5rem 1.1rem',
-                                            border: '1px solid rgba(255, 76, 43, 0.4)',
+                                            border: '1px solid rgba(161, 97, 97, 0.4)',
                                             borderRadius: '4px',
                                             fontSize: '0.8rem',
                                             fontWeight: 600,
                                             letterSpacing: '0.05em',
                                             textTransform: 'uppercase',
-                                            color: 'var(--accent, #ff4c2b)',
+                                            color: 'var(--accent, #a16161)',
                                             textDecoration: 'none'
                                         }}
                                     >

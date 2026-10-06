@@ -195,7 +195,7 @@
 }
 
 .navbar-sheet-link:hover {
-  background: rgba(255, 76, 43, 0.12);
+  background: rgba(161, 97, 97, 0.12);
   color: var(--accent-red) !important;
 }
 

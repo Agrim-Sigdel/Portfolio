@@ -24,7 +24,7 @@
   --ad-item-nested: #0c0c0c;
   --ad-thumb-bg: #1a1a1a;
   --ad-topbar-bg: rgba(11, 11, 11, 0.9);
-  --ad-accent: #ff4c2b;
+  --ad-accent: #a16161;
   --ad-accent-hover: #ff6347;
   --ad-on-accent: #0b0b0b;
   --ad-ok: #7ee081;
@@ -464,7 +464,7 @@
   margin: 14px 0;
   transition: border-color 0.15s, background 0.15s;
 }
-.admin-dropzone:hover { border-color: var(--ad-accent); background: rgba(255, 76, 43, 0.04); }
+.admin-dropzone:hover { border-color: var(--ad-accent); background: rgba(161, 97, 97, 0.04); }
 .admin-dropzone p { margin: 4px 0; }
 
 .admin-media-grid {

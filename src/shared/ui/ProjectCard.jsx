@@ -40,8 +40,8 @@ const ProjectCard = ({ project, index = 0 }) => {
                         fontWeight: 700,
                         letterSpacing: '0.08em',
                         textTransform: 'uppercase',
-                        color: 'var(--accent, #ff4c2b)',
-                        border: '1px solid rgba(255, 76, 43, 0.4)',
+                        color: 'var(--accent, #a16161)',
+                        border: '1px solid rgba(161, 97, 97, 0.4)',
                         borderRadius: '999px',
                         padding: '0.25rem 0.7rem',
                         whiteSpace: 'nowrap'
@@ -76,7 +76,7 @@ const ProjectCard = ({ project, index = 0 }) => {
                             letterSpacing: '0.05em',
                             textTransform: 'uppercase',
                             color: '#fff',
-                            backgroundColor: 'var(--accent, #ff4c2b)',
+                            backgroundColor: 'var(--accent, #a16161)',
                             textDecoration: 'none'
                         }}
                     >
@@ -99,13 +99,13 @@ const ProjectCard = ({ project, index = 0 }) => {
                                 alignItems: 'center',
                                 gap: '0.4rem',
                                 padding: '0.5rem 1.1rem',
-                                border: '1px solid rgba(255, 76, 43, 0.4)',
+                                border: '1px solid rgba(161, 97, 97, 0.4)',
                                 borderRadius: '4px',
                                 fontSize: '0.8rem',
                                 fontWeight: 600,
                                 letterSpacing: '0.05em',
                                 textTransform: 'uppercase',
-                                color: 'var(--accent, #ff4c2b)',
+                                color: 'var(--accent, #a16161)',
                                 textDecoration: 'none'
                             }}
                         >

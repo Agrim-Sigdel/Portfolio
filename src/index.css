@@ -4,15 +4,15 @@
   --bg-panel: #111111;
   --text-cream: #f5f5f5;
   --text-muted: #888888;
-  --accent-red: #ff4c2b;
+  --accent-red: #a16161;
   --accent-pink: #e0115f;
 
   /* Typography */
-  --font-serif: "Fraunces", serif;
-  --font-sans: "Instrument Sans", "Inter", system-ui, sans-serif;
+  --font-serif: "Montserrat", sans-serif;
+  --font-sans: "Open Sans", system-ui, sans-serif;
 
   /* TAN MEMORIES style override */
-  --font-display: "Fraunces", serif;
+  --font-display: "Montserrat", sans-serif;
 
   /* Spacing */
   --spacing-container: 90vw;

@@ -15,8 +15,8 @@
   --fun-bg: #071011;
   --fun-surface: #0e1f20;
   --fun-border: #143d3b;
-  --fun-accent: #00f0b5;
-  --fun-accent-soft: rgba(0, 240, 181, 0.1);
+  --fun-accent: #a16161;
+  --fun-accent-soft: rgba(244, 244, 244, 0.1);
   --fun-text: #ffffff;
   --fun-text-muted: #84a49c;
   
@@ -29,7 +29,7 @@
   --fun-bg: #f4fbf9;
   --fun-surface: #ffffff;
   --fun-border: #c8e0da;
-  --fun-accent: #0b665c;
+  --fun-accent: #d4074b;
   --fun-accent-soft: rgba(11, 102, 92, 0.1);
   --fun-text: #071011;
   --fun-text-muted: #4f7972;
@@ -195,4 +195,27 @@
    transition made every hover/toggle restyle the entire DOM) */
 .fun-mode-tilted-content {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Hero Background Image */
+.hero-bg-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/hero-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  /* By default (dark mode), invert the image so white canvas becomes dark */
+  filter: invert(1);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+[data-theme="light"] .hero-bg-canvas {
+  /* In light mode, keep the original white background with black strokes */
+  filter: invert(0);
 }

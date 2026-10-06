@@ -67,8 +67,8 @@ const About = () => {
                                 style={{
                                     display: 'inline-block',
                                     padding: '0.5rem 1.5rem',
-                                    backgroundColor: 'rgba(255, 76, 43, 0.1)',
-                                    border: '1px solid rgba(255, 76, 43, 0.3)',
+                                    backgroundColor: 'rgba(161, 97, 97, 0.1)',
+                                    border: '1px solid rgba(161, 97, 97, 0.3)',
                                     borderRadius: '4px',
                                     fontSize: '0.9rem',
                                     color: 'var(--text-cream)'

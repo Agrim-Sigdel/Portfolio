@@ -24,7 +24,7 @@ export default function NotFound() {
         padding: '24px',
       }}
     >
-      <h1 style={{ margin: 0, fontSize: '3rem', fontWeight: 800, color: '#ff4c2b' }}>404</h1>
+      <h1 style={{ margin: 0, fontSize: '3rem', fontWeight: 800, color: '#a16161' }}>404</h1>
       <h2 style={{ margin: 0, fontSize: '1.4rem' }}>Page not found</h2>
       <p style={{ margin: 0, opacity: 0.75, fontSize: '0.9rem', maxWidth: '400px', lineHeight: 1.5 }}>
         The link you followed may be broken, or the page may have been removed.
