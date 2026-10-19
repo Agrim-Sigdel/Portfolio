@@ -206,11 +206,10 @@ function CaseStudyRoute() {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
-  // These are normal scrollable pages; each one starts at the top.
+  // The case-study page restores its own section anchor after it mounts.
   const { projectSlug } = useParams();
   useEffect(() => {
     document.body.style.overflow = 'auto';
-    window.scrollTo(0, 0);
   }, [projectSlug]);
 
   return (

@@ -83,8 +83,8 @@
     "personal": {
       "name": "Agrim Sigdel",
       "intro": "I build things that work.",
-      "summary": "Versatile Full-Stack Developer with a strong foundation in modern AI, engineering production-ready applications using React/TypeScript and Python/Django. Adept at building scalable REST APIs, optimizing relational databases, and implementing clean architecture across web, mobile, and open-source platforms. I bridge the gap between complex AI models and user-centric applications.",
-      "tagline": "FULL-STACK DEVELOPER | AI RESEARCHER ",
+      "summary": "I am a Full-Stack Developer and published AI researcher specializing in building end-to-end machine learning pipelines and the robust web infrastructure required to scale them. My focus lies at the intersection of applied artificial intelligence and scalable software architecture.\n\nI have a proven track record of designing advanced computer vision architectures (YOLO, RT-DETR) and deploying them into production-ready SaaS platforms using Python/Django, React, and AWS. Whether I am architecting a multi-tenant CRM, optimizing a React Native mobile application for high performance, or engineering a cascaded AI vision pipeline that reduces compute load by over 60%, I am driven by the challenge of turning complex theoretical frameworks into user-centric, high-availability tools.",
+      "tagline": "Full-Stack Software Engineer & AI Researcher | Specializing in React, Django, & Scalable ML/Computer Vision Pipelines",
       "firstName": "Agrim",
       "shortSummary": "Full-Stack Developer & AI Researcher building production-ready applications with React, TypeScript, and Python/Django - and shipping open-source tools.",
       "areasOfExpertise": [
@@ -111,11 +111,12 @@
           }
         ],
         "title": "Feriaau",
-        "outcome": "Shipped and maintained in production with high availability and a streamlined release pipeline.",
+        "outcome": "A production platform shared by the web experience and Feriaau’s mobile apps.",
         "category": "Full-Stack · Web Platform",
+        "featured": true,
         "caseStudy": {
           "wip": false,
-          "tagline": "A multi-vendor loyalty and commerce platform — 21 Django domain apps behind a React 19 SPA, shipped to production through a two-environment GitLab pipeline.",
+          "tagline": "Giving each shop its own loyalty programme, without building a separate system for every shop.",
           "role": "Full-Stack Engineer — backend services, REST APIs, frontend, server configuration, CI/CD",
           "stack": [
             "Python",
@@ -135,115 +136,110 @@
             "Linux / VPS"
           ],
           "highlights": [
-            "21 Django domain apps · 22 versioned REST API modules",
-            "One response envelope across every endpoint — success and failure share one shape",
-            "Auto-deploy to staging, manual-gated release to production"
+            "Vendor-specific points and rewards",
+            "Shared APIs for web and mobile",
+            "Separate staging and production releases"
           ],
           "sections": [
             {
-              "heading": "Overview",
-              "body": "Feriaau lets many independent vendors each run a real loyalty programme from one platform and one database — storefront, catalogue, points, rewards, coupons, orders, staff accounts with genuine permissions, and their own branding — without any of them hiring an engineering team.\n\nThe backend is a modular Django 5 monolith: 21 domain apps, each exposing its own versioned REST API module, sitting on PostgreSQL 15 with Redis 7 for cache and as the Celery broker. Wagtail runs alongside the API so marketing pages are editable by people who don't deploy. The frontend is a React 19 + TypeScript SPA built with Vite, organised by audience rather than by component type.\n\nIt has been in production since late 2025 across a staging and a production environment, and is the platform the Feriaau mobile apps consume.",
+              "heading": "What I worked on",
+              "body": "Feriaau brings catalogues, orders, points, coupons, and rewards into one platform. I worked across the Django backend, the React frontend, and the server and release setup.\n\nThe important detail is that a customer earns points with a particular shop. That relationship runs through the whole product: the balance they see, the rewards they can claim, and what a member of staff is allowed to change.",
               "media": []
             },
             {
-              "heading": "Scale & Shape",
-              "body": "Twenty-one Django domain apps behind twenty-two versioned REST API modules. At that scale the codebase is too large to hold in your head, so structure has to do the remembering.",
-              "bullets": [
-                "21 Django domain apps · 22 versioned api/v1 URL modules",
-                "70+ page directories on the frontend, split by audience: public, user, admin, superadmin, vendor"
-              ],
+              "heading": "What the platform covers",
+              "body": "The customer side connects vendor discovery and product catalogues with carts, orders, points, coupons, gift cards, and rewards. The vendor side brings the shop’s catalogue, customers, orders, and loyalty activity into one workspace. Customer drilldowns make it possible to look beyond the summary numbers.\n\nThere are separate user, vendor, administrator, and superadmin routes. Onboarding, email verification, vendor access, trials, and permissions determine which parts of that workspace someone can use. Reporting includes customer analytics, QR activity, and loyalty performance; notifications and the POS integration support the work around those screens.\n\nThe screenshots focus on the public entry point and two vendor views. The wider feature scope comes from the application routes and backend domains, rather than implying that every module is visible in those three images.",
               "media": []
             },
             {
-              "heading": "The Problem",
-              "body": "A loyalty programme sounds like a points counter. Built for many vendors at once it is really three harder problems wearing a points counter as a disguise.\n\nThe first is identity of ownership: a customer does not have \"points\", they have points at a vendor. The second is permission: a vendor admin, a vendor staff member, a super admin and a customer all touch the same endpoints and must see different things. The third is auditability: points are money-adjacent, so every mutation has to be reconstructible after the fact when a customer disputes a balance.",
+              "heading": "Getting the boundaries right",
+              "body": "I kept the backend as a modular Django application, with separate domains for things like orders, points, and users. A points balance belongs to a customer and a vendor, and transactions are recorded separately so there is a history behind the number on screen.\n\nThe API also uses a shared response format. That made the React side easier to work with: errors and successful responses follow the same contract across features. Permission classes handle common rules such as whether a vendor is active.",
               "media": []
             },
             {
-              "heading": "Architecture",
-              "body": "Three tiers, containerised, communicating over REST. React holds server state entirely in TanStack Query — no Redux, no global store — and authenticates with JWT. Django REST Framework handles authentication, permissions, throttling and serialisation, then hands off to a service layer over the ORM.\n\nDocker Compose runs seven services: database, backend, Redis, Celery worker, Celery beat, frontend, and a React builder, with named volumes for Postgres, Redis, media and static.\n\nMulti-vendor isolation is row scoping on the vendor foreign key, with the active vendor carried in a custom header. CORS is extended to allow x-vendor-id and x-vendor-name — plus x-page-context and x-action-label, which exist purely so the audit log can record what the user was doing rather than just which endpoint fired.",
-              "bullets": [
-                "points.UserVendorPoints keys the balance on the (user, vendor) pair — loyalty is per-vendor by construction",
-                "points.PointTransaction is an append-only ledger, so a balance is always reconstructible and auditable",
-                "orders is the largest domain at 15 models; users carries 11, including activity logs and their archive tables",
-                "Celery runs two queues — the default and a dead_letter queue — with explicit task routing",
-                "CELERY_TASK_REJECT_ON_WORKER_LOST requeues a task whose worker dies instead of losing it silently"
-              ],
+              "heading": "Working with another system",
+              "body": "The Atithi POS integration needed room to change as its API evolved. I kept the mapping between the two systems in a separate integration app instead of spreading external IDs through the core models.\n\nStatus mappings and per-flow switches live in configuration. Outgoing work runs through Celery, and incoming webhooks are logged. That gives support a record to investigate and lets us pause an integration without stopping the rest of the platform.",
               "media": []
             },
             {
-              "heading": "Decision: one response contract, not 300",
-              "body": "Every endpoint renders through a single StandardizedJSONRenderer with a matching custom exception handler. Success and failure share one envelope shape.\n\nThe alternative — each viewset shaping its own response — means the React client writes a bespoke unwrap for every endpoint and guesses at the error shape. One renderer means one client-side contract, and an error surface that cannot drift per endpoint because no endpoint gets to define it.",
-              "media": []
-            },
-            {
-              "heading": "Decision: business rules as global permission classes",
-              "body": "Three custom permission classes sit in DEFAULT_PERMISSION_CLASSES, so they apply to every endpoint unless explicitly overridden — opt-out rather than opt-in.\n\nMPINChangeRequired blocks the entire API for a user still holding a temporary mobile PIN until they change it. VendorActivePermission blocks every request belonging to a vendor that is inactive or whose trial has expired. RequireReAuthentication intercepts sensitive super-admin actions — enumerated in a JSON file rather than hard-coded — and demands a fresh re-authentication.\n\nEach of these is a business rule that would otherwise be copy-pasted into dozens of views and forgotten in one of them. Pushing them into the permission layer makes \"we forgot to check\" structurally impossible: adding a new endpoint inherits every rule for free.",
-              "media": []
-            },
-            {
-              "heading": "Decision: throttling as configuration",
-              "body": "There are 22 named throttle scopes, and every rate is read from an environment variable with a sane default — login at 5/minute, registration at 3/hour, reward redemption at 10/hour, bulk operations at 10/hour, file uploads at 20/hour.\n\nThe shape came from a real problem. QA runs kept tripping the login throttle mid-suite, and each adjustment was a code change and a redeploy. Externalising the rates turned a tuning problem into a config problem: staging can be permissive while production keeps brute-force protection strict. A dedicated LoginRateThrottle stayed on the login view specifically so relaxing the general limits could never relax that one.",
-              "media": []
-            },
-            {
-              "heading": "Integrating a POS we didn't control",
-              "body": "Feriaau syncs bidirectionally with Atithi, an external restaurant POS, whose API surface and status vocabulary were still being finalised while we built against them.\n\nThe easy version is to store their identifier in a column on our Order model. Instead the integration is its own Django app with five explicit ID-mapping tables — customer, vendor, order, product and table. Neither system has to know the other's identifier scheme, mappings survive re-syncs, and the whole integration is removable.\n\nA singleton AtithiSyncConfig row carries a master kill switch and per-flow toggles, plus a JSONField mapping our order statuses to theirs — so when their vocabulary changed, it was a database edit rather than a deploy. Outbound events go through Celery tasks; inbound settlement and status webhooks are logged in full, denormalised for lookup without a join.",
-              "bullets": [
-                "Bidirectional and event-driven: outbound via Celery, inbound via logged webhooks",
-                "Status mapping stored as JSON so it changes without a code deploy",
-                "Master toggle plus per-flow toggles — the integration can be switched off in one field",
-                "Every webhook recorded in AtithiWebhookLog for replay and dispute resolution"
-              ],
-              "media": []
-            },
-            {
-              "heading": "Problems worth naming",
-              "body": "Coupon transfer between users is a two-phase handoff with explicit accept and reject states. Naive transfer — reassigning the owner — creates double-spend and dispute problems; a pending state does not.\n\nTrial expiry is enforced at the platform level rather than per feature. VendorTrialConfig and VendorTrialExtensionHistory hold the policy and its history, and the global VendorActivePermission does the enforcing, so an expired trial closes the vendor's entire API surface in one place while the extension history stays available for support and billing.\n\nActivity logging was built with its own end in mind: UserActivityLog has both an archive table and a configurable archive policy, because audit logs grow without bound and that is easier to plan for than to discover.\n\nThe most recent work adds walk-in customers with just a name and phone — a loyalty system whose data model assumes every customer has an account cannot serve a physical shop counter.",
-              "media": []
-            },
-            {
-              "heading": "Delivery & Reliability",
-              "body": "GitLab CI runs on a shell executor on our own server with a deliberately asymmetric model: pushing to the stage branch deploys automatically to staging, while production requires a manual trigger from main. Staging optimises for speed of feedback, production for intent.\n\nDeploy logic lives in versioned shell scripts rather than in CI YAML, so it can be tested — there are dedicated compose files for simulating the pipeline and the server locally before anything touches a real environment.\n\nAPI documentation is generated by drf-spectacular and served behind a login. A django-silk profiling hook can be switched on per environment. The whole API prefix is configurable, so the surface can be relocated under a path without touching a single route definition.",
-              "media": []
-            },
-            {
-              "heading": "Outcome",
-              "body": "Shipped and maintained in production with a staging environment in front of it and a release path that is repeatable rather than heroic.\n\nAlongside the code sits a 16-section developer handbook — architecture, data model, application flow, key modules, configuration, APIs, error handling, security, performance, local development, testing, an extension guide and a glossary — plus a design system and style guide. The platform is workable by people who did not build it, which for a codebase this size is the actual deliverable.",
+              "heading": "What shipped",
+              "body": "The platform has a staging environment and a separate production release step. I also documented the setup, application flow, and extension points for the next developer.\n\nThe walkthrough combines the public site with local captures of the vendor dashboard and customer drilldown. Sample records keep the operational screens readable without exposing customer accounts.",
               "media": []
             }
           ],
-          "media": [
-            {
-              "alt": "feriaau landing page",
-              "url": "https://wmzywhhrsapfhywdiyig.supabase.co/storage/v1/object/public/media/screenshot-2026-07-29-at-15-37-18.png",
-              "type": "image",
-              "caption": ""
-            }
-          ]
+          "media": [],
+          "walkthrough": {
+            "intro": "A look at the public site and the tools a vendor uses behind it. Dashboard captures use the original components with fictional sample data.",
+            "steps": [
+              {
+                "title": "Find the right shop",
+                "body": "The public site introduces the loyalty programme and directs customers to participating vendors. Each vendor owns its catalogue and reward rules.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/feriaau/home.jpg",
+                    "alt": "Feriaau homepage with vendor and customer entry points",
+                    "caption": "Public Feriaau homepage · October 2026.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ],
+                "flow": []
+              },
+              {
+                "title": "See how the shop is doing",
+                "body": "The vendor dashboard brings customer activity, repeat visits, and tracked revenue together. Each metric explains what it counts, so a shop owner can understand the number before opening a report.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/feriaau/dashboard.jpg",
+                    "alt": "Feriaau vendor dashboard with customer, visit and revenue cards",
+                    "caption": "Original dashboard components in a local preview · all figures are sample data.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ],
+                "flow": []
+              },
+              {
+                "title": "Open the records behind a number",
+                "body": "Selecting a customer metric opens a drilldown with the matching records. This gives the vendor a path from the summary to the customers behind it.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/feriaau/customers.jpg",
+                    "alt": "Feriaau customer drilldown showing two fictional customer records",
+                    "caption": "Local customer drilldown · fictional customer records.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ],
+                "flow": []
+              }
+            ]
+          }
         },
-        "description": "Lead full-stack engineer for Feriaau - a production web platform built on a modular Python/Django backend with a dynamic React.js/TypeScript frontend, deployed on secure servers with automated CI/CD.",
-        "featured": true,
+        "description": "I built the Django APIs, React interfaces, and deployment setup for a platform where shops run their own loyalty programmes.",
         "showInResume": false
       },
       {
         "id": 10,
         "slug": "peeq",
-        "title": "peeq",
-        "category": "AI · Commerce · Next.js",
-        "status": "In Development",
         "color": "#141414",
-        "description": "Founder and full-stack engineer of peeq - a virtual try-on shopping platform for Nepal. Shoppers see a garment on themselves before buying; shops get a catalogue, an in-store kiosk and an online storefront, including made-to-order pieces nobody has photographed.",
-        "outcome": "A three-sided platform with plans, metering, local payment gateways and an admin console - one build that runs offline on localStorage or multi-tenant on Postgres.",
         "links": [
           {
-            "label": "Live Site",
-            "url": "https://peeq.fashion"
+            "url": "https://peeq.fashion",
+            "label": "Live Site"
           }
         ],
+        "title": "peeq",
+        "status": "In Development",
+        "outcome": "A working storefront and try-on experience, with vendor tools still in development.",
+        "category": "AI · Commerce · Next.js",
+        "featured": true,
         "caseStudy": {
           "wip": false,
-          "tagline": "Virtual try-on commerce for Nepal — you see it on you before you buy, including garments nobody has photographed yet.",
+          "tagline": "A little look before you buy: bringing virtual try-on into the way local shops sell clothes.",
           "role": "Founder & Full-Stack Engineer",
           "stack": [
             "Next.js 15",
@@ -260,102 +256,90 @@
             "PWA"
           ],
           "highlights": [
-            "One build runs offline on localStorage or multi-tenant on Postgres — no environment branching",
-            "Four-layer AI cost control: result cache, per-IP limits, daily cap, atomic per-shop metering",
-            "Made-to-order renders: a fabric stitched into a cut nobody has photographed"
+            "Shopfront, product page, and try-on kiosk",
+            "Usage limits before paid generation",
+            "Fabric and cut previews for tailoring shops"
           ],
           "sections": [
             {
-              "heading": "Overview",
-              "body": "Nepali fashion commerce runs on Instagram and TikTok with checkout by direct message — no catalogue, no trust, no returns process. The thing stopping people buying clothes online is not price; it is not knowing how something will look on them.\n\npeeq puts virtual try-on at the centre of shopping. A shopper takes a photo, picks a piece, and sees it on themselves. Shops get a catalogue, an in-store kiosk and an online storefront. And for tailoring shops, peeq can show a garment that does not exist yet — a fabric rendered into a cut nobody has photographed.\n\nNext.js 15 App Router, React 19, TypeScript strict, Supabase for Postgres, Auth, Storage and row-level security — 24 migrations and 15 API routes.",
+              "heading": "What I’m building",
+              "body": "peeq starts with a small shopping question: how might this look on me? A shopper picks a piece from a store and enters a try-on flow. The shop gets a catalogue, a storefront, and a kiosk it can use in person.\n\nI’m the founder and full-stack engineer. The work spans the shopper experience, the shop dashboard, the AI integration, and the operational tools behind them.",
               "media": []
             },
             {
-              "heading": "The Problem",
-              "body": "Three constraints shaped everything. The product is only convincing if try-on is good, which means paying a per-generation cost to an AI provider on every interaction. The customers are small Kathmandu shops, so that cost has to stay proportionate to what they sell rather than to how much traffic they get. And the sales motion is walking into a shop with a laptop, often without reliable internet.\n\nA fourth constraint arrived with the tailoring shops: most of a catalogue is a photograph of something hanging in the back, but a tailor sells cloth plus a promise. There is nothing to photograph until someone orders.",
+              "heading": "The experience beyond try-on",
+              "body": "For shoppers, the product includes store discovery, individual storefronts, garment pages, kiosk entry, QR links, saved account views, and comparison. A shop can use the catalogue online or bring the same experience to its counter.\n\nThe repository also contains owner and shop dashboards, fabric tooling, and administration for shops, users, billing, and operations. These are different audiences with different jobs: showing a garment, maintaining a shop, and running the platform.\n\nThe captures follow the public shopping flow. They do not demonstrate a completed AI generation, payment, or private administration session. Those parts should be assessed separately from the storefront walkthrough.",
               "media": []
             },
             {
-              "heading": "Architecture",
-              "body": "Server-rendered storefront and product pages give shareable link cards; the kiosk and dashboard are client-driven. Fifteen API routes keep every provider key server-side — the earlier prototype shipped a key in client code, and the README still carries the instruction to rotate it.\n\nThe decision that shaped everything else is a single storage adapter with two backends behind one interface. Without Supabase environment variables the whole app runs on localStorage: zero setup, works offline, which is exactly how it gets demoed on a laptop inside a shop. With them set, the same UI runs multi-tenant against Postgres, Storage and RLS.\n\nNo code branches on environment. The offline sales demo and the production SaaS are the same build.",
-              "bullets": [
-                "Shopper: landing, kiosk, per-shop kiosk at /k/[slug], storefront and product pages at /s/[slug]",
-                "Vendor: catalogue, fabrics and the fabric studio, analytics, leads inbox, plan",
-                "Admin: shop approval queue, billing inbox, ops, users, overview",
-                "Renders live in a private bucket, served through signed URLs re-signed on every read with a one-hour TTL",
-                "Postgres schema across 24 migrations: shops, garments, tryon_results, tryon_events, leads, rate_limits, error_logs, plans, shop_subscriptions, payments, plan_requests, fabrics, styles, compositions"
-              ],
+              "heading": "The part behind the preview",
+              "body": "The Next.js server handles generation requests so provider keys stay off the client. A repeat request can reuse a cached result, and usage checks happen before a paid call. Shop allowances are reserved before generation and refunded when a request fails.\n\nI also built a local storage adapter for demonstrations. The catalogue and interface can work without the hosted database; generating a new AI result still needs a connection. That distinction matters when showing the product in a shop.",
               "media": []
             },
             {
-              "heading": "The try-on pipeline",
-              "body": "Two finishes sit behind one shopper-facing choice. A quick finish runs fal.ai's FASHN v1.6 — a dedicated try-on model, results in seconds. A studio finish runs an OpenAI gpt-image-2 image edit — slower, finer detail, and shared with the vendor's counter bench.\n\nModel names are deliberately never exposed to the UI. The shopper picks a finish, not a vendor, which keeps the provider swappable without a product change. Studio falls back to quick when no OpenAI key is configured, and content moderation runs on the shopper's photo before generation.\n\nThe route sets a 300-second max duration, learned the hard way: a multi-piece studio render is the slowest case and the platform default was killing requests mid-generation — after the shopper had already waited and after the credit had already been spent.",
+              "heading": "When there is no product photo",
+              "body": "Tailoring adds a different problem: the finished garment may not exist yet. I modelled fabrics and cuts separately so a shop can preview a combination before it is made.\n\nA fabric photo cannot describe everything. The studio also carries notes about details such as borders and drape. These previews help explain a proposed piece; they are not a promise of exact fit or fabric behaviour.",
               "media": []
             },
             {
-              "heading": "Cost control is the architecture",
-              "body": "Every generation is money, so the defences are layered rather than bolted on, and they compose: an abusive request has to get past all of them.",
-              "bullets": [
-                "Result cache keyed on a hash of person, garment and category — a repeat try-on is free, and cache hits deliberately do not consume rate-limit quota",
-                "Per-IP limit of 30 generations per 10 minutes",
-                "A global daily cap, default 500 and environment-tunable, so a distributed abuser cannot drain the provider account",
-                "Per-shop plan allowances metered atomically in Postgres functions, reserved before the call and refunded if it fails — concurrent try-ons cannot overshoot a plan",
-                "Metering is fail-closed: any database error blocks the spend rather than allowing it",
-                "In Supabase mode the garment must exist in that shop's catalogue, and the server uses the catalogue's own image URL — arbitrary URLs from the client are ignored",
-                "A four-megabyte payload ceiling, far above the app's own compression"
-              ],
-              "media": []
-            },
-            {
-              "heading": "Made to order",
-              "body": "A tailoring shop sells cloth plus a promise: pick this fabric, have it stitched into that cut. Nobody has photographed the result, because it does not exist until someone orders it.\n\nSo fabrics and cuts are modelled separately and the pairing is rendered. A fabric is a bolt of cloth, priced per meter or piece or set, carrying a vendor note for what a photo cannot show — where a border falls, how heavily it drapes. A style is a cut; platform-global ones ship as a seeded library and a shop can add its own. A composition is one row per pairing a vendor deliberately authored, priced and published.\n\nThe critical decision is that a composition is not a cache. Generating on demand would fill the catalogue with combinations the shop cannot actually stitch, and a shopper would be looking at a promise nobody made. Every row is a product a human chose and a tailor agreed to make.\n\nIt is also what makes the economics work. A composition render has nobody in it, so it caches forever and is shared by every shopper. Cost scales with the combinations a vendor authored, not with traffic.",
-              "media": []
-            },
-            {
-              "heading": "The ghost-mannequin lock",
-              "body": "This is the single most important constraint in the compose path, and it is an ethics rule that turned out to be the technically optimal one.\n\nA made-to-order render becomes the garment input to try-on. If it comes back on a model — or on a mannequin with a shaped bust and hips — that body silhouette is baked into the garment image, and try-on drags it onto the shopper. They then see a body that is not theirs, and order a garment cut for it.\n\nSo: no person, no face, no shaped torso, ever. And the prompt states it as absence rather than instruction, because the difference matters. \"Render the top\" leaves the model free to add trousers for a tidier picture; \"below the hem there is nothing but empty background\" does not.\n\nGhost-mannequin also happens to be the format try-on models are trained on. The constraint that protects body fidelity improves fit quality at the same time.",
-              "media": []
-            },
-            {
-              "heading": "Coverage, and routing around a model limit",
-              "body": "A cut's coverage is an enum — top, bottom or set — rather than prose, because it is read twice: once by the compose prompt, to decide what to draw and what must be absent, and once by try-on placement, to choose how the garment is applied. A note could only ever do the first job; try-on cannot read a sentence, and a suruwal sent up untyped gets hung on the torso.\n\nMulti-piece outfits exposed a harder limit. FASHN warps exactly one garment onto a body, so a set sent down the quick path returns the kurtha and silently drops the churidar and the dupatta. That is a capability limit of the model, not a wording problem — no amount of prompt tuning fixes it. So the API forces set pieces onto the studio path, where the prompt can enumerate every piece.\n\nRecognising when to stop prompting and route around the model is the part of this worth remembering.",
-              "media": []
-            },
-            {
-              "heading": "Prompts as versioned software",
-              "body": "The prompts are treated as artifacts, not string literals. There is a studio prompt version constant, a dedicated compose prompt review document, and a commit history that reads like a changelog for them.\n\nOne commit adds a body lock — size the garment to the body, never the reverse. Another sets a rule that the pattern must survive enhancement. Another drops a fidelity parameter because gpt-image-2 rejects it with a 400. Another tunes quality per case: low for a single piece, medium for a set.\n\nThe same discipline shows in failure handling. An early build fell back to the manual positioning preview when a generation failed, which looked like a result. A later commit changed it so a failed try-on says so. In a product whose entire value is trust, an honest failure beats a prettier lie.",
-              "media": []
-            },
-            {
-              "heading": "Product surface",
-              "body": "The parts a demo does not have are what make it a business.",
-              "bullets": [
-                "Plans, subscriptions, payments and plan requests, with a free tier and request guards",
-                "Khalti ePayment and eSewa ePay v2 integrated server-side with HMAC signing and per-gateway verify callbacks, sandbox by default",
-                "Admin console: shop approval queue covering pending, rejected and suspended states, plus billing inbox and ops",
-                "Vendor analytics with stat tiles, a 30-day chart, per-garment history and CSV export, on anonymous session ids",
-                "Per-garment QR hanger tags — a shopper scans a tag and that garment tries itself on, on their own phone",
-                "Two-step checkout, orders inbox, shopper order history, item codes and a cart",
-                "Shop discovery on a map via Leaflet and OpenStreetMap, with shop types and categories",
-                "A consent screen before the camera, a photo-never-saved policy, and a private results bucket",
-                "An installable PWA so the kiosk runs full-screen on a shop tablet"
-              ],
-              "media": []
-            },
-            {
-              "heading": "Front-end craft",
-              "body": "Fonts are self-hosted through next/font rather than a CSS import, because the import was a render-blocking request Next could not preload — every page painted in the fallback face and reflowed when the display font landed.\n\nPinch-zoom is deliberately not locked. It is how people read a price at arm's length and how they check a weave; disabling it is a WCAG failure and, on a shopping site, removes the one gesture the product is about.\n\nLight and dark come straight from the device with no in-app switch — no script, no stored preference, nothing to hydrate around. The browser theme colour is pinned to the page background with a comment explaining that the two must track each other, or the OS chrome sits at a different colour from the page it frames.",
-              "media": []
-            },
-            {
-              "heading": "Outcome",
-              "body": "A working three-sided platform built toward launch: vendors can list, price, meter and get paid; shoppers can try on and order; and a tailoring shop can sell a garment that does not exist yet.\n\nPayment gateways are integrated and verifiable against their sandbox endpoints, pending go-live. The product plan that drives the roadmap — influencer storefronts with commission, a multi-shop shopper app — is written down and phased rather than aspirational.",
+              "heading": "Where it stands",
+              "body": "The public storefront and try-on entry are available, and the wider product is still in development. The walkthrough follows a real product from the public catalogue into its kiosk.\n\nThe shopper-facing page currently hands order confirmation, payment, and delivery back to the shop. Those handoffs are part of the current shopping flow.",
               "media": []
             }
           ],
-          "media": []
+          "media": [],
+          "walkthrough": {
+            "intro": "A real shopper journey through the public site. No personal photo was uploaded and no paid generation was run for these captures.",
+            "steps": [
+              {
+                "title": "Start with a piece",
+                "body": "The landing page gives shoppers a way into participating shops. A fit preview explains the idea before asking them to use their own photo.",
+                "flow": [],
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/peeq/home.jpg",
+                    "alt": "peeq homepage introducing virtual try-on beside a model preview",
+                    "caption": "Public landing page · the hero is a product demonstration.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ]
+              },
+              {
+                "title": "Look at the details",
+                "body": "The product page keeps the price, sizes, and try-on entry together. Shoppers can inspect the garment before deciding whether to preview it on themselves.",
+                "flow": [],
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/peeq/product.jpg",
+                    "alt": "peeq Lehenga product page with price, size options, and try-on link",
+                    "caption": "Public product detail · catalogue content as captured in October 2026.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ]
+              },
+              {
+                "title": "Carry the garment into try-on",
+                "body": "Opening the kiosk preserves the selected piece. The next part asks for a shopper photo; this capture stops at the entry screen.",
+                "flow": [],
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/peeq/try-on.jpg",
+                    "alt": "peeq try-on entry with the selected Lehenga and see it on you button",
+                    "caption": "Try-on entry · no generated result or personal photo is shown.",
+                    "width": 615,
+                    "height": 709
+                  }
+                ]
+              }
+            ]
+          }
         },
-        "featured": true,
+        "description": "I’m building a shopping platform for Nepal where people can preview a garment on themselves and shops can manage a catalogue and try-on kiosk.",
         "showInResume": false
       },
       {
@@ -373,11 +357,12 @@
           }
         ],
         "title": "Partweave",
-        "outcome": "'create-t3-app meets shadcn/ui' - deterministic template injection produces fully-owned, ready-to-run code; published to npm and extensible through a modules catalog.",
+        "outcome": "An open-source scaffolder that generates code you own, with a plan step before it writes files.",
         "category": "Open Source · Developer Tooling · CLI",
+        "featured": true,
         "caseStudy": {
           "wip": false,
-          "tagline": "A full-stack scaffolder that resolves capabilities, not packages — pick the parts you want and get a monorepo wired together, with code you own.",
+          "tagline": "Choose the pieces of a stack, check how they fit, and start with a repository you can own.",
           "role": "Creator & Maintainer",
           "stack": [
             "TypeScript",
@@ -390,94 +375,87 @@
             "npm"
           ],
           "highlights": [
-            "7 commands · 12 modules · 6 build targets",
-            "Capability-keyed dependency resolution rejects impossible stacks before writing a byte",
-            "Idempotent anchor injection — one mechanism across Python, TypeScript, JSON and YAML"
+            "Plan before generating files",
+            "Resolve dependencies and conflicts",
+            "Add modules to an existing scaffold"
           ],
           "sections": [
             {
-              "heading": "Overview",
-              "body": "Every new full-stack project starts with the same two days: wire a Django server, wire a Next.js app, wire an Expo app, connect them, add auth, a database, Docker, CI. Existing scaffolders give you either a fixed stack you must take whole, or a blank page.\n\nPartweave generates only the parts you pick, wires them together, and hands you the code — there is no runtime dependency on the generator afterwards. Its own README describes it as create-t3-app meets shadcn/ui: choose your stack, then own what lands in your repo.\n\nA TypeScript CLI of seven commands, twelve modules and six build targets, published to npm and runnable with a single npx invocation.",
+              "heading": "Why I built it",
+              "body": "Setting up a full-stack project involves a lot of familiar work: an API, a client, authentication, environment files, and local services. I built Partweave to make that setup reusable while still letting me choose which parts belong in a project.\n\nThe generated application does not depend on Partweave at runtime. Once it is written, it is ordinary source code.",
               "media": []
             },
             {
-              "heading": "The Problem",
-              "body": "A generator that runs once is half a tool. The genuinely hard parts are deciding which combinations are legal before writing anything, injecting wiring into five different file formats, and being safe to run again on a project that already exists.\n\nGet the first wrong and users get broken projects. Get the second wrong and you maintain a parser per language. Get the third wrong and the tool can only ever be used on day one.",
+              "heading": "What is built, and what is still planned",
+              "body": "The current module catalogue includes PostgreSQL, authentication, storage, Docker, CI, a web UI kit, a working client–server example, and feedback forms. Storage supplies local and S3 adapters; feedback can connect the server, web, and mobile apps without requiring authentication.\n\nThe CLI supports planning before generation, inspecting the catalogue, creating a project, and adding modules later. Module contracts and generated-project checks are part of that workflow, because a selectable module needs to work with its declared dependencies.\n\nRole-based access, rate limiting, audit logging, and the workflow engine are documented plans. They are kept outside the selectable module catalogue until they are implemented and tested. This distinction is important when describing what someone can install today.",
               "media": []
             },
             {
-              "heading": "Capabilities, not packages",
-              "body": "Every component declares itself as data in a module manifest: which targets it contributes to, which apps it requires, which modules it conflicts with, which capability it provides, and the lines it injects.\n\nThe key move is that dependencies are expressed as capabilities rather than module names. The auth module does not require Postgres — it requires a database. Swap in a different database module that also provides that capability and auth keeps working, untouched. Two modules that provide the same capability conflict automatically, without either naming the other.\n\nRequirements come in two flavours because real stacks need both. Conjunctive requirements demand that all listed apps are selected. Disjunctive ones express \"needs a web or mobile client\" as an OR-group, and all groups must hold.",
-              "bullets": [
-                "requires pulls in other modules transitively; conflicts rejects incompatible pairs",
-                "provides is a capability tag — duplicate providers are a conflict by construction",
-                "Environment keys are routed to the right app's env file by prefix, so a NEXT_PUBLIC_ key cannot land in the server's config",
-                "A module contributing to none of the selected apps is rejected rather than installed — otherwise it is a silent no-op and the user believes they got a feature they did not"
-              ],
+              "heading": "Deciding what fits together",
+              "body": "Each module describes what it needs and what it provides. Authentication can require a database capability without naming one particular database module. The resolver expands those requirements and rejects conflicting combinations before generation.\n\nOptional wiring is applied after the full module set is resolved. That keeps the output from changing just because modules were visited in a different order.",
               "media": []
             },
             {
-              "heading": "Injection without a parser",
-              "body": "Generated scaffolds carry anchor comments. Modules declare lines; the engine injects them at the matching anchor — installed apps, URL patterns, settings, providers, routes, dependency lists.\n\nThis is deliberately not AST manipulation. One injector works identically across Django settings, TypeScript provider trees, package manifests, pyproject files and Dockerfiles. The alternative was five language-specific transformers to build and keep working.\n\nTwo properties make it usable rather than merely clever. Injection is idempotent — a line already present is skipped — which is what makes adding a component to an existing project safe to re-run. And it preserves the anchor's indentation, so the output is formatted code rather than something you have to tidy afterwards.\n\nThe cost is real and worth stating: anchors must exist in the scaffold, and a user who deletes one breaks later injection. That trade bought support for every file type in the stack from a single implementation.",
+              "heading": "A deliberately simple way to edit files",
+              "body": "Modules insert lines at named anchor comments in the scaffolds. The same approach works across Python, TypeScript, configuration files, and Dockerfiles, and skips lines that are already present.\n\nThe trade-off is visible: removing an anchor can break a later addition. I chose that constraint over maintaining a separate syntax transformer for every language in the stack.",
               "media": []
             },
             {
-              "heading": "Determinism",
-              "body": "Modules can declare soft joins — wiring applied only when some other selected module provides a given capability. A storage module can contribute extra configuration to the server, but only if auth is present.\n\nThe hard part is not the feature, it is that the result must not depend on which module the resolver happens to visit first. Soft joins are keyed by capability and applied in a separate pass over the already-resolved set, which makes them order-independent.\n\nNon-deterministic output is the worst possible bug in a code generator: it produces projects that differ for reasons nobody can see. It has its own test suite, alongside tests for manifest validation, requirement evaluation, the registry, extraction, reporting and root generation.",
-              "media": []
-            },
-            {
-              "heading": "The engine",
-              "body": "The CLI source reads like a compiler pipeline, and the separation is what makes each stage testable on its own.",
-              "bullets": [
-                "registry and catalog discover and load module manifests",
-                "contract validates each manifest against the module contract",
-                "resolve evaluates requirements and conflicts into a final module set",
-                "compose assembles the plan; render handles token substitution; inject applies the wiring",
-                "rootgen generates the monorepo root — workspace files, tsconfig, scripts",
-                "projectmanifest records what was installed, so a later add knows the current state",
-                "pm detects package managers with fallbacks; preflight checks the environment before anything is written",
-                "extract-infer runs the pipeline backwards, inferring a module from existing code"
-              ],
-              "media": []
-            },
-            {
-              "heading": "Commands built from using generators in anger",
-              "body": "Seven commands, and three of them exist because of specific frustrations.\n\nPlan is a dry run: show me what this would generate before it touches my disk. Doctor diagnoses an already-generated project, because the interesting failures happen after generation, not during it. Extract runs the whole thing in reverse — turn existing code into a module — which is what lets the catalogue grow from real projects instead of hand-authored manifests.\n\nThe other four are create, add, list and explore. Add is the one that only works because injection is idempotent.",
-              "media": []
-            },
-            {
-              "heading": "What ships in the catalogue",
-              "body": "Twelve modules today, each built once so it stops being rewritten per project.",
-              "bullets": [
-                "db-postgres — Postgres wiring and driver, provides the database capability",
-                "auth — register, login, refresh, JWT, a custom user model and a TokenStore on both clients; spans server, web, mobile and shared",
-                "storage — a StorageProvider abstract base with local and S3 implementations, documented as the swappable-provider reference",
-                "docker — local Postgres compose plus a production server image",
-                "ci — per-app GitHub Actions with path filtering, so a mobile change does not run the server suite",
-                "ui-kit — owned Button, Badge, Card, Container and Input primitives",
-                "example — a working screen proving the client-to-server round trip",
-                "rbac, rate-limit, audit-log, feedback and workflow-engine added in later releases"
-              ],
-              "media": []
-            },
-            {
-              "heading": "Scope, stated honestly",
-              "body": "The README puts the limitation above the fold, in the project's own marketing copy: Partweave scaffolds one opinionated stack — Django, Next.js and Expo. You pick which of those apps and which components to include, but the frameworks themselves are not swappable yet. Pluggable stacks are on the roadmap, not in the box.\n\nThe roadmap in the feature catalogue specs roughly thirty further modules as mini-specifications — what each provides, which apps it touches, what it depends on — so a contributor can build one by dropping a folder in and following the module contract.",
-              "media": []
-            },
-            {
-              "heading": "Outcome",
-              "body": "Published to npm, runnable with npx, with a documented module contract, an authoring guide, and CI on every push.\n\nThe part worth keeping is not the generator; it is that the resolution model turned out to be the interesting problem. Capability-keyed dependencies, order-independent soft joins and idempotent injection are three ideas that would apply to any plugin system, and this is where they got worked out.",
+              "heading": "What is available",
+              "body": "Partweave is published on npm with commands for creating, planning, inspecting, and extending projects. The supported framework choices are Django, Next.js, and Expo; arbitrary framework combinations are outside the current scope.\n\nThe most useful part of the project for me has been working out the module contract. It gives new components a predictable way to participate without teaching the generator about each one individually.",
               "media": []
             }
           ],
-          "media": []
+          "media": [],
+          "walkthrough": {
+            "intro": "From choosing a project shape to understanding the generated workspace. These screens come from the local documentation site; the diagram shows the CLI generation sequence.",
+            "steps": [
+              {
+                "title": "Start with a project shape",
+                "body": "Partweave introduces the supported apps and modules together. The aim is to make the first decision about what the project needs, rather than which starter repository to copy.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/partweave/home.jpg",
+                    "alt": "Partweave homepage with its project generation introduction",
+                    "caption": "Local Partweave website · captured from the project source.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ],
+                "flow": []
+              },
+              {
+                "title": "Choose what gets generated",
+                "body": "The creating-projects guide explains the supported combinations. Behind the CLI, module manifests define requirements and conflicts before the generator writes any files.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/partweave/docs.jpg",
+                    "alt": "Partweave documentation explaining the applications and modules it can create",
+                    "caption": "Local documentation · What you can create.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ],
+                "flow": []
+              },
+              {
+                "title": "Inspect, generate, then keep building",
+                "body": "The plan command shows the proposed composition. Template rendering creates the files, anchor injection connects the modules, and a saved manifest supports later additions.",
+                "media": [],
+                "flow": [
+                  "Validate module selection",
+                  "Inspect generation plan",
+                  "Render and connect modules"
+                ]
+              }
+            ]
+          }
         },
-        "description": "Creator of an open-source full-stack project scaffolder - a TypeScript CLI that generates self-contained monorepos from only the components you pick (Django, Next.js, Expo, plus auth, database, Docker and CI/CD modules), resolving dependencies and rejecting incompatible selections upfront.",
-        "featured": true,
-        "showInResume": true,
         "resumeRole": "Creator",
+        "description": "I made a CLI that assembles Django, Next.js, and Expo projects from the apps and modules you choose.",
+        "showInResume": true,
         "resumeDescription": "Creator of an open-source full-stack TypeScript CLI that generates self-contained monorepos with deterministic template injection (Django, Next.js, Expo, Auth, Docker)."
       },
       {
@@ -495,11 +473,12 @@
           }
         ],
         "title": "easy-3dkit",
-        "outcome": "Drop-in scroll-reactive surfaces, particle fields, instanced layouts, and post-processing - lightweight and production-ready.",
+        "outcome": "A published npm package used by this portfolio’s terminal backdrop.",
         "category": "Open Source · NPM Package",
+        "featured": true,
         "caseStudy": {
           "wip": false,
-          "tagline": "50+ interactive 3D effects for React from a handful of components — with the packaging discipline to make them safe to install.",
+          "tagline": "The 3D setup I kept needing, turned into reusable React components.",
           "role": "Creator & Maintainer",
           "stack": [
             "TypeScript",
@@ -513,88 +492,87 @@
             "npm"
           ],
           "highlights": [
-            "21 components, 22 surface materials and 11 instance layouts across six families",
-            "Peer-dependency design avoids the classic duplicate three.js failure",
-            "Docs site builds against the published bundle, not the source"
+            "Live controls and copyable examples",
+            "Shared components with swappable materials",
+            "A published package used in this portfolio"
           ],
           "sections": [
             {
-              "heading": "Overview",
-              "body": "Adding 3D to a React site is disproportionately hard for what is usually a background effect. You need three.js, React Three Fiber, drei, a camera rig, a render loop, resize handling, a WebGL-unavailable fallback, reduced-motion handling, and enough shader knowledge to write the thing you actually wanted.\n\neasy-3dkit collapses that to a Stage and a component. It ships a documentation site, a live gallery, and its own create-app so a working project is one command away.\n\nWritten in TypeScript, it exposes 50+ effects across six families through 81 exports from a single entry file.",
+              "heading": "What I wanted to make easier",
+              "body": "A background effect can require a surprising amount of setup: a canvas, camera, input handling, resize behaviour, and a fallback when WebGL is unavailable. easy-3dkit packages that common work so I can start with a Stage and compose components inside it.\n\nI built the library and its gallery together. The gallery is a place to try the components, adjust their controls, and copy a useful starting point.",
               "media": []
             },
             {
-              "heading": "The Problem",
-              "body": "A component library is a promise you cannot take back. Every export is API surface you have to keep working. Every dependency is something you impose on a consumer's bundle. And packaging mistakes have a particular cruelty: they only appear after you publish, in someone else's project.\n\nSo the library is designed around its boundary rather than around its features. The public entry file opens with the rule stated outright — this file is the package boundary, everything a consuming app is allowed to import lives here, keep internals private.",
+              "heading": "How the pieces fit together",
+              "body": "Stage handles the scene setup. InteractiveSurface and its materials cover shader-based surfaces, while InstancedGrid and its layouts handle repeated geometry. Pointer-driven behaviour and shared utilities let those components participate in an interactive page.\n\nThe gallery adds controls and copyable examples around the components. The package also includes a starter workflow and an optional post-processing entry point. Server rendering, missing WebGL support, resizing, and package exports are part of the integration work behind the visual demo.\n\nThe walkthrough shows the documentation and one live effect. It introduces the component families and the path to using them; it is not a screenshot catalogue of every variant.",
               "media": []
             },
             {
-              "heading": "Three layers",
-              "body": "The engine layer owns the canvas, camera, easing and failure handling: Stage, CameraRig, a WebGL error boundary, a fallback component, a WebGL availability check, view-angle helpers, an easing set, an input-mode store and a scroll driver.\n\nThe hooks layer exposes reusable reactive inputs — pointer position, scroll progress, and the user's reduced-motion preference.\n\nThe component layer holds the six master families: particle fields, ripple shaders, floating objects, scroll scenes and animators, interactive surfaces, instanced grids, and post-processing.",
+              "heading": "One component, different looks",
+              "body": "An InteractiveSurface takes a material; an InstancedGrid takes a layout. Changing that input changes the visual while the component keeps responsibility for its lifecycle and rendering.\n\nThe variant types and shared shader utilities are public extension points. A user can make a new material without having to fork the whole component.",
               "media": []
             },
             {
-              "heading": "The variant pattern",
-              "body": "Rather than fifty components, a handful of master components accept variant objects. An interactive surface takes a material; an instanced grid takes a layout. That yields 22 surface effects and 11 instanced arrangements from two components, with the render loop, uniform handling and lifecycle written once.\n\nThe part that matters more: the extension point is public. The variant type, the standard uniform set and the shader chunks are all exported, so a consumer can author a twenty-third material without forking the library. Being able to extend without forking is the difference between a library and a starting point.",
-              "bullets": [
-                "Materials include glassmorphism, iridescent, thermal vision, frosted glass, holographic foil, toon cel, wireframe morph, moiré, fractal zoom, liquid blob, brushed metal, neon line art, bioluminescent, x-ray ghost, rain streaks, scanlines, 8-bit dither, kinetic type, plasma, voronoi cells and heat haze",
-                "Layouts include orbit, tunnel, isometric stack, voxel sphere, voronoi shatter, gear field, kinetic ring, origami fold, wave grid, galaxy spiral and cube swarm",
-                "Standalone components cover card flip, magnetic group, squash-stretch, elastic jiggle, path spline, morph shape, exploded view, parallax layers, ocean plane, portal ring, camera flythrough and popup fold"
-              ],
+              "heading": "The less visible work",
+              "body": "Packaging needed as much care as the effects. The 3D engine is a peer dependency so a consuming application can share its existing copy. Optional post-processing has its own entry point.\n\nI also added checks around the built package and starter. Building the documentation against the distribution catches missing exports and packaging mistakes that source imports would hide.",
               "media": []
             },
             {
-              "heading": "Packaging: the duplicate-three problem",
-              "body": "The entire 3D stack is declared as peer dependencies rather than bundled — three.js, React Three Fiber, drei, GSAP, React, and post-processing.\n\nBundling three.js would give a consumer two copies with separate module registries. Objects created by one would not be recognised by the other, producing errors that look like nonsense: an instance that fails an instanceof check against its own class. It is the most common and most confusing failure in the R3F ecosystem, and the library is designed around avoiding it. The README states the peer install line explicitly rather than hoping the user works it out.",
-              "media": []
-            },
-            {
-              "heading": "Packaging: making an optional peer actually optional",
-              "body": "Post-processing ships from its own export subpath, so the main entry never references the optional peer dependency at all.\n\nIf it lived in the main entry, every consumer would need the post-processing package installed whether or not they ever rendered an effect — because the import would be evaluated regardless. A subpath export means users who do not want it never install it, and users who do get types and runtime from one place.",
-              "media": []
-            },
-            {
-              "heading": "Release engineering",
-              "body": "Publishing is guarded rather than manual, and each script exists because of a class of bug it catches.",
-              "bullets": [
-                "A separate library build and a separate types build from a dedicated tsconfig, so the published artifact is not the app build",
-                "A pack check that verifies what actually lands in the tarball",
-                "A size measurement, so bundle growth is visible rather than discovered",
-                "Smoke tests run twice — with WebGL and without — because the no-GPU path is the one nobody tests",
-                "A Next.js check, because server-side rendering is where 3D libraries break: window access at module scope",
-                "A starter-template sync and smoke test, so the create-app cannot drift from the library",
-                "A dogfood build that compiles the docs site against the published dist instead of the source",
-                "Changesets for versioning and changelog discipline; the publish script cannot run without a full build"
-              ],
-              "media": []
-            },
-            {
-              "heading": "Why building against dist matters",
-              "body": "A library repo that imports its own source never exercises the packaged artifact. Everything resolves through the bundler's path aliases, so a missing export, a wrong types path or a file left out of the package manifest is invisible right up until the moment a user installs it.\n\nThe dogfood build flips an environment flag and rebuilds the documentation site against the published output. If an export is missing, the site fails to build — in CI, not in someone's inbox.",
-              "media": []
-            },
-            {
-              "heading": "Tests that test the right things",
-              "body": "The test suite is small and deliberately aimed at library-specific failure modes rather than at coverage.\n\nAn exports test asserts the public surface, so removing or renaming an export cannot happen by accident — for a library, that is a breaking change, and this makes it a deliberate one. A mount test verifies components actually render. A reduced-motion test covers the accessibility path, because a 3D library that ignores prefers-reduced-motion makes some users physically unwell, and that hook is exported for exactly this reason.",
-              "media": []
-            },
-            {
-              "heading": "Real-world use",
-              "body": "The library powers the live backdrop on this portfolio, which is also how packaging regressions get caught early: the consumer and the author are the same person, and the consumer builds against the published artifact rather than the source.\n\nThe portfolio's own bundling decisions came out of that relationship — three.js is deliberately left in a lazily-loaded chunk rather than forced into a named vendor bundle, which is documented in the other case study on this site.",
-              "media": []
-            },
-            {
-              "heading": "Outcome",
-              "body": "A published, versioned package with a live gallery, a scaffolding command, changelog discipline, and a public API designed to be extended rather than forked.\n\nIt is pre-1.0 and honest about that. What it demonstrates is not scale but judgement: knowing that a library's hard problems are its boundary, its peers and its release path, not the number of effects behind them.",
+              "heading": "Using it outside its own repo",
+              "body": "This portfolio installs easy-3dkit as a dependency and uses it for the terminal backdrop. That gives me another place to find integration problems.\n\nThe library is still pre-1.0. I’m treating the public API, fallback behaviour, and release process as part of the product, alongside the effects you can see.",
               "media": []
             }
           ],
-          "media": []
+          "media": [],
+          "walkthrough": {
+            "intro": "The live gallery is the quickest way to understand the library: pick an effect, change its controls, then bring the component into a project.",
+            "steps": [
+              {
+                "title": "Start with the components",
+                "body": "The documentation introduces the Stage and the component families, with small examples beside the visuals.",
+                "flow": [],
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/easy-3dkit/home.jpg",
+                    "alt": "easy-3dkit documentation homepage introducing interactive React components",
+                    "caption": "Live documentation site · captured October 2026.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ]
+              },
+              {
+                "title": "Try an effect in the gallery",
+                "body": "The gallery puts the effect and its controls in the same view. Material changes reuse the same component underneath.",
+                "flow": [],
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/easy-3dkit/gallery.jpg",
+                    "alt": "easy-3dkit live gallery with a shader preview and controls",
+                    "caption": "Live gallery · a real rendered effect, not a mockup.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ]
+              },
+              {
+                "title": "Bring the setup into React",
+                "body": "The copied configuration becomes props on a component inside Stage. The application supplies its own page and interaction context.",
+                "flow": [
+                  "Choose a material or layout",
+                  "Configure component props",
+                  "Render inside Stage"
+                ],
+                "media": []
+              }
+            ]
+          }
         },
-        "description": "Creator and maintainer of an open-source library of interactive 3D components for React, built natively on Three.js, React Three Fiber (R3F), and GSAP.",
-        "featured": true,
-        "showInResume": true,
         "resumeRole": "Creator & Maintainer",
+        "description": "I built a React library for interactive 3D effects, along with a live gallery where you can tune a scene and copy its code.",
+        "showInResume": true,
         "resumeDescription": "Creator and maintainer of an open-source library providing interactive 3D components for React, built natively on Three.js, React Three Fiber (R3F), and GSAP."
       },
       {
@@ -608,11 +586,12 @@
           }
         ],
         "title": "Kingsoft CRM",
-        "outcome": "Tenant isolation enforced in four layers, with a self-authored security audit separating what is provably safe from what still needs a database backstop.",
+        "outcome": "A CRM for Feriaau’s operations, with the tenant boundaries and their limitations documented.",
         "category": "Full-Stack · Multi-Tenant SaaS",
+        "featured": false,
         "caseStudy": {
           "wip": false,
-          "tagline": "A shared-table multi-tenant CRM — 26 tenant-scoped models, a soft-delete cascade engine, and a self-authored isolation audit.",
+          "tagline": "Keeping contacts, deals, and follow-ups organised across separate teams.",
           "role": "Backend Engineer",
           "stack": [
             "Python",
@@ -627,68 +606,140 @@
             "GitLab CI"
           ],
           "highlights": [
-            "50 models across 5 apps; 26 of them cannot be saved without a tenant",
-            "Soft delete that reproduces real cascade, set-null and protect semantics",
-            "Self-directed isolation audit that found three divergent tenant resolvers"
+            "Organisation-scoped records",
+            "Role and record-level permissions",
+            "Soft deletion across related records"
           ],
           "sections": [
             {
-              "heading": "Overview",
-              "body": "A CRM where multiple organisations share one deployment and one database but can never see each other's rows — contacts, deals, tickets, tasks, meetings, invoices and commissions, with roles, permissions, invitations, two-factor authentication and audit logging underneath.\n\nDjango 5.2 with DRF and SimpleJWT on PostgreSQL 15 and Redis 7, containerised, with Celery and Flower for background work and MinIO for object storage. Five apps, roughly 50 models.\n\nThis is a different problem from a multi-vendor marketplace. There, a leak between vendors is a UX bug. Here, a leak between tenants is a breach.",
+              "heading": "The job of the CRM",
+              "body": "The CRM brings together contacts, deals, tasks, tickets, meetings, and finance records. Several organisations use the same deployment, so every business record needs a clear owner and every request needs the right organisation context.\n\nI worked on the Django backend and the interface, including the shared infrastructure for permissions and record handling.",
               "media": []
             },
             {
-              "heading": "The interface, stated plainly",
-              "body": "There is no React frontend. The UI is server-rendered Django templates driving a hand-rolled SPA-fragment system: a persistent app shell, a fragment template that renders one page component into a main container, and a client-side loader that swaps fragments without a full navigation.\n\nThat was a defensible choice. The team was already deep in Django, the application is form-and-table heavy, and fragments reuse the same permission context the API layer has already computed — so a field that a role cannot see is never rendered, rather than being hidden client-side.\n\nThe cost is equally real: things a framework gives you free were hand-written, including the data table, the kanban board and the dialog system. Around 56 templates and 50 JavaScript modules.",
+              "heading": "The full organisation workspace",
+              "body": "The default Workspace menu contains Dashboard, Contacts, Deals, Tasks, Tickets, Meetings, and Analytics. Contacts include search, stage and owner filters, imports, exports, and custom fields. Deals can be viewed as a table or a pipeline board; the other modules cover follow-up work, support requests, appointments, and reporting.\n\nFinance exposes Commissions. The Organization section contains General Settings, Organization Defaults, Team Members, Audit Log, Billing, and API Keys. Help Center and Support complete the navigation. These are the 16 organisation menu entries in the source’s default sidebar.\n\nVisibility depends on role and permission. The captures use an Owner fixture to show the organisation’s full default menu. The sidebar scrolls independently, so the later capture shows the settings and support entries below the workspace links.",
               "media": []
             },
             {
-              "heading": "Architecture",
-              "body": "Five apps with sharp boundaries. Identity holds organisations, users, memberships, roles, permissions, sessions, social accounts, invitation and verification tokens, platform and per-organisation default settings, and the audit log — sixteen models. The CRM app holds the pipeline, stages, statuses, contacts with custom field definitions and import jobs, deals, tasks, tickets, meetings with attendees and invitations, and a comment model per entity — seventeen models. Finance holds invoices, invoice items, salespeople and commissions. Integrations holds custom fields, API keys, webhooks with delivery records, and uploads. Core holds the base model, the tenant model, the soft-delete engine, scoped managers, RBAC, middleware, permissions, throttling and the sidebar models.",
-              "bullets": [
-                "Role permissions are cached and explicitly invalidated on change, rather than joined on every check",
-                "Record-level ownership enforcement sits on top of role-level permissions",
-                "Navigation is data — sidebar sections, items and actions are database rows, so it is per-organisation configuration rather than a hard-coded template",
-                "Internationalisation via modeltranslation, with UI copy held in a JSON layer so text is data too"
-              ],
+              "heading": "Platform administration is a separate role",
+              "body": "Superadmins have four default navigation entries: Platform Settings, Organization Approvals, Sidebar Control, and Role Permission Control. Their role is to administer the platform, so the application gives them a separate navigation view from an organisation member.\n\nSidebar Control manages sections, links, ordering, and actions as data. Role Permission Control governs the access rules behind those entries. The menu is therefore both configurable and permission-aware; showing every entry to every account would misrepresent how the CRM works.\n\nThe final screenshot uses the original Sidebar Control interface with the source’s seeded menu definitions. It demonstrates the platform view without connecting to a live organisation or changing its configuration.",
               "media": []
             },
             {
-              "heading": "Tenancy, enforced in layers",
-              "body": "Shared table with an organisation foreign key, enforced at four levels rather than trusted at one.\n\nMiddleware resolves the current organisation from the URL slug, a header, the session, or a sole membership — and validates that the user actually belongs to it before anything downstream reads it. A tenant base model auto-fills the organisation from request context on save, and raises rather than persisting a row it cannot scope. Scoped managers filter querysets. And every permission check runs against the validated organisation and membership pair.\n\nTwenty-six business models inherit that base class. An unscoped write fails loudly at the ORM boundary rather than quietly creating an invisible or cross-tenant row.",
+              "heading": "Keeping the interface close to Django",
+              "body": "The interface uses Django templates and a JavaScript fragment loader. The app shell stays in place while page fragments change. That suited a product built largely from forms and tables and kept the rendering close to the server-side permission context.\n\nIt also meant maintaining our own table, dialog, and board behaviour. That is a cost of the approach, even when the server-side integration is convenient.",
               "media": []
             },
             {
-              "heading": "The soft-delete cascade engine",
-              "body": "Django's usual soft-delete patterns do not cascade. Soft-deleting a parent leaves active children pointing at a row that is gone, which is a data-integrity bug that surfaces months later as a mysterious orphan.\n\nSo deletion walks the relation graph and computes the closure of rows to soft-delete, then applies real deletion semantics to that closure. Cascade children are soft-deleted with the parent. Set-null referrers are nulled — but only if they are not themselves in the closure, because nulling a link on a row you are also deleting is pointless churn. Protect is checked before anything is written, so a protected reference aborts the whole operation rather than leaving it half-applied. Models excluded from soft deletion are left untouched and never hard-deleted. And re-deleting an already-deleted row is a no-op, so the operation is idempotent.\n\nIt is the smallest piece of code in the project and the one I would show first.",
+              "heading": "Deletion has to respect relationships",
+              "body": "Hiding a parent record is only part of soft deletion. Its related records still need a consistent outcome. I built a deletion pass that collects the affected records, checks protected relationships before writing, and then applies the cascade or null behaviour.\n\nThat work is less visible than a dashboard, but it matters when someone deletes a contact or another record with a long history attached.",
               "media": []
             },
             {
-              "heading": "Auditing my own isolation",
-              "body": "While migrating the browser SPA from token storage to session cookies, the fetch layer began sending two different organisation headers. That surfaced something worth finding: the application had three independently-resolved notions of \"the current organisation\", with different source orders and different validation.\n\nOne resolver — the middleware — checks URL slug, then header, then session, then a sole membership, and validates membership. A second reads a different header, falls back to the session, then to the user's first membership, and does not validate. A third, used by the current-user endpoint, reads the header then filters by membership.\n\nThe primary data paths turned out to be safe: list, retrieve and create all require the validated organisation-and-membership pair, and refuse rather than degrade when it is absent. The risk lived in the secondary, header-trusted paths.\n\nThe audit also found that the row-level security the app advertised did not exist. A per-request database setting was being executed on every request and consumed by nothing — there were no Postgres policies behind it. All isolation was, and is, application-level.",
-              "bullets": [
-                "Documented what is provably safe first, so the remediation could not regress it",
-                "Separated proven-safe paths from header-trusted ones rather than reporting a single verdict",
-                "Phased plan: unify on the validated resolver, then add real database policies as a backstop",
-                "Written before anyone asked for it, as part of an auth migration rather than an incident"
-              ],
-              "media": []
-            },
-            {
-              "heading": "Operational details worth keeping",
-              "body": "A deploy-config commit restricted the API and the Celery monitoring UI to localhost bindings. Flower exposed publicly leaks task payloads — which for this application means customer data passing through background jobs.\n\nGlobal loading state and double-submission prevention were implemented once in the fetch layer rather than per form, which is the difference between a convention and a guarantee.\n\nAround forty feature and page-plan design documents sit in the repository, written before the code rather than after it.",
-              "media": []
-            },
-            {
-              "heading": "Outcome",
-              "body": "A CRM running the operations behind Feriaau, with tenant isolation enforced in four layers, deletion that stays consistent across 26 related models, and a written security review that says plainly which guarantees are application-level and which are not.\n\nThe honest summary is the one in that review: the primary paths are safe, the database has no backstop yet, and the plan to add one is written down. That is a more useful thing to be able to say than \"it's isolated\".",
+              "heading": "What I checked along the way",
+              "body": "I reviewed how organisation context was resolved during an authentication change and documented places where the paths differed. Organisation isolation relies on those application-level checks, so inconsistencies in the request path needed particular attention.\n\nThe walkthrough uses the actual Django templates with fictional contacts. It shows the day-to-day interface while keeping real operational records out of the portfolio.",
               "media": []
             }
           ],
-          "media": []
+          "media": [],
+          "walkthrough": {
+            "intro": "The CRM has an organisation workspace and a separate platform administration view. These captures use the original Django templates and JavaScript, the complete default sidebar definitions, and fictional records. The sidebar scrolls; the organisation settings appear in step 5.",
+            "steps": [
+              {
+                "title": "See the contact list in context",
+                "body": "The contact table keeps company, contact details, stage, and score together. Organisation context determines which records the signed-in team can access.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/kingsoft-crm/contacts.jpg",
+                    "alt": "Kingsoft CRM contact table showing four fictional contacts and pipeline stages",
+                    "caption": "Original CRM templates · local demo organisation and sample contacts. Full default Owner navigation.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ],
+                "flow": []
+              },
+              {
+                "title": "Narrow the list before acting",
+                "body": "Stage, owner, and sorting controls sit above the list. A team member can find the right slice of contacts without leaving the workspace.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/kingsoft-crm/filters.jpg",
+                    "alt": "CRM contact filters for stage, owner and sorting",
+                    "caption": "Expanded contact filters · local preview. Full default Owner navigation.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ],
+                "flow": []
+              },
+              {
+                "title": "Edit the record where the work happens",
+                "body": "The edit form keeps identity, company, stage, source, and ownership in one place. The backend still has to validate permission and organisation scope for each change.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/kingsoft-crm/edit.jpg",
+                    "alt": "Kingsoft CRM edit-contact form with a fictional contact",
+                    "caption": "Contact editor · sample data, no live records changed. Full default Owner navigation.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ],
+                "flow": []
+              },
+              {
+                "title": "Follow an opportunity through the pipeline",
+                "body": "The Deals board places opportunities in their current stage, with value, probability, dates, and the linked contact visible on each card. A table view is available for reviewing the same records in rows.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/kingsoft-crm/deals.jpg",
+                    "alt": "CRM Deals board with qualification, proposal and won columns and fictional opportunities",
+                    "caption": "Original Deals board · fictional opportunities, amounts, probabilities, and dates.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ],
+                "flow": []
+              },
+              {
+                "title": "Find the organisation controls below the workspace",
+                "body": "Scrolling the sidebar reveals General Settings, Organization Defaults, Team Members, Audit Log, Billing, API Keys, Help Center, and Support. These entries are part of the same Owner workspace shown above.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/kingsoft-crm/organisation-menu.jpg",
+                    "alt": "CRM sidebar scrolled to all six organisation settings and both support entries",
+                    "caption": "Same Owner workspace · sidebar scrolled to the remaining default menu items.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ],
+                "flow": []
+              },
+              {
+                "title": "Administer the platform from its own workspace",
+                "body": "The superadmin view contains Platform Settings, Organization Approvals, Sidebar Control, and Role Permission Control. Sidebar Control manages the structure that the permission-aware navigation renders.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/kingsoft-crm/sidebar-control.jpg",
+                    "alt": "CRM superadmin navigation and Sidebar Control showing all five configured menu sections",
+                    "caption": "Original Sidebar Control template · local seeded menu fixture, no live configuration changed.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ],
+                "flow": []
+              }
+            ]
+          }
         },
-        "description": "Multi-tenant CRM platform powering Feriaau's operations - a Django/DRF backend with shared-table tenant isolation, a cached RBAC layer, and a soft-delete engine that reproduces real cascade semantics across 26 tenant-scoped models.",
-        "featured": false,
+        "description": "I built a Django CRM with organisation-scoped records, role permissions, and consistent soft deletion across related data.",
         "showInResume": false
       },
       {
@@ -706,11 +757,12 @@
           }
         ],
         "title": "ANPR + Smart Parking System",
-        "outcome": "97.1% / 97.8% mAP@50 on the held-out test set and an estimated 90.4% end-to-end precision, with 61%–73% compute reduction via intelligent vehicle gating.",
+        "outcome": "A research-backed prototype for camera-based parking sessions, with stage metrics reported separately from end-to-end estimates.",
         "category": "AI · Computer Vision",
+        "featured": false,
         "caseStudy": {
           "wip": false,
-          "tagline": "A three-stage cascaded vision pipeline that reads bi-scriptual Nepali plates — and the parking platform it runs inside.",
+          "tagline": "Reading a small licence plate in a busy camera frame, one stage at a time.",
           "role": "Lead Researcher & Engineer",
           "stack": [
             "Python",
@@ -728,77 +780,94 @@
             "Docker"
           ],
           "highlights": [
-            "97.1% mAP@50 plate localisation, 97.8% mAP@50 character recognition on the test set",
-            "61–73% compute reduction by gating the expensive model behind a cheap one",
-            "Reads a plate once per vehicle, not once per frame"
+            "Vehicle → plate → character recognition",
+            "97.1% / 97.8% test mAP@50 for plate / character stages",
+            "Parking sessions around the recognition pipeline"
           ],
           "sections": [
             {
-              "heading": "Overview",
-              "body": "A parking facility needs to know which vehicle entered, when, which one left, and what to charge. Manual logbooks at comparable facilities in Kathmandu carry a transcription error rate we estimated at 3–7% per session, worse at night and worse for embossed plates.\n\nThis system replaces the logbook using the cameras that are already there. It recognises the plate at entry, opens a session, recognises it again at exit, and computes the bill — over standard RTSP, with no hardware modification and no gantry.\n\nThe vision pipeline is also the validation case for a research framework, Cascaded AI Task Decomposition, accepted subject to minor revision at NCCS in June 2026.",
+              "heading": "Starting with the camera frame",
+              "body": "A parking camera sees much more than a licence plate. The plate may be small, reflective, or partly obscured, and Nepali plates bring both Devanagari and Latin characters into the task.\n\nI split recognition into three stages: find the vehicle, find the plate inside that crop, then read the characters. This became the validation case for my Cascaded AI Task Decomposition research.",
               "media": []
             },
             {
-              "heading": "The Problem",
-              "body": "Nepali plates stack several hard problems on each other. The character set is bi-scriptual — Devanagari and Latin — which means 61 classes rather than the Latin-only set most published ANPR work assumes. Embossed surfaces produce specular glare that defeats edge-gradient-based OCR. Kathmandu's monsoon gives highly variable illumination and elevated atmospheric particulates. And Nepali plate formats are poorly represented in public datasets, so any supervised approach starts with a data deficit.\n\nUnderneath all of that sits a modelling problem. A single network asked to find a vehicle in a full frame and read a twelve-pixel glyph is optimising objectives at incompatible spatial scales. It is not that any one component is weak; it is that the objectives compete.",
+              "heading": "The operator workflow around the model",
+              "body": "The dashboard connects camera feeds and detections with parking sessions. Operators can inspect activity, enter a plate manually when recognition needs help, and review entry and exit records. Pricing and reporting sit alongside that operational workflow.\n\nThe project also has image and video input paths for examining recognition outside a live camera stream. Tracking and cached reads reduce repeated inference, while error reporting gives a place to investigate failed processing.\n\nThe dashboard, session list, and manual-entry captures use a local fixture API with DEMO plates. Their sample totals and percentages illustrate the interface; they are separate from the research measurements described below.",
               "media": []
             },
             {
-              "heading": "The framework",
-              "body": "Cascaded AI Task Decomposition is the deliberate split of a compound vision problem into a sequential pipeline of specialised, independently trained models, each operating on a progressively cropped region of interest.\n\nEach stage strips background clutter before handing off, so every downstream model sees a cleaner, tighter and more uniform input than the one before it. The ablation isolates that effect at 13.2 percentage points.\n\nThe generalisation claim is the actual contribution. ANPR is the validation case, not the point — the paper draws an explicit structural equivalence with multi-agent LLM orchestration: a complex task broken into sub-tasks assigned to specialists, each one narrowing the context for the next.",
+              "heading": "Why the stages are separate",
+              "body": "YOLOv8n filters frames for vehicles. A trained YOLOv11n model locates the plate, and RF-DETR Base detects the characters. Each stage passes a smaller region to the next, reducing the background the recogniser has to deal with.\n\nIn the parking prototype, tracking and a cache tie a plate read to a vehicle across frames. A car staying in view should not trigger a fresh OCR request for every frame.",
               "media": []
             },
             {
-              "heading": "Three stages",
-              "body": "A pre-trained YOLOv8n processes every incoming frame at 640×640 and gates on whether a vehicle is present, filtering to four COCO classes — car, motorcycle, bus, truck. Frames with no vehicle are discarded immediately.\n\nA custom-trained YOLOv11n localises the plate inside the vehicle crop. Training used a learning rate of 1e-2 with mosaic and mixup augmentation.\n\nAn RF-DETR Base recogniser, on a DINOv2 backbone, reads characters inside the plate crop across 61 classes. Training used a learning rate of 5e-4 — twenty times smaller, because this is fine-tuning a pre-trained transformer rather than training a small detector — with crop and rotate augmentation.\n\nPost-processing assembles the plate string by sorting detections left to right and validating against format regexes, which is also what catches rare-token misrecognition.",
+              "heading": "What the evaluation says",
+              "body": "The paper reports held-out test mAP@50 of 97.1% for plate localisation and 97.8% for character recognition. These are stage detection metrics, not the percentage of complete plates read correctly.\n\nThe 90.4% end-to-end precision figure is a model-based estimate formed from stage precisions. Errors can be correlated across stages, so a direct full-string benchmark is still needed. The dataset also has limited coverage for rare characters.",
               "media": []
             },
             {
-              "heading": "Results",
-              "body": "On the held-out test set the plate localiser reaches 97.1% mAP@50 and the character recogniser 97.8% mAP@50.\n\nStrict-IoU numbers are lower and the paper explains rather than hides them: 91.0% for the localiser, around 81.0% for the recogniser. mAP@50 counts a character correct at 50% overlap; mAP@50:95 averages over progressively stricter thresholds up to 95%, penalising minor box looseness. Since the downstream task only needs the right character in the right left-to-right order — not pixel-perfect geometry — mAP@50 is the operationally relevant metric, and the gap reflects box-tightness variation on low-resolution embossed glyphs.",
-              "bullets": [
-                "Stage 1 vehicle detection: 98.5% precision, 99.1% recall, 98.8% F1",
-                "Stage 2 plate localisation: 97.1% mAP@50, 91.0% mAP@50:95, 96.5% precision, 93.7% recall, 95.1% F1",
-                "Stage 3 character OCR: 97.8% mAP@50, ~81.0% mAP@50:95, 95.1% precision, 93.8% recall, 94.4% F1",
-                "Gating the expensive recogniser behind the cheap detector cuts effective compute by 61–73%, depending on vehicle density"
-              ],
-              "media": []
-            },
-            {
-              "heading": "A number reported as an estimate",
-              "body": "End-to-end precision is estimated at 90.4%, as the product of the measured per-stage precisions: 0.985 × 0.965 × 0.951.\n\nThe paper is explicit, in the abstract, that this is a model-based estimate rather than a directly measured full-string read accuracy — and then names the flaw in its own assumption. Statistical independence is optimistic: when stage one crops a vehicle partially out of frame, stage two receives an incomplete input and is significantly more likely to fail too. The stages are correlated for exactly the cases that matter, so the product overestimates.\n\nTwo mitigations are proposed rather than implied: expand stage one training to include partially occluded vehicles, or insert a quality filter that discards crops below a bounding-box-area threshold before they reach stage two. A dedicated held-out benchmark of true embossed plates remains the principal target for future validation.",
-              "media": []
-            },
-            {
-              "heading": "Solving the data deficit",
-              "body": "There is essentially no public dataset of Nepali embossed plates, so the target domain could not be sampled directly. Instead the problem was decomposed into two learnable factors, each sourced from a domain that did have data.\n\nNepali traditional flat plates — 1,380 images, 55% of the corpus — carry the script and the character layout. Indian embossed plates — 1,127 images, 45% — carry the surface texture and specular behaviour. Augmentation expanded 2,507 source plates to 9,366 images, a 3.7× factor, split 75/20/5. The character dataset yielded 21,648 bounding-box annotations across 61 classes at a median resolution of 324×121 pixels, all annotated by hand.\n\nThe recogniser has never seen a Nepali embossed plate. It generalises to them by composing two factors that were never observed together — worth 24.5 percentage points over a single-domain baseline under specular-reflection conditions.\n\nThe limitation is disclosed alongside the result: eleven of the 61 classes have fewer than three total annotations and no test-set coverage, and rare-token misrecognition is caught by the regex validation stage rather than by the model.",
-              "media": []
-            },
-            {
-              "heading": "From pipeline to platform",
-              "body": "The deployed system is FastAPI with MongoDB via an async driver and a Next.js 14 dashboard.\n\nEighteen backend services handle stream management, two- and three-stage detection pipelines, session coordination, adaptive processing, adaptive quality, HLS and MJPEG streaming with detection overlays, WebSocket fan-out, circuit breaking and webhooks. Sixteen REST route modules cover auth, users, cameras, sessions, detections, pricing, analytics, dashboards, uploads and webhooks.\n\nNotably, both a two-stage and a three-stage pipeline ship, switchable from the admin dashboard. The research configuration maximises accuracy; the deployed one trades a little for latency and cost. Which is correct depends on the site.",
-              "media": []
-            },
-            {
-              "heading": "Reading a plate once per vehicle",
-              "body": "Running the full pipeline on every frame of every stream is computationally impossible at multi-camera scale, and also pointless — a vehicle occupies hundreds of consecutive frames.\n\nFrames are sampled at a configurable interval, defaulting to every tenth. Detections are filtered to the four vehicle classes so non-vehicle frames never reach the expensive stages. ByteTrack assigns each vehicle a persistent track identity across frames. And the recognised plate string is cached against that track id.\n\nThe result is one OCR per vehicle rather than one per frame. That single caching decision is the difference between one camera and eight on the same hardware.",
-              "media": []
-            },
-            {
-              "heading": "Failing safely",
-              "body": "Stages two and three call a hosted inference API, which means a network blip or a rate limit could cascade: every frame retrying, queues backing up, every live stream stalling at once.\n\nCircuit breakers wrap the inference path and surface their state in the admin dashboard alongside error logs, so an outage degrades to pass-through video rather than taking the platform down — and an operator can see why rather than guess.\n\nAdaptive stream quality and adaptive processing load are deliberately separate managers. A client on poor Wi-Fi is a different problem from a server that cannot keep up with eight cameras, and conflating them means the system degrades along the wrong axis.\n\nMock detection models and demo media fixtures let the API, session and streaming layers be tested without a GPU or an API key — which is why this computer-vision project has a test suite that actually runs.",
-              "media": []
-            },
-            {
-              "heading": "Outcome",
-              "body": "A prototype platform doing automated billing and traffic analytics off existing camera infrastructure, and a first-author framework paper accepted subject to minor revision.\n\nAt the estimated accuracy, roughly one vehicle in ten may need manual intervention — a substantial reduction against a fully manual baseline, and stated as pending empirical confirmation rather than claimed.",
+              "heading": "Connecting recognition to parking",
+              "body": "The surrounding application uses FastAPI and a Next.js dashboard for cameras, detections, sessions, and pricing. Entry and exit detections feed the session workflow.\n\nHosted inference can fail, so the stream and inference paths have to degrade separately. The result is a prototype that connects the research to an operational flow; it should not be read as a validated unattended billing system.",
               "media": []
             }
           ],
-          "media": []
+          "media": [],
+          "walkthrough": {
+            "intro": "The operator side of the parking system, captured from the local Next.js app. Session records and dashboard figures are illustrative fixtures, not recognition measurements.",
+            "steps": [
+              {
+                "title": "Get an overview of the car park",
+                "body": "The dashboard brings occupancy, revenue, and recent plate encounters into one view. It is the operational view of the system, downstream of the recognition pipeline.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/anpr-smart-parking/dashboard.jpg",
+                    "alt": "Parking system dashboard showing occupancy, revenue and recent sample plate encounters",
+                    "caption": "Local dashboard with sample figures · displayed rates are not evaluation results.",
+                    "width": 1272,
+                    "height": 716
+                  }
+                ],
+                "flow": []
+              },
+              {
+                "title": "Follow a vehicle’s session",
+                "body": "The sessions page pairs a plate with its vehicle type, entry time, camera, and duration. This is where the recognition result becomes a parking record.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/anpr-smart-parking/sessions.jpg",
+                    "alt": "Active parking sessions for fictional DEMO 001 and DEMO 002 plates",
+                    "caption": "Active sessions · fictional plates and timestamps.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ],
+                "flow": []
+              },
+              {
+                "title": "Keep a manual path available",
+                "body": "Operators can enter or close a session manually when a camera event needs intervention. That fallback matters because plate recognition will not be correct in every frame.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/anpr-smart-parking/manual-entry.jpg",
+                    "alt": "Manual vehicle entry and exit forms in the parking application",
+                    "caption": "Manual entry and exit forms · no parking session was submitted.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ],
+                "flow": [
+                  "Detect vehicle",
+                  "Locate and read plate",
+                  "Match entry and exit"
+                ]
+              }
+            ]
+          }
         },
-        "description": "Three-stage cascaded computer-vision pipeline (YOLOv8n → YOLOv11n → RF-DETR Base) for bi-scriptual Nepali plate recognition, serving as the backbone of an automated smart-parking platform.",
-        "featured": false,
+        "description": "I built a staged vehicle, plate, and character-recognition pipeline and connected it to a parking-management prototype.",
         "showInResume": false
       },
       {
@@ -812,11 +881,12 @@
           }
         ],
         "title": "Reddit Sentiment Analysis",
-        "outcome": "Seven-emotion distributions averaged post to subreddit, so leaderboards measure community mood rather than comment volume.",
+        "outcome": "A seven-emotion view of posts and communities, with aggregation that accounts for different comment volumes.",
         "category": "NLP · Deep Learning",
+        "featured": false,
         "caseStudy": {
           "wip": false,
-          "tagline": "Community-level emotion analysis with two inference engines — one on the server, one running entirely in your browser.",
+          "tagline": "Looking at the emotions in a community without simply measuring how busy it is.",
           "role": "Creator",
           "stack": [
             "Python",
@@ -834,68 +904,88 @@
             "Docker"
           ],
           "highlights": [
-            "Two inference paths behind one UI — server batch and zero-cost in-browser",
-            "Scores are means of probability distributions, so mood is ranked and not volume",
-            "Scheduled tracking turns one-off analysis into a time series"
+            "Server batch jobs and browser inference",
+            "Seven-emotion distributions",
+            "Community scores averaged across posts"
           ],
           "sections": [
             {
-              "heading": "Overview",
-              "body": "\"Is this subreddit angry?\" is a question with no good answer available. Sentiment tools give you positive or negative on a single text. Emotion at the level of a community, tracked over time and comparable across communities, needs aggregation rules that somebody has to actually decide.\n\nThis platform analyses posts, comments and whole subreddits into a seven-emotion distribution, re-analyses the top communities on a schedule so the data becomes a time series, and ranks them on leaderboards.\n\nFlask and SQLAlchemy on PostgreSQL, Celery and Celery Beat over Redis, HuggingFace Transformers in the worker — and a second inference engine that runs entirely in the visitor's browser.",
+              "heading": "What I built",
+              "body": "The app analyses text, Reddit posts, and whole subreddits into emotion distributions. It also stores repeated community analyses so they can be compared over time.\n\nMy work was in the application, inference pipeline, and aggregation. The classifiers are existing models; I did not train or fine-tune the shipped models.",
               "media": []
             },
             {
-              "heading": "The Problem",
-              "body": "Two constraints pulled against each other. Transformer inference on demand, for anyone who visits a public site, is not something a personal project can afford to pay for. But a demo with no interactivity is not a demo.\n\nAnd under that sat a subtler problem: how do you compare the mood of a community with ten thousand comments to one with two hundred, without simply measuring which is busier?",
+              "heading": "From one input to a community comparison",
+              "body": "A user can begin with a piece of text, a Reddit post, or a subreddit. Longer jobs report progress while they run. The result views break down the sampled text and comments into emotion scores, rather than reducing the output to one positive-or-negative label.\n\nStored analyses support a community history, a sortable leaderboard, and CSV export. Scheduled and interactive work share the analysis pipeline, while the browser model provides another path for direct text exploration.\n\nThe walkthrough shows the input page and the real leaderboard template populated with fictional communities. It explains the queue and aggregation flow separately; no inference run or real community result is claimed by those screenshots.",
               "media": []
             },
             {
-              "heading": "Two engines, one interface",
-              "body": "The same analysis runs two ways and the user picks.\n\nThe cloud engine runs a DistilRoBERTa emotion classifier — trained on GoEmotions, seven labels — inside a Celery worker. It handles whole-subreddit batch work and the scheduled tracker, where the job is long and the result is stored.\n\nThe browser engine runs an ONNX GoEmotions model with 28 labels, executed by Transformers.js on WebAssembly inside a Web Worker. Weights download to IndexedDB on first use — not on page load — so the cost of the model is paid only by users who actually choose it. Inference then costs nothing, needs no round trip, and the text never leaves the device.\n\nThe 28 browser labels are bucketed into the server's seven, so the interface renders one shape either way.",
+              "heading": "Two ways to run the model",
+              "body": "Longer Reddit jobs run in a Celery worker behind Flask. For interactive text, a second model runs in a browser Web Worker through Transformers.js and WebAssembly. Its weights load when that path is selected.\n\nThe two engines return the same seven-category interface, but they use different models and label mappings. A matching chart shape does not make their scores directly comparable.",
               "media": []
             },
             {
-              "heading": "Saying that the numbers are not comparable",
-              "body": "The architecture document states it plainly: the two engines are not interchangeable. They are different models over different label sets, so the same sentence can score differently depending on which one ran it. Both emit the same seven-category shape and both normalise to a probability distribution, but the numbers are only comparable within an engine.\n\nBuilding two inference paths is competent. Documenting, in user-facing docs, that their outputs must not be compared is the part that keeps the tool honest — because the interface makes them look identical, and nothing else would stop a user drawing a false conclusion.",
+              "heading": "Fixing what the leaderboard measured",
+              "body": "Adding predictions together made larger communities score higher on every emotion. That was measuring activity as much as mood. I changed aggregation to use distributions and weighted means at the post level, then averages across posts.\n\nI also kept text cleaning conservative. Punctuation, casing, and emoji can carry useful context for the model, even though they do not have one fixed emotional meaning.",
               "media": []
             },
             {
-              "heading": "Means, not sums",
-              "body": "Every prediction is a probability distribution over seven emotions summing to one. A post score is the weighted mean of its title, its body and up to fifty comments, with comments weighted at 0.8. A subreddit score is the mean of its posts' distributions.\n\nThe original implementation summed. That made every score scale with comment volume, so the leaderboard was effectively ranking subreddits by how busy they were rather than by mood — a large community topped every emotion at once, which is the tell that the metric was measuring the wrong thing.\n\nAveraging puts a ten-thousand-comment community and a two-hundred-comment one on the same scale. The leaderboard measures mood, not volume.\n\nUnknown labels are dropped and the remainder renormalised, so the distribution still sums to one; text the model cannot score at all falls back to neutral rather than being silently omitted.",
-              "media": []
-            },
-            {
-              "heading": "Preprocessing argued from the model",
-              "body": "Text cleaning is deliberately conservative. It strips URLs, markdown link targets, quoted parent comments, HTML entities and control characters — and leaves casing, punctuation and emoji alone.\n\nThose carry emotion signal the transformer was trained on. ALL CAPS is anger. Three exclamation marks are not the same as one. Aggressive lowercasing and punctuation stripping is bag-of-words-era preprocessing inherited from TF-IDF pipelines, and applying it to a transformer actively costs accuracy.\n\nThat decision has a consequence recorded next to it: because punctuation survives cleaning, template output must stay escaped, and no field derived from Reddit or from user-submitted text may be marked safe. Tracing a preprocessing choice through to an XSS rule, and writing it down for whoever comes next, is the part worth copying.",
-              "media": []
-            },
-            {
-              "heading": "Engineering",
-              "body": "Flask enqueues work and the interface polls a task-status endpoint. Celery Beat re-analyses top subreddits on a configurable interval, which is what turns one-off analysis into the time series the trend charts need.\n\nA memory bug worth naming: the model and the Reddit client were originally constructed at import time. Because the web app imports the task module simply to enqueue work, every Gunicorn worker was loading a copy of the transformer weights it would never use. Both moved behind lazy accessors, with a worker-init hook that warms the model in Celery processes only — so the weights live exactly where inference happens, and the first task is still fast.",
-              "bullets": [
-                "Four Celery tasks: single post, whole subreddit, free-text playground, and the scheduled batch",
-                "Analyses stored one row per post with the full nested comment scores as JSON",
-                "Aggregate snapshots store the seven emotions as indexed float columns, because leaderboards sort and average them and JSON does not index portably",
-                "A source column separates real Reddit posts from playground submissions, and playground rows are excluded from the public feed",
-                "The leaderboard's latest-per-subreddit query avoids Postgres-only syntax, so the same code runs against the SQLite fallback used locally",
-                "Rate limiting via Flask-Limiter backed by Redis, with an in-memory fallback for bare runs",
-                "Tests stub the model pipeline, so the suite runs in about a second and never downloads weights"
-              ],
-              "media": []
-            },
-            {
-              "heading": "Outcome",
-              "body": "A containerised platform that batch-analyses subreddits on a schedule, offers instant analysis at zero marginal inference cost, and reports community mood on a scale that does not reward being loud.\n\nWorth stating plainly: the emotion model is used off the shelf rather than fine-tuned, and it is English-only. The engineering is in the pipeline, the aggregation semantics and the dual-engine design, not in training a model.",
+              "heading": "Keeping inference out of the web process",
+              "body": "The web app queues work; the worker loads and runs the classifier. Moving model construction behind lazy accessors stopped ordinary web workers from loading weights they never used.\n\nThe project supports English text and inherits the limitations of its models, including sarcasm and context. Its scores are a way to explore language in the sampled posts, not a diagnosis of the people writing them.",
               "media": []
             }
           ],
-          "media": []
+          "media": [],
+          "walkthrough": {
+            "intro": "The original Flask interface, rendered locally. The leaderboard uses labelled demo communities and illustrative distributions; these are not new model results.",
+            "steps": [
+              {
+                "title": "Choose the scope",
+                "body": "The landing screen separates a text playground, a single Reddit post, and a subreddit batch. Each starts a different amount of work, so the interface makes the scope explicit.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/reddit-sentiment-analysis/analyze.jpg",
+                    "alt": "Reddit emotion analyzer with text, post URL and subreddit inputs",
+                    "caption": "Original Flask template · no Reddit collection or model run was triggered.",
+                    "width": 1270,
+                    "height": 714
+                  }
+                ],
+                "flow": []
+              },
+              {
+                "title": "Compare distributions, not just labels",
+                "body": "The leaderboard shows a mix of emotions for each community. A single dominant label would hide the smaller signals and make very different discussions look the same.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/reddit-sentiment-analysis/leaderboard.jpg",
+                    "alt": "Emotion leaderboard with demo gardening, books and cooking communities",
+                    "caption": "Local leaderboard · fictional communities and illustrative scores.",
+                    "width": 1270,
+                    "height": 714
+                  }
+                ],
+                "flow": []
+              },
+              {
+                "title": "Keep the processing path visible",
+                "body": "Interactive text and queued batches take different paths. Scores are mapped into the UI’s seven categories before post distributions are averaged into community snapshots.",
+                "media": [],
+                "flow": [
+                  "Browser worker or server model",
+                  "Seven-emotion distribution",
+                  "Timestamped community snapshot"
+                ]
+              }
+            ]
+          }
         },
-        "description": "Dual-engine emotion analysis over Reddit at scale - a GoEmotions transformer served asynchronously via Celery for whole-subreddit batch work, plus the same class of model running entirely in the browser on WebAssembly for zero-cost interactive analysis.",
-        "featured": false,
-        "showInResume": true,
         "resumeRole": "Developer",
-        "resumeDescription": "Deep NLP pipeline using fine-tuned BERT for nuanced emotion classification on large-scale Reddit data, integrated with LLM-based frontend interfaces."
+        "description": "I built a Reddit emotion-analysis app with background batch jobs and an interactive model that runs in the browser.",
+        "showInResume": true,
+        "resumeDescription": "Built a Reddit emotion-analysis pipeline with an off-the-shelf DistilRoBERTa classifier, Celery batch processing, and browser inference through Transformers.js."
       },
       {
         "id": 4,
@@ -904,11 +994,12 @@
         "links": [],
         "title": "ContractorOps AI App",
         "status": "In Development",
-        "outcome": "Currently building the app: streamlining real-time application features and resolving full-stack integration bottlenecks across the stack.",
+        "outcome": "A mobile application in active development, with shared handling for authentication, requests, and connectivity failures.",
         "category": "Mobile · AI · React Native",
+        "featured": false,
         "caseStudy": {
           "wip": false,
-          "tagline": "A field CRM for contractors — an Expo client that cannot render an authenticated screen before it knows who you are.",
+          "tagline": "Helping contractors work through leads, quotes, and projects from a phone.",
           "role": "Software Developer (Full-Stack)",
           "stack": [
             "React Native",
@@ -922,74 +1013,90 @@
             "PostgreSQL"
           ],
           "highlights": [
-            "Single-flight token refresh — concurrent expiries can't kill the session",
-            "Four layered error boundaries — nothing white-screens and nothing fails silently",
-            "Client types generated from the backend's OpenAPI schema"
+            "React Native and TypeScript",
+            "Shared authentication and request handling",
+            "Visible offline and error states"
           ],
           "sections": [
             {
-              "heading": "Overview",
-              "body": "Contractors run their business from a truck: leads, quotes, proposals, projects, crews, invoices and a calendar — on a phone, often on bad signal, often without remembering a password.\n\nContractorOps is the field CRM for that. The mobile app is a pure API client with no backend code in it, talking to a separate FastAPI service on PostgreSQL. Expo SDK 54, React Native 0.81, React 19, TypeScript in strict mode.",
+              "heading": "My part of the project",
+              "body": "ContractorOps AI brings leads, quotes, proposals, project details, and crew work into a mobile app. I’m responsible for the React Native application and its API integration, working with a FastAPI backend.\n\nA field workflow has to account for interrupted connections. That made request behaviour and recovery part of the interface work from the start.",
               "media": []
             },
             {
-              "heading": "My Role",
-              "body": "Building the mobile application, and refactoring the backend REST APIs it consumes — reshaping payloads and serialisation for low-latency mobile use, and resolving the full-stack integration bottlenecks between the two.",
+              "heading": "What the mobile app brings together",
+              "body": "The feature modules cover leads, clients, follow-ups, quotes, proposals, and invoices. Projects, crew, tasks, work, and calendar screens support the handoff from winning a job to delivering it.\n\nAssistant, lead-generation, frontline, integration, reporting, and settings modules extend that core flow. My work is on the mobile screens, shared behaviour, and API integration; the presence of a module in the repository does not mean every connected service has been exercised in this walkthrough.\n\nThe three images below are from the project’s existing interactive design prototype: the overview, quote list, and proposal detail. They explain the intended journey. They are clearly labelled because they are not screenshots of a running native build.",
               "media": []
             },
             {
-              "heading": "The layering rule",
-              "body": "One rule explains the whole structure: files under the routes directory are route declarations, not screens. A route file is a one-line re-export of a screen that lives in a feature folder.\n\nRoutes are the URL tree; screens are code. Moving a screen does not rewrite it, and a route file cannot accumulate logic because there is nowhere to put it. Feature folders own their own screens and logic; a design-system folder holds headless hooks and themed views; theme, api, auth, error, config and lib hold the cross-cutting pieces.",
-              "bullets": [
-                "Route groups separate the authenticated tab shell from the auth flow, each with its own guard layout",
-                "Feature surface spans leads, lead generation, quotes, proposals, projects, clients, invoices, tasks, crews, bookings, calendar, conversations, frontline and settings",
-                "All query keys are centralised in one module so cache invalidation is consistent and discoverable",
-                "Client types are generated from the backend's OpenAPI schema, so client and server cannot drift silently"
-              ],
+              "heading": "Getting startup and sessions right",
+              "body": "The app waits for stored authentication and fonts before mounting its main navigation. Tokens are mirrored in memory after startup so every request does not have to read secure storage again.\n\nWhen several requests encounter an expired token, they share one refresh operation. That avoids a burst of competing refresh calls. A failed refresh clears the session instead of keeping the app in a retry loop.",
               "media": []
             },
             {
-              "heading": "The bootstrap gate",
-              "body": "The classic cold-start bug in a mobile app: the authenticated tab tree mounts before authentication resolves, so every data hook fires without a bearer token, receives a 401, and the user stares at skeletons everywhere.\n\nTwo mechanisms rule it out, described in the codebase as belt and suspenders.\n\nFirst, an in-memory token mirror. Secure storage is asynchronous, but the request path has to attach a token synchronously. Tokens are read from the keychain once at startup into a module-level variable; the API client reads that variable on every request and never awaits secure storage in the hot path. Secure storage is the write path; memory is the read path.\n\nSecond, a root gate. While authentication status is still resolving — or while fonts are still loading — only a launch screen renders. The router stack is not mounted at all, so the tab tree literally cannot exist to fire a query. A minimum display time stops the launch animation flashing, and a font-load error counts as ready, so a missing font can never wedge startup behind the gate.",
+              "heading": "Making failures understandable",
+              "body": "The request client normalises errors so screens receive a consistent shape. Network and server failures can retry; validation failures need a useful message and a changed input.\n\nConnectivity state is connected to the query layer, with an offline banner and a shared toast surface. A root error boundary handles rendering failures. These cover different failures rather than treating every problem as the same retry button.",
               "media": []
             },
             {
-              "heading": "Single-flight token refresh",
-              "body": "When an access token expires, several in-flight requests fail at once. If each one fires its own refresh, they rotate the token out from under each other and the session dies for reasons that look random.\n\nThe API client holds a module-level lock: concurrent 401s await the same in-flight refresh promise, then each original request retries exactly once. If the refresh fails, tokens are cleared, the auth context drops the session, the query cache is cleared, and the route guards redirect to login.\n\nClearing the query cache is the detail people miss. Without it the next user to sign in on that device sees the previous user's cached data.",
-              "bullets": [
-                "Bearer token attached synchronously from the in-memory mirror",
-                "Exactly one retry per request — a retry loop on an auth failure is an outage, not a recovery",
-                "Every failure normalised into one typed error, including FastAPI's detail and validation-array shapes",
-                "A 20-second timeout, with caller abort signals forwarded so the query layer can cancel",
-                "A tunnel-specific header, because the dev tunnel's HTML interstitial otherwise breaks web fetches"
-              ],
-              "media": []
-            },
-            {
-              "heading": "Four layers of failing well",
-              "body": "A field app on bad signal fails constantly. The requirement was that it never white-screens and never fails silently, so each class of failure has a designated handler.\n\nA root error boundary turns a render or lifecycle crash into a friendly retry rather than a redbox. Global query and mutation cache handlers route failures centrally: a 401 stays silent because the client already handled it, network and server errors raise a toast, anything else surfaces the normalised message. Connectivity is bridged into the query client so requests pause offline and resume on reconnect, behind a visible banner. And a single themed toast surface handles transient messages.\n\nThe retry policy is the line worth quoting: retries fire only for network and 5xx errors, never for a 4xx. Retrying a validation error is not resilience, it is a bug repeated three times.",
-              "media": []
-            },
-            {
-              "heading": "A design system instead of a UI kit",
-              "body": "There is no third-party component library, because a heavy kit would fight a bespoke prototype design.\n\nInstead each primitive is two pieces. A headless hook owns behaviour, state and accessibility and renders nothing — returning a props bag with press handling, disabled state, accessibility role and hit slop. A themed view composes over it and maps variant and size to tokens.\n\nThe tricky parts — accessibility, press and loading gating — are written once. Each themed view stays a thin styling map. Text takes a typography variant and a colour token, so no call site ever holds a raw font size or hex value.\n\nThe theme tokens were extracted from an HTML prototype, and carry a React Native-specific detail: RN has no colour-mix function, so opacity tints are precomputed to static values in parallel light and dark palettes.",
-              "media": []
-            },
-            {
-              "heading": "Decisions with the reasoning attached",
-              "body": "Environment configuration is validated with zod at startup and throws a loud, readable error if the API URL is missing — fail fast, not on the first network call. The bundler inlines those variables at build time, which is why changing one needs a cache-clearing restart, and that is documented rather than rediscovered.\n\nA single flag flips the whole app between a local backend behind a tunnel and the hosted one, each with its own URL variable, so backend work does not require keeping a tunnel alive.\n\nThe Expo SDK is pinned to 54, downgraded from 56 so it runs in the standard client on the physical test device — recorded in the repo's agent instructions specifically so nobody helpfully upgrades it.\n\nJWTs are kept lean because the keychain has a size limit per key and oversized values can fail to save silently; profile data comes from a current-user endpoint and is cached in the query layer instead of being stuffed into token claims.",
-              "media": []
-            },
-            {
-              "heading": "Status",
-              "body": "In active development. Recent work covers quote generation with materials search and payment draws, standalone proposals, project financials and attachments, crew and calendar surfaces, lead-generation campaign lifecycle controls, property-data enrichment on leads, and an in-app assistant that streams over server-sent events with a buffered fallback and a tool-results trace.\n\nThe architecture document that explains why each pattern was chosen is checked into the repository — which for a client project is the part that keeps it maintainable after handover.",
+              "heading": "Keeping it maintainable",
+              "body": "Routes declare navigation while feature modules hold the screens and logic. Shared controls separate behaviour from themed rendering, so loading, disabled states, and accessibility do not have to be reimplemented on every screen.\n\nThis is client work in active development. The visual walkthrough uses the interactive prototype already in the repository. It shows the intended product flow while the native app continues to develop.",
               "media": []
             }
           ],
-          "media": []
+          "media": [],
+          "walkthrough": {
+            "intro": "A walkthrough of the existing interactive design prototype in the project folder. These are prototype screens with built-in demo records; the implementation notes below describe the Expo app.",
+            "steps": [
+              {
+                "title": "Start with the pipeline",
+                "body": "The prototype opens on the pipeline and active work. It puts the day’s position up front before asking the contractor to move into a specific record.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/contractorops-ai/dashboard-prototype.jpg",
+                    "alt": "ContractorOps mobile design prototype showing a pipeline overview",
+                    "caption": "Existing design prototype · demo workspace and illustrative values.",
+                    "width": 1280,
+                    "height": 860
+                  }
+                ],
+                "flow": []
+              },
+              {
+                "title": "Find the quote that needs attention",
+                "body": "The quote list shows the project, client, amount, and status together. Draft, sent, and accepted states give the list a practical reading order.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/contractorops-ai/quotes-prototype.jpg",
+                    "alt": "ContractorOps prototype quote list with draft, sent and accepted statuses",
+                    "caption": "Existing prototype · seeded example quotes, not client records.",
+                    "width": 1280,
+                    "height": 860
+                  }
+                ],
+                "flow": []
+              },
+              {
+                "title": "Review the proposal details",
+                "body": "Opening a quote reveals its scope, line items, payment terms, and total. That detail is the context a contractor needs before changing its status.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/contractorops-ai/proposal-prototype.jpg",
+                    "alt": "ContractorOps prototype proposal detail with sample line items and payment terms",
+                    "caption": "Prototype proposal · illustrative scope and amounts; no acceptance was submitted.",
+                    "width": 1280,
+                    "height": 860
+                  }
+                ],
+                "flow": []
+              }
+            ]
+          }
         },
-        "description": "High-performance React Native + TypeScript application for Contractor Ops AI, backed by a FastAPI service - with refactored low-latency REST payloads, single-flight token refresh, and four layers of error handling for use on unreliable field connections.",
-        "featured": false,
+        "description": "I’m building the React Native app for ContractorOps AI, connecting field workflows to a FastAPI backend.",
         "showInResume": false
       },
       {
@@ -1007,11 +1114,12 @@
           }
         ],
         "title": "Feriaau App",
-        "outcome": "Published on the Google Play Store and Apple App Store for iOS and Android.",
+        "outcome": "The consumer app is available on iOS and Android; the vendor companion serves the staff workflow.",
         "category": "Mobile · Flutter",
+        "featured": false,
         "caseStudy": {
           "wip": false,
-          "tagline": "Two shipped Flutter apps — a consumer loyalty app on both stores, and a vendor companion — over one REST API.",
+          "tagline": "Bringing the loyalty programme to the customer’s phone and the shop counter.",
           "role": "Mobile Contributor",
           "stack": [
             "Flutter",
@@ -1027,72 +1135,90 @@
             "Android"
           ],
           "highlights": [
-            "Consumer app live on Google Play and the App Store",
-            "Clean Architecture with a strict layering rule across both apps",
-            "Offline-tolerant cache, rich push notifications and in-app update prompts"
+            "Consumer app on both stores",
+            "Separate vendor companion",
+            "Shared platform APIs"
           ],
           "sections": [
             {
-              "heading": "Overview",
-              "body": "A loyalty platform that only works in a browser does not work. Customers earn points at a physical counter and want to check a balance, scan a QR code or redeem a reward on their phone in seconds. Staff at the till need to place an order and print an invoice without leaving it.\n\nTwo audiences, two Flutter apps, one REST API — the same backend the Feriaau web platform uses, so mobile and web never drift apart.\n\nThe consumer app is published on Google Play and the App Store. The vendor companion is smaller and newer.",
+              "heading": "Two audiences, two apps",
+              "body": "Customers need to find a vendor, check their points, and redeem rewards. Staff need a different view of orders and the work at the counter. Feriaau handles those audiences through separate Flutter apps over the same backend.\n\nI contributed feature UI and API integration to the consumer app with the wider mobile team, and built the vendor companion. The consumer application was shared team work.",
               "media": []
             },
             {
-              "heading": "My Role",
-              "body": "Contributor on the consumer application alongside the wider mobile team — building feature UI and wiring it to the shared REST APIs — and builder of the vendor-side companion app.",
+              "heading": "What each app is responsible for",
+              "body": "The consumer journey starts with finding a vendor, opening its page, and checking the points attached to that relationship. Rewards, coupons, QR scanning, and notifications support the return visit. The published screenshots show discovery, a vendor page, and the points balance.\n\nThe vendor companion has its own authentication, home, order, and notification features. Its purpose is to support staff work rather than reproduce every consumer screen. Both apps rely on the same platform services, but each has its own presentation and state.\n\nThe images here document the published consumer experience. The vendor companion is explained from its source and architecture; no consumer screenshot is presented as a vendor screen.",
               "media": []
             },
             {
-              "heading": "One architecture, two apps",
-              "body": "Both apps use the same layering, and that is what makes it possible for one person to move between them without re-learning anything.\n\nA core layer holds everything cross-cutting: the API client and its interceptors, token storage, the refresh service, dependency injection, theming, routing, shared widgets and utilities. Each feature is then split into a domain half — models and repository interfaces — and a presentation half holding BLoCs or Cubits, pages and feature-local widgets.\n\nThe rule that makes it work: presentation never touches core services directly. A page dispatches to a BLoC, which calls a repository interface, whose implementation is injected. Swapping the HTTP client or stubbing a repository for a test touches one registration line.",
-              "bullets": [
-                "Consumer app: fourteen features — auth, dashboard, vendors, rewards, points, coupons, cart, history, maps, notifications, scanner, pages, onboarding and a points guide",
-                "Vendor app: focused on auth, home, orders and notifications",
-                "Repository results are returned as explicit success-or-failure values rather than thrown exceptions",
-                "Cubits handle simple state such as theming; BLoCs handle flows with a real event vocabulary"
-              ],
+              "heading": "A structure we could share",
+              "body": "Both applications separate feature presentation from the data access behind it. Pages work through BLoCs or Cubits and repository interfaces; core services own concerns such as HTTP, persistence, and routing.\n\nThat made it easier to work across the two apps. The vendor app uses generated dependency registrations, while the older consumer app has manual registrations.",
               "media": []
             },
             {
-              "heading": "Different DI for different ages",
-              "body": "The two apps deliberately differ on dependency injection, and the difference is the point.\n\nThe consumer app — fourteen features, already stable — uses hand-written service-locator registrations. The vendor app, started later and expected to grow, uses the same locator with code generation on top, so registrations cannot drift from constructors.\n\nNeither app pays for machinery it does not need. Codegen earns its keep when the surface is still moving; on a settled codebase it is a build step for no benefit.",
+              "heading": "The details around everyday use",
+              "body": "Token storage, refresh, and request interception have separate responsibilities. The consumer app also includes QR scanning, local caching, notifications, and update prompts.\n\nOne useful change was replacing a Flutter-rendered splash with the native splash. The operating system can show that before the Flutter engine starts, avoiding the blank period that an in-app animation cannot cover.",
               "media": []
             },
             {
-              "heading": "Token lifecycle",
-              "body": "Token storage, the refresh service and the HTTP interceptors are three separate files, and the separation is the interesting part.\n\nThe interceptor detects an expired-token response. The refresh service performs a single refresh. Storage is the only thing that touches persistence. The classic bug this design prevents is the refresh stampede — ten concurrent failures each firing their own refresh call and invalidating each other's result.",
-              "media": []
-            },
-            {
-              "heading": "What the consumer app actually does",
-              "body": "The feature list is what separates a shipped product from a demo, and each item carries a decision behind it.",
-              "bullets": [
-                "QR scanning to earn and redeem, plus generated codes for display",
-                "Vendor discovery on a map with marker clustering — a pin per vendor degrades badly past a few hundred",
-                "An offline-tolerant local cache so a balance is readable without signal",
-                "Rich push notifications, which required downloading and caching the imagery before the local notification can render it, since a payload carries a URL and not an image",
-                "PDF invoice generation and printing",
-                "Infinite feeds, shimmer skeletons and cached images for perceived speed",
-                "An in-app update prompt, so users are not stranded on old builds against a moving API",
-                "A scratch-card reveal for rewards, and OTP autofill on sign-in"
-              ],
-              "media": []
-            },
-            {
-              "heading": "Deleting the splash animation",
-              "body": "The app originally opened with a custom animated splash built in Flutter. It was replaced with the native splash the operating system renders.\n\nThe reason is structural rather than aesthetic: a Flutter-rendered splash cannot appear until the engine has booted, so users saw a blank frame first and only then the animation. The native splash renders before Dart runs at all.\n\nDeleting the flashiest code path because it measurably hurt the metric it was supposed to help is the kind of change that only shows up if someone is actually watching cold-start time.",
-              "media": []
-            },
-            {
-              "heading": "Outcome",
-              "body": "Published on Google Play and the Apple App Store and iterated across dozens of builds through a review-based branch workflow, with a second vendor-facing app sharing the same architecture and the same backend.\n\nBoth apps are light on automated tests, which is the honest gap: the layering makes them testable, and that potential is currently unspent.",
+              "heading": "What shipped",
+              "body": "The consumer app is published on Google Play and the App Store. The screenshots here come from its public App Store listing and show the consumer experience.\n\nAutomated coverage is still an area to improve. The separate repositories and state layers give me a useful starting point for that work.",
               "media": []
             }
           ],
-          "media": []
+          "media": [],
+          "walkthrough": {
+            "intro": "Three steps through the consumer app, using the original screenshots published in its App Store listing.",
+            "steps": [
+              {
+                "title": "Discover a nearby vendor",
+                "body": "The map gives customers a way to find participating shops. Discovery starts with where they can use the programme.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/feriaau-app/discover.webp",
+                    "alt": "Feriaau consumer app map showing participating vendors",
+                    "caption": "Published App Store screenshot · vendor discovery.",
+                    "width": 600,
+                    "height": 1298
+                  }
+                ],
+                "flow": []
+              },
+              {
+                "title": "Open the shop’s space",
+                "body": "A vendor page brings the shop, products, and loyalty shortcuts together. The customer can move from discovery into the shop’s own catalogue.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/feriaau-app/vendor.webp",
+                    "alt": "Feriaau app vendor page with featured products and loyalty shortcuts",
+                    "caption": "Published App Store screenshot · vendor page.",
+                    "width": 600,
+                    "height": 1298
+                  }
+                ],
+                "flow": []
+              },
+              {
+                "title": "Understand the points balance",
+                "body": "Points are broken down by vendor, with earning options explained below. The shared backend connects this mobile view to the transactions recorded on the web.",
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/feriaau-app/points.webp",
+                    "alt": "Feriaau app points page with a per-vendor balance and earning instructions",
+                    "caption": "Published App Store screenshot · points breakdown.",
+                    "width": 600,
+                    "height": 1298
+                  }
+                ],
+                "flow": []
+              }
+            ]
+          }
         },
-        "description": "Contributor to the Feriaau mobile app - a cross-platform Flutter application built on Clean Architecture and BLoC, sharing backend services and REST APIs with the web platform, alongside a second vendor-facing Flutter app.",
-        "featured": false,
+        "description": "I contributed to Feriaau’s consumer Flutter app and built its vendor companion, both using the platform’s shared APIs.",
         "showInResume": false
       },
       {
@@ -1110,11 +1236,12 @@
           }
         ],
         "title": "Personal Portfolio",
-        "outcome": "Fast, installable, and playful - the site you're on right now, with a hidden shell for the curious.",
+        "outcome": "One content source feeds the portfolio modes and generated résumé, with a CMS for updates.",
         "category": "Web · React · Interactive 3D",
+        "featured": false,
         "caseStudy": {
           "wip": false,
-          "tagline": "One content source, three interfaces — including a real shell with a virtual filesystem.",
+          "tagline": "A portfolio you can skim, read, or explore from a command prompt.",
           "role": "Designer & Developer",
           "stack": [
             "React 19",
@@ -1129,62 +1256,90 @@
             "jsPDF"
           ],
           "highlights": [
-            "Normal, fun and terminal modes rendered from a single content source",
-            "24 shell commands over a virtual filesystem built from that same content",
-            "Installable PWA with caching tuned so the 3D bundle stays lazy"
+            "Three interfaces, one content source",
+            "A terminal with a virtual filesystem",
+            "3D loaded when the terminal needs it"
           ],
           "sections": [
             {
-              "heading": "Overview",
-              "body": "A portfolio has to serve two audiences that want opposite things. Recruiters want the facts quickly. Engineers want to poke at something.\n\nSo this site offers three ways in — a direct normal mode, a motion-designed fun mode, and a terminal mode that is an actual shell — all rendered from one content source, so nothing can drift out of sync.",
+              "heading": "Why there are three ways in",
+              "body": "Some visitors want a quick account of my experience. Others want to look through the projects or try something interactive. I built a CV view, a visual portfolio, and a terminal so the same work can be explored in different ways.\n\nAll three read the same content tree. The generated résumé reads it too, which reduces the places I have to edit when something changes.",
               "media": []
             },
             {
-              "heading": "One source, four surfaces",
-              "body": "Everything lives in a single content tree. All three modes read it, and so does the CV, which is generated client-side with jsPDF rather than being a separate uploaded file.\n\nThat last part matters more than it sounds: a portfolio whose downloadable résumé disagrees with the page it sits on is a very common and very avoidable failure. Here the two cannot disagree, because there is only one set of facts.\n\nAt runtime the app boots from a baked-in copy of that tree — instant first paint, works offline — then fetches the live version from Supabase and swaps it in. If Supabase is unreachable the bundled copy simply stays.",
+              "heading": "What visitors and editors can do",
+              "body": "Visitors can read the CV, browse the visual project collection, or explore the terminal. Project pages add the problem, my contribution, implementation choices, limitations, and a visual walkthrough. Images open at a larger size for a closer look.\n\nThe terminal offers content navigation and scene controls, while the résumé generation reuses the same profile data. Contact, metadata, and offline-support work sit around those main views.\n\nThe editor manages the shared content, including project sections and ordered walkthrough steps. Bundled JSON provides the initial content; a configured Supabase store can supply newer published content. Updating the source and publishing CMS content are separate release steps.",
               "media": []
             },
             {
-              "heading": "The terminal",
-              "body": "Not a gimmick with three canned responses. Twenty-four commands over a virtual filesystem built from the site's own content.\n\nNavigation and reading are real: ls, cd, cat, head, tree, pwd, and a grep that searches file contents rather than names. The shell furniture is there too — help, per-command man pages, history, clear, echo, whoami, neofetch and a joke sudo. Two commands, fx and scene, drive the live 3D backdrop from the prompt.\n\nThe filesystem models two kinds of node. Text files render inline through cat; binary files carry a href and a size and are handled by open — so cat on a PDF does something sensible instead of dumping bytes at you.",
-              "bullets": [
-                "Paths are normalised strings, so navigation behaves the way a shell user expects",
-                "The tree rebuilds from the latest content before each render, so CMS edits appear without a redeploy",
-                "Output is word-wrapped to the terminal frame — the kind of thing you only add after watching it look wrong",
-                "A sentinel line inside a text file is swapped by the renderer for a real contact button, so text output can contain an interactive element without the filesystem knowing anything about React"
-              ],
+              "heading": "Making the terminal useful",
+              "body": "The terminal has a virtual filesystem built from the portfolio content. Commands such as ls, cd, cat, and grep let visitors move around and read it; help and man explain what is available.\n\nThe fx and scene commands control a live 3D backdrop. It uses easy-3dkit as an installed package, giving the library a real consumer outside its own documentation site.",
               "media": []
             },
             {
-              "heading": "The chunk that got faster by being ignored",
-              "body": "The instinct with a large 3D dependency is to force it into its own vendor chunk. Doing that here made things measurably worse.\n\nNaming three.js, React Three Fiber and easy-3dkit as a manual chunk pulled them into the entry graph, so roughly a megabyte was statically imported and executed on the landing page. Left to the bundler's default behaviour, they stay inside the lazily-loaded terminal chunk and are fetched only when someone actually opens the terminal.\n\nOnly two chunks are named — the React runtime, which loads on every page anyway, and the animation library, which is dynamically imported by the mode pages. Both are named for long-term caching, not for size.\n\nThe reasoning is written into the config, so the optimisation cannot be helpfully undone by a future edit.",
+              "heading": "Keeping the first page light",
+              "body": "The 3D code is loaded through the terminal’s lazy backdrop. Forcing those dependencies into a named vendor chunk had pulled them into the entry graph, so I left that part of chunking to the bundler.\n\nThe service worker also avoids precaching the heavy backdrop. Otherwise it would download the code at install time even for someone who only wanted the CV.",
               "media": []
             },
             {
-              "heading": "A service worker that respects lazy loading",
-              "body": "The same decision had to be made twice. The service worker precaches the app shell — styles, markup, icons, fonts and normal-sized scripts — but explicitly excludes the heavy 3D bundle, which is runtime-cached on first use instead.\n\nPrecaching it would have eagerly downloaded roughly 900 kilobytes at install time and quietly undone the lazy loading the bundler config worked to preserve. Deep links fall back to the app shell so navigation works offline, and the worker auto-updates with claim-and-skip-waiting so a deploy never serves stale content.",
-              "media": []
-            },
-            {
-              "heading": "The CMS nobody expects",
-              "body": "The site is not static. Behind it sits Supabase: three migrations covering an admin CMS schema, contact replies and outbound message composition, plus three edge functions for notifying on a new contact submission and sending replies.\n\nAn authenticated admin area edits every part of the content tree through structured forms — no raw JSON — with publish-time validation, a per-save history snapshot for undo, and media upload for case-study screenshots and demo clips.\n\nThe seed script that pushes content into the database carries a security note next to the code that needs it: it runs with the service-role key, which bypasses row-level security, so it must never be committed or shipped. Knowing that, and writing it where the next person will read it, is what prevents the most common way these projects leak.",
-              "media": []
-            },
-            {
-              "heading": "Dogfooding",
-              "body": "The live 3D backdrop runs on easy-3dkit — my own npm package — as a real dependency rather than vendored source.\n\nThat closes a loop in both directions. The site gets its visuals from the library; the library gets a consumer that exercises its published artifact, which is how packaging regressions surface before a stranger finds them.",
-              "media": []
-            },
-            {
-              "heading": "Outcome",
-              "body": "Fast, installable and playful — the site you are on right now, with a hidden shell for the curious, a content pipeline that keeps every surface saying the same thing, and performance decisions documented where they were made rather than in a changelog nobody reads.",
+              "heading": "Making updates manageable",
+              "body": "The app starts with bundled content and can hydrate from Supabase. An authenticated editor handles project copy, media, and other site content; saved history supports recovery.\n\nThe case studies now include visual walkthroughs and full-size image viewing. The aim is to let someone understand a project before asking them to read the implementation details.",
               "media": []
             }
           ],
-          "media": []
+          "media": [],
+          "walkthrough": {
+            "intro": "Three ways through the same portfolio, captured from the local site. The information comes from the same content model in each view.",
+            "steps": [
+              {
+                "title": "Choose a way in",
+                "body": "The opening screen gives the visitor a choice of presentation. Each route serves a different way of browsing the same work.",
+                "flow": [],
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/personal-portfolio/modes.jpg",
+                    "alt": "Portfolio opening screen with three mode choices",
+                    "caption": "Local portfolio capture · mode selection.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ]
+              },
+              {
+                "title": "Read the visual portfolio",
+                "body": "The visual mode connects the introduction, experience, and projects. Case studies provide a closer look at each project.",
+                "flow": [],
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/personal-portfolio/work.jpg",
+                    "alt": "Portfolio visual mode showing the work and introduction",
+                    "caption": "Local portfolio capture · visual mode.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ]
+              },
+              {
+                "title": "Explore from the prompt",
+                "body": "Terminal commands navigate a content-backed filesystem, while the backdrop is loaded separately.",
+                "flow": [],
+                "media": [
+                  {
+                    "type": "image",
+                    "url": "/projects/personal-portfolio/terminal.jpg",
+                    "alt": "Interactive portfolio terminal with command output and 3D background",
+                    "caption": "Local portfolio capture · terminal mode.",
+                    "width": 1280,
+                    "height": 720
+                  }
+                ]
+              }
+            ]
+          }
         },
-        "description": "Designer and builder of my personal portfolio - a React/Vite site with Framer Motion motion design, a live Three.js/R3F backdrop powered by my own easy-3dkit, and an installable PWA. Ships a fully interactive terminal mode with a virtual filesystem and command parser as an alternate way to explore the site.",
-        "featured": false,
+        "description": "I designed and built this portfolio with three ways to browse the same work: a visual site, a CV view, and an interactive terminal.",
         "showInResume": false
       }
     ],

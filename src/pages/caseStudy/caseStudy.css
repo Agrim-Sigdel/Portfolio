@@ -502,3 +502,48 @@
   .cs-link:hover,
   .cs-nav-link:hover { transform: none; }
 }
+
+/* Screens stay uncropped; the native dialog handles focus and Escape. */
+.cs-shell { max-width: 1320px; }
+.cs-article { min-width: 0; }
+.cs-reading-time { margin: 0; font-size: 0.8rem; color: var(--text-muted); line-height: 1.7; }
+.cs-reading-time a { color: var(--cs-accent); text-underline-offset: 4px; }
+.cs-reading-time span { padding: 0 0.5rem; }
+.cs-stack-details { color: var(--text-muted); font-size: 0.82rem; }
+.cs-stack-details summary { cursor: pointer; line-height: 1.7; }
+.cs-stack-details .cs-stack { margin-top: 1rem; }
+.cs-image-button { position: relative; display: block; width: 100%; padding: 0; border: 0; cursor: zoom-in; background: var(--bg-panel); }
+.cs-media-item .cs-image-button img { aspect-ratio: auto; object-fit: contain; max-height: 620px; }
+.cs-image-expand { position: absolute; right: 12px; bottom: 12px; display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 6px; color: #fff; background: #141414e6; font: 600 0.7rem var(--font-sans); }
+.cs-lightbox { position: fixed; inset: 0; margin: auto; width: min(1440px, 94vw); max-width: 94vw; max-height: 94dvh; padding: 3rem 1rem 1rem; border: 0; border-radius: 12px; background: var(--bg-panel); color: var(--text-cream); box-shadow: 0 24px 100px #0008; }
+.cs-lightbox::backdrop { background: #08090de6; }
+.cs-lightbox img { width: 100%; height: auto; max-height: 76dvh; object-fit: contain; aspect-ratio: auto; }
+.cs-lightbox p { margin: 1rem 0 0; font: 0.9rem/1.6 var(--font-sans); }
+.cs-lightbox-close { position: absolute; top: 8px; right: 8px; display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 50%; color: var(--text-cream); background: var(--bg-black); cursor: pointer; }
+.cs-media-unavailable { padding: 2rem; color: var(--text-muted); font-size: 0.85rem; }
+.cs-media-unavailable a { color: var(--cs-accent); }
+.cs-walkthrough { gap: 2rem; }
+.cs-walkthrough-header { display: grid; gap: 0.8rem; }
+.cs-walkthrough-header h2 { margin: 0; font: 400 clamp(1.9rem, 3vw, 2.5rem)/1.15 var(--font-serif); }
+.cs-walkthrough-header > p:last-child { margin: 0; max-width: 65ch; color: var(--text-muted); line-height: 1.7; font-size: 0.94rem; }
+.cs-walkthrough-steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 2.5rem; }
+.cs-walkthrough-step { display: grid; gap: 1.2rem; min-width: 0; }
+.cs-step-copy { display: flex; gap: 1rem; align-items: start; }
+.cs-step-number { display: grid; place-items: center; flex: 0 0 38px; height: 38px; background: var(--bg-panel); color: var(--cs-accent); border-radius: 50%; font: 700 0.8rem var(--font-sans); }
+.cs-step-copy h3 { margin: 0 0 0.4rem; font-size: 1.08rem; font-weight: 600; line-height: 1.4; }
+.cs-step-copy p { max-width: 68ch; margin: 0; color: var(--text-muted); font-size: 0.95rem; line-height: 1.75; }
+.cs-flow-diagram { margin: 0; padding: 1.4rem; border-radius: 12px; background: var(--bg-panel); }
+.cs-flow-diagram figcaption { color: var(--text-muted); font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 1.25rem; }
+.cs-flow-diagram ol { list-style: none; padding: 0; margin: 0; display: flex; align-items: stretch; gap: 0.65rem; }
+.cs-flow-diagram li { flex: 1; display: flex; gap: 0.65rem; align-items: center; min-width: 0; }
+.cs-flow-node { display: grid; place-items: center; width: 100%; min-height: 76px; padding: 1rem 0.7rem; background: var(--bg-black); border-radius: 7px; text-align: center; font: 500 0.82rem/1.5 var(--font-sans); overflow-wrap: anywhere; }
+.cs-flow-arrow { flex: 0 0 16px; transform: rotate(-90deg); color: var(--cs-accent); }
+.case-study :is(a, button, summary):focus-visible { outline: 2px solid var(--cs-accent); outline-offset: 4px; }
+@media (max-width: 640px) {
+  .cs-flow-diagram ol { flex-direction: column; }
+  .cs-flow-diagram li { flex-direction: column; }
+  .cs-flow-arrow { transform: none; }
+  .cs-flow-node { min-height: 52px; }
+  .cs-lightbox { padding: 3rem 0.6rem 0.6rem; }
+  .cs-image-expand { font-size: 0.62rem; padding: 6px 8px; }
+}

@@ -20,9 +20,9 @@ import { slugify } from './adminUtils';
  * edited by hand it stops following. Slugs map to routes, so validation blocks
  * publishing empty/duplicate ones (see validate.js).
  *
- * Media lives at two levels on purpose: a gallery on the case study (the
- * project's showcase, shown up top) and an optional list per section (a
- * screenshot next to the prose it illustrates). Uploads name themselves after
+ * Media lives at three levels on purpose: a gallery on the case study (the
+ * project's showcase, shown up top), ordered walkthrough steps, and prose
+ * sections. Uploads name themselves after
  * the slug, so renaming a project doesn't move files that are already live.
  */
 
@@ -33,6 +33,7 @@ const emptyCaseStudy = () => ({
   highlights: [],
   media: [],
   sections: [],
+  walkthrough: { intro: '', steps: [] },
 });
 
 export default function ProjectsEditor({ value, onChange, onBusy }) {
@@ -129,6 +130,22 @@ export default function ProjectsEditor({ value, onChange, onBusy }) {
                 slug={item.slug}
                 onBusy={onBusy}
                 hint="Screenshots and demo clips for this project, shown near the top of the case study. The first image also becomes the social share card."
+              />
+
+              <h3 className="admin-subhead">Visual walkthrough</h3>
+              <TextAreaField label="Walkthrough introduction" value={cs.walkthrough?.intro} onChange={(intro) => patchCs({ walkthrough: { ...cs.walkthrough, intro } })} rows={2} />
+              <ObjectListEditor
+                items={cs.walkthrough?.steps}
+                onChange={(steps) => patchCs({ walkthrough: { ...cs.walkthrough, steps } })}
+                itemTitle={(step) => step.title || 'New step'}
+                makeNew={() => ({ title: '', body: '', media: [], flow: [] })}
+                addLabel="+ Add walkthrough step"
+                renderItem={(step, patchStep) => <>
+                  <TextField label="Step title" value={step.title} onChange={(title) => patchStep({ title })} />
+                  <TextAreaField label="What happens and why it matters" value={step.body} onChange={(body) => patchStep({ body })} rows={3} />
+                  <MediaListEditor label="Step screenshots or demo clips" items={step.media} onChange={(media) => patchStep({ media })} slug={item.slug} onBusy={onBusy} hint="Use real screens. Add a caption identifying demo data, prototypes, or public pages." />
+                  <StringListField label="Workflow diagram (one stage per line)" items={step.flow} onChange={(flow) => patchStep({ flow })} hint="Optional explanatory diagram. This is labelled as a diagram, never as a screenshot." />
+                </>}
               />
 
               <div className="admin-field">

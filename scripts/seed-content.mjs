@@ -127,6 +127,7 @@ const summarise = (tree) => {
       (n, p) =>
         n +
         (p.caseStudy?.media?.length ?? 0) +
+        (p.caseStudy?.walkthrough?.steps ?? []).reduce((m, s) => m + (s.media?.length ?? 0), 0) +
         (p.caseStudy?.sections ?? []).reduce((m, s) => m + (s.media?.length ?? 0), 0),
       0
     ),

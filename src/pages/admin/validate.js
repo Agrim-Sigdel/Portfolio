@@ -40,6 +40,14 @@ export function validateContent(content) {
     if (!Number.isInteger(p.id)) errors.push(`${label}: id must be an integer.`);
     checkLinks(p.links, label, errors);
     checkMedia(p.caseStudy?.media, `${label} → gallery`, errors);
+    (p.caseStudy?.walkthrough?.steps ?? []).forEach((step, si) => {
+      const at = `${label} → walkthrough step #${si + 1}`;
+      if (!step.title?.trim()) errors.push(`${at}: title is required.`);
+      if (!step.body?.trim()) errors.push(`${at}: describe what this step shows.`);
+      checkMedia(step.media, at, errors);
+      if (!(step.media?.length || step.flow?.length)) errors.push(`${at}: add a screenshot, clip, or workflow diagram.`);
+      if ((step.flow ?? []).some((stage) => !stage?.trim())) errors.push(`${at}: diagram stages cannot be blank.`);
+    });
     (p.caseStudy?.sections ?? []).forEach((s, si) => {
       if (!s.heading?.trim()) errors.push(`${label}: case-study section #${si + 1} has no heading.`);
       checkMedia(s.media, `${label} → section "${s.heading || si + 1}"`, errors);

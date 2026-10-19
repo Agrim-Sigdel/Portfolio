@@ -1,28 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { motion, useReducedMotion, useScroll, useSpring } from 'framer-motion';
+import { motion as Motion, useReducedMotion, useScroll, useSpring } from 'framer-motion';
 import { FiArrowLeft, FiArrowRight, FiExternalLink, FiLink } from 'react-icons/fi';
 import { getProjectsData, getProjectBySlug } from '../../entities/portfolio/model';
 import { useContent } from '../../shared/lib/contentStore';
 import SEO from '../../shared/ui/SEO';
+import MediaGrid from './CaseStudyMedia';
+import ProjectWalkthrough from './ProjectWalkthrough';
 import './caseStudy.css';
 
-/*
- * CaseStudyPage — the detail page for a single project, at /work/:projectSlug.
- * Content lives in content.json under each project's `caseStudy`; this component
- * is presentation only.
- *
- * Laid out as a long-form article rather than a page of boxes, because the
- * write-ups run 1,000–1,700 words across 8–12 sections. That length needs three
- * things a flat stack of blocks doesn't give you: somewhere to see where you
- * are (the sticky index + progress bar), somewhere to jump to (anchored,
- * numbered headings), and a consistent vertical rhythm so scanning works.
- *
- * All spacing derives from the four --cs-flow-* tokens in caseStudy.css. Blocks
- * never set their own bottom margins — the container's flex gap owns it, so a
- * project missing a status pill, links, highlights or a gallery still reads with
- * exactly the same rhythm as one that has all four.
- */
+// Case-study content and walkthroughs stay editable through the CMS.
 
 const fade = (delay = 0) => ({
   initial: { y: 18, opacity: 0 },
@@ -54,44 +41,9 @@ const paragraphs = (body) =>
     .map((p) => p.trim())
     .filter(Boolean);
 
-/*
- * Showcase media — [{type, url, alt, caption, poster?}] uploaded from the admin.
- * Videos carry `controls` and never autoplay: an unprompted moving image is
- * hostile on a text page and costs mobile data. `preload="metadata"` keeps a
- * page with several clips from fetching any of them until asked.
- */
-const MediaGrid = ({ items, className = '' }) => {
-  const list = (items ?? []).filter((m) => m && m.url);
-  if (!list.length) return null;
-
-  return (
-    <div className={`cs-media${list.length === 1 ? ' cs-media-single' : ''} ${className}`.trim()}>
-      {list.map((m, i) => (
-        <figure className="cs-media-item" key={`${m.url}-${i}`}>
-          {m.type === 'video' ? (
-            <video
-              src={m.url}
-              poster={m.poster || undefined}
-              controls
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              aria-label={m.alt || m.caption || 'Project demo clip'}
-            />
-          ) : (
-            <img src={m.url} alt={m.alt || ''} loading="lazy" decoding="async" />
-          )}
-          {m.caption && <figcaption>{m.caption}</figcaption>}
-        </figure>
-      ))}
-    </div>
-  );
-};
-
 /** First still image anywhere in the case study — used as the social card. */
 const shareImage = (caseStudy) => {
-  const pools = [caseStudy?.media, ...(caseStudy?.sections ?? []).map((s) => s.media)];
+  const pools = [caseStudy?.media, ...(caseStudy?.walkthrough?.steps ?? []).map((s) => s.media), ...(caseStudy?.sections ?? []).map((s) => s.media)];
   for (const pool of pools) {
     const hit = (pool ?? []).find((m) => m?.url && m.type !== 'video');
     if (hit) return hit.url;
@@ -149,25 +101,26 @@ const CaseStudyPage = () => {
   const { projectSlug } = useParams();
   const project = getProjectBySlug(projectSlug);
   const reduceMotion = useReducedMotion();
+  const entrance = (delay) => reduceMotion ? {} : fade(delay);
 
   // Only projects with a written case study join the prev/next chain.
   const chain = getProjectsData().filter((p) => p.slug && p.caseStudy);
 
-  // No useMemo: the React Compiler is enabled for this project and handles
-  // memoization, and useActiveSection depends on the joined ids rather than the
-  // array identity — so rebuilding this list each render costs nothing.
   const sections = project?.caseStudy?.sections ?? [];
-  const seenIds = new Map();
+  const hasWalkthrough = Boolean(project?.caseStudy?.walkthrough?.steps?.length);
+  const seenIds = new Map([['visual-walkthrough', 1]]);
   const ids = sections.map((s, i) => sectionId(s.heading, i, seenIds));
 
-  const active = useActiveSection(ids);
+  const active = useActiveSection(hasWalkthrough ? ['visual-walkthrough', ...ids] : ids);
 
   // Reading progress. Spring-smoothed so the bar glides instead of stepping.
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 260, damping: 40, restDelta: 0.001 });
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const target = document.getElementById(window.location.hash.slice(1));
+    if (target) target.scrollIntoView({ block: 'start' });
+    else window.scrollTo(0, 0);
   }, [projectSlug]);
 
   // Unknown slug, or a project without a case study -> back to the work grid.
@@ -202,13 +155,13 @@ const CaseStudyPage = () => {
       />
 
       {/* reading progress — decorative, so hidden from assistive tech */}
-      <motion.div className="cs-progress" style={{ scaleX: progress }} aria-hidden="true" />
+      <Motion.div className="cs-progress" style={{ scaleX: progress }} aria-hidden="true" />
 
       <div className="cs-shell">
         {/* ── sidebar: back, section index, at-a-glance meta ── */}
         <aside className="cs-aside">
           <div className="cs-aside-inner">
-            <Link to="/normal" className="cs-back">
+            <Link to="/work" className="cs-back">
               <FiArrowLeft aria-hidden="true" /> All work
             </Link>
 
@@ -216,6 +169,7 @@ const CaseStudyPage = () => {
               <nav className="cs-toc" aria-label="Sections">
                 <p className="cs-toc-label">Contents</p>
                 <ol>
+                  {hasWalkthrough && <li><a href="#visual-walkthrough" onClick={jumpTo('visual-walkthrough')} className={active === 'visual-walkthrough' ? 'is-active' : undefined} aria-current={active === 'visual-walkthrough' ? 'true' : undefined}><span className="cs-toc-num">↗</span><span className="cs-toc-text">Visual walkthrough</span></a></li>}
                   {sections.map((s, i) => (
                     <li key={ids[i]}>
                       <a
@@ -245,23 +199,24 @@ const CaseStudyPage = () => {
         {/* ── the article ── */}
         <article className="cs-article">
           {isWip && (
-            <motion.div className="cs-wip" role="note" {...fade(0)}>
+            <Motion.div className="cs-wip" role="note" {...entrance(0)}>
               <span className="cs-wip-badge">Work in progress</span>
               <span className="cs-wip-text">
                 This case study is still being written — details may be incomplete or change.
               </span>
-            </motion.div>
+            </Motion.div>
           )}
 
           {/* hero — its own flex column so eyebrow/title/tagline stay tight
               together instead of inheriting the between-blocks gap */}
-          <motion.header className="cs-hero" {...fade(0.04)}>
+          <Motion.header className="cs-hero" {...entrance(0.04)}>
             <p className="cs-eyebrow">{category}</p>
             <h1 className="cs-title">
               {title}
               {status && <span className="cs-status">{status}</span>}
             </h1>
             {tagline && <p className="cs-tagline">{tagline}</p>}
+            <p className="cs-reading-time">{Math.max(1, Math.ceil([tagline, ...sections.map((s) => s.body), ...(caseStudy.walkthrough?.steps ?? []).map((s) => s.body)].join(' ').split(/\s+/).length / 200))} min read{hasWalkthrough && <> <span aria-hidden="true"> / </span> <a href="#visual-walkthrough" onClick={jumpTo('visual-walkthrough')}>Start with the walkthrough ↓</a></>}</p>
 
             {((links && links.length > 0) || role) && (
               <div className="cs-herometa">
@@ -283,42 +238,39 @@ const CaseStudyPage = () => {
                 )}
               </div>
             )}
-          </motion.header>
+          </Motion.header>
 
           {stack && stack.length > 0 && (
-            <motion.div className="cs-stack" {...fade(0.08)}>
-              {stack.map((tech) => (
-                <span key={tech} className="cs-chip">{tech}</span>
-              ))}
-            </motion.div>
+            <details className="cs-stack-details">
+              <summary>Built with {stack.slice(0, 3).join(', ')}{stack.length > 3 ? ` + ${stack.length - 3} more` : ''}</summary>
+              <div className="cs-stack">{stack.map((tech) => <span key={tech} className="cs-chip">{tech}</span>)}</div>
+            </details>
           )}
 
           {highlights && highlights.length > 0 && (
-            <motion.div className="cs-highlights" {...fade(0.12)}>
+            <Motion.div className="cs-highlights" {...entrance(0.12)}>
               {highlights.map((h, i) => (
                 <div key={i} className="cs-highlight">
                   <span className="cs-highlight-num">{String(i + 1).padStart(2, '0')}</span>
                   <p>{h}</p>
                 </div>
               ))}
-            </motion.div>
+            </Motion.div>
           )}
 
           {caseStudy.media && caseStudy.media.length > 0 && (
-            <motion.div {...fade(0.16)}>
-              <MediaGrid items={caseStudy.media} className="cs-media-gallery" />
-            </motion.div>
+            <Motion.div {...entrance(0.16)}>
+              <MediaGrid items={caseStudy.media} className="cs-media-gallery" priority />
+            </Motion.div>
           )}
 
+          <ProjectWalkthrough walkthrough={caseStudy.walkthrough} />
+
           {sections.map((section, i) => (
-            <motion.section
+            <Motion.section
               key={ids[i]}
               id={ids[i]}
               className="cs-section"
-              initial={{ y: 22, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             >
               <h2 className="cs-section-heading">
                 <span className="cs-section-num" aria-hidden="true">
@@ -350,7 +302,7 @@ const CaseStudyPage = () => {
               )}
 
               <MediaGrid items={section.media} />
-            </motion.section>
+            </Motion.section>
           ))}
 
           {(prev || next) && (

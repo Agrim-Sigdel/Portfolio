@@ -12,6 +12,10 @@ const ProjectCard = ({ project, index = 0 }) => {
     const { theme } = useTheme();
     const isLight = theme === 'light';
     const MotionDiv = motion.div;
+    const preview = [
+        ...(project.caseStudy?.media ?? []),
+        ...(project.caseStudy?.walkthrough?.steps ?? []).flatMap((step) => step.media ?? []),
+    ].find((item) => item.url && item.type !== 'video');
 
     return (
         <MotionDiv
@@ -30,6 +34,11 @@ const ProjectCard = ({ project, index = 0 }) => {
         whileHover={{ y: -5 }}
     >
         <div style={{ position: 'relative', zIndex: 2 }}>
+            {preview && project.slug && (
+                <Link to={`/work/${project.slug}#visual-walkthrough`} aria-label={`View ${project.title} walkthrough`} style={{ display: 'block', marginBottom: '1.6rem', borderRadius: '6px', overflow: 'hidden', background: 'var(--bg-black)' }}>
+                    <img src={preview.url} alt={preview.alt || `${project.title} preview`} width={preview.width} height={preview.height} loading="lazy" decoding="async" style={{ display: 'block', width: '100%', height: 'auto', aspectRatio: '16 / 9', objectFit: 'contain' }} />
+                </Link>
+            )}
             <p className="text-accent uppercase tracking-widest text-xs font-bold mb-4">{project.category}</p>
             <h3 className="font-serif text-3xl mb-6 leading-tight" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
                 {project.title}
