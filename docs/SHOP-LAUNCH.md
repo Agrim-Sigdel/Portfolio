@@ -6,8 +6,9 @@ Both addresses are supported:
 - `https://shop.agrimsigdel.com.np/` — storefront root and clean product paths.
 - `https://agrimsigdel.com.np/shop` — compatible portfolio path.
 
-The portfolio's Shop buttons link to the subdomain. Old portfolio shop URLs keep
-working; they are not redirected away while the domain is being established.
+The portfolio's Shop buttons retain `/shop` until the subdomain's HTTPS certificate
+is verified. Both URL families work independently; existing links are not redirected
+away while the domain is being established.
 Administration remains at `https://agrimsigdel.com.np/admin`.
 
 ## Domain setup
@@ -66,3 +67,20 @@ Sources checked 9 November 2026:
 - [Dodo test and live environments](https://docs.dodopayments.com/miscellaneous/test-mode-vs-live-mode)
 - [Netlify domain aliases](https://docs.netlify.com/manage/domains/configure-domains/add-a-domain-alias/)
 - [Netlify external DNS](https://docs.netlify.com/manage/domains/configure-domains/configure-external-dns/)
+
+## Launch status — 9 November 2026
+
+- Live key installed in Supabase; Products and Entitlements access verified.
+- Validation Sprint prepared in Dodo live mode at USD 5. Product ID:
+  `pdt_0NrYy1iG62IBXCTyXXAJF`. Its PDF download matched the private master by SHA-256.
+- Public catalogue remains in test mode. The live reusable checkout currently
+  returns “This link isn't available”; the account owner has not confirmed live
+  payment approval. Complete Dodo Verification before activating the listing.
+- The live key does not have `checkout_sessions:write`. Static product links and
+  the existing product/file sync do not require it; a diagnostic session API call
+  returned 403 for that missing scope, so it did not establish the approval status.
+- Cloudflare's shop CNAME points to `agrimsigdel.netlify.app`. HTTPS was still
+  failing hostname validation at verification time. Complete certificate setup in
+  Netlify, then verify the deployed root, product, help and return routes.
+- After approval, Admin → Shop → Validation Sprint → live → confirm live operations
+  → Sync reuses the prepared live product and file, then enables its live checkout.
