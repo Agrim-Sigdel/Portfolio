@@ -5,6 +5,8 @@ from a local JSON batch. Both use the same `shop-product-admin` Edge Function.
 The public shop still reads the catalogue from Supabase, so product changes do
 not require a Netlify deployment.
 
+For the shop subdomain and the switch to real payments, see [SHOP-LAUNCH.md](SHOP-LAUNCH.md).
+
 ## Initial backend setup
 
 Apply only `supabase/migrations/20261109120000_shop_dodo_automation.sql` after the

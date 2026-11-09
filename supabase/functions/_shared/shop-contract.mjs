@@ -1,7 +1,27 @@
 export const SHOP_BRAND = 'Obsidian International';
 export const SHOP_EMAIL = 'contact@agrimsigdel.com.np';
+export const SHOP_ORIGIN = 'https://shop.agrimsigdel.com.np';
+export const PORTFOLIO_ORIGIN = 'https://agrimsigdel.com.np';
 export const FORMATS = ['Guide', 'Template', 'Spreadsheet', 'Bundle'];
 export const CHECKOUT_MODES = ['disabled', 'free', 'test', 'live'];
+
+export function isShopOrigin(origin) {
+  try {
+    const { hostname } = new URL(origin);
+    return hostname === 'shop.agrimsigdel.com.np' || hostname === 'shop.localhost';
+  } catch { return false; }
+}
+
+// The same deployment serves /shop on the portfolio and / on the shop host.
+export function shopPath(path = '', origin = PORTFOLIO_ORIGIN) {
+  const suffix = path.replace(/^\/+/, '');
+  const base = isShopOrigin(origin) ? '' : '/shop';
+  return suffix ? `${base}/${suffix}` : base || '/';
+}
+
+export function shopRoutePath(pathname) {
+  return pathname.replace(/^\/shop(?=\/|$)/, '') || '/';
+}
 
 export function safeAssetUrl(value) {
   if (!value || typeof value !== 'string') return '';
@@ -23,7 +43,7 @@ export function dodoLink(value, mode, origin) {
     url.search = '';
     url.hash = '';
     url.searchParams.set('quantity', '1');
-    if (origin) url.searchParams.set('redirect_url', new URL('/shop/checkout/return', origin).href);
+    if (origin) url.searchParams.set('redirect_url', new URL(shopPath('checkout/return', origin), origin).href);
     return url.href;
   } catch { return ''; }
 }
@@ -49,7 +69,7 @@ export function priceLabel(details) {
 
 export function validateProduct(product) {
   const d = product.details;
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(product.slug) || product.slug.length > 100 || ['help', 'support', 'refunds', 'terms', 'privacy', 'checkout'].includes(product.slug)) return 'Use a unique lowercase slug with hyphens (not a reserved shop page).';
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(product.slug) || product.slug.length > 100 || ['shop', 'admin', 'help', 'support', 'refunds', 'terms', 'privacy', 'checkout'].includes(product.slug)) return 'Use a unique lowercase slug with hyphens (not a reserved shop page).';
   if (!d.title?.trim() || d.title.length > 120) return 'Add a title of up to 120 characters.';
   if (!FORMATS.includes(d.format) || !CHECKOUT_MODES.includes(d.checkout_mode)) return 'Choose a valid format and checkout mode.';
   if (!['USD', 'EUR', 'GBP', 'INR', 'NPR'].includes(d.currency)) return 'Choose a supported display currency.';

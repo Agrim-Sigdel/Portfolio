@@ -19,6 +19,40 @@
 [dev]
   command = "npm run dev"
 
+# Assign shop.agrimsigdel.com.np as an alias of this SAME Netlify site. DNS is
+# managed in Cloudflare. The React router selects the storefront by hostname.
+# Keep old /shop links usable on the dedicated host, including Dodo returns.
+[[redirects]]
+  from = "https://shop.agrimsigdel.com.np/shop"
+  to = "https://shop.agrimsigdel.com.np/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://shop.agrimsigdel.com.np/shop/*"
+  to = "https://shop.agrimsigdel.com.np/:splat"
+  status = 301
+  force = true
+
+# Keep the existing admin login on the portfolio origin.
+[[redirects]]
+  from = "https://shop.agrimsigdel.com.np/admin"
+  to = "https://agrimsigdel.com.np/admin"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "https://shop.agrimsigdel.com.np/robots.txt"
+  to = "/shop-robots.txt"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://shop.agrimsigdel.com.np/sitemap.xml"
+  to = "/shop-sitemap.xml"
+  status = 200
+  force = true
+
 # SPA fallback: client-side routes like /cv, /normal, /terminal have no file on
 # disk, so serve index.html for any unmatched path and let React Router resolve
 # it. Without this, refreshing or deep-linking a route 404s.

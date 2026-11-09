@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FiGithub, FiLinkedin, FiMail, FiGlobe, FiSend, FiArrowRight } from 'react-icons/fi';
 import { useContent } from '../../../shared/lib/contentStore';
 import ContactModal from '../../../shared/ui/ContactModal';
+import { SHOP_ORIGIN } from '../../shop/shopModel.mjs';
 import './ModeTriptych.css';
 
 /*
@@ -208,7 +209,7 @@ export default function ModeTriptych() {
             </a>
           ))}
         </nav>
-        <Link to="/shop" className="tri-contact-btn">Shop <FiArrowRight aria-hidden="true" /></Link>
+        <a href={SHOP_ORIGIN} className="tri-contact-btn">Shop <FiArrowRight aria-hidden="true" /></a>
         <button
           type="button"
           className="tri-contact-btn"

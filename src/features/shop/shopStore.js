@@ -30,7 +30,7 @@ export async function shopAdminRequest(body) {
 }
 
 export function trackShop(event, productSlug = '') {
-  if (!supabase || navigator.doNotTrack === '1' || navigator.globalPrivacyControl || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return;
+  if (!supabase || navigator.doNotTrack === '1' || navigator.globalPrivacyControl || window.location.hostname === 'localhost' || window.location.hostname.endsWith('.localhost') || window.location.hostname === '127.0.0.1') return;
   const params = new URLSearchParams(window.location.search);
   // No cookies, persistent identifier, full referrer, or full URL is stored.
   // Analytics must never interrupt navigation or downloading.

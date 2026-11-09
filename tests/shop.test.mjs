@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { campaignSearch, campaignValue, dodoLink, productAction, safeAssetUrl, validateProduct } from '../src/features/shop/shopModel.mjs';
+import { campaignSearch, campaignValue, dodoLink, productAction, safeAssetUrl, validateProduct, isShopOrigin, shopPath, shopRoutePath } from '../src/features/shop/shopModel.mjs';
 const seed = JSON.parse(readFileSync(new URL('../src/features/shop/seed-product.json', import.meta.url)));
 
 test('the launch resource is complete and downloadable', () => {
@@ -25,6 +25,30 @@ test('checkout removes prefilled PII and overrides and sets a local return page'
   assert.equal(result.searchParams.get('quantity'), '1');
   assert.equal(result.searchParams.get('redirect_url'), 'https://agrimsigdel.com.np/shop/checkout/return');
   assert.equal(result.hash, '');
+});
+test('shop host uses root routes while portfolio and previews retain /shop', () => {
+  for (const origin of ['https://shop.agrimsigdel.com.np', 'http://shop.localhost:5173']) {
+    assert.equal(isShopOrigin(origin), true);
+    assert.equal(shopPath('', origin), '/');
+    assert.equal(shopPath('/help', origin), '/help');
+    assert.equal(shopPath('a-guide', origin), '/a-guide');
+    const checkout = new URL(dodoLink('https://test.checkout.dodopayments.com/buy/pdt_123', 'test', origin));
+    assert.equal(checkout.searchParams.get('redirect_url'), `${origin}/checkout/return`);
+  }
+  for (const origin of ['https://agrimsigdel.com.np', 'https://example.netlify.app', 'http://localhost:5173', 'https://shop.agrimsigdel.com.np.evil.test']) {
+    assert.equal(isShopOrigin(origin), false);
+    assert.equal(shopPath('', origin), '/shop');
+    assert.equal(shopPath('help', origin), '/shop/help');
+  }
+  assert.equal(isShopOrigin('not a URL'), false);
+});
+test('legacy shop paths normalize without changing unrelated product names', () => {
+  assert.equal(shopRoutePath('/shop'), '/');
+  assert.equal(shopRoutePath('/shop/'), '/');
+  assert.equal(shopRoutePath('/shop/checkout/return'), '/checkout/return');
+  assert.equal(shopRoutePath('/shop/a-guide'), '/a-guide');
+  assert.equal(shopRoutePath('/shopping-guide'), '/shopping-guide');
+  assert.equal(shopRoutePath('/a-guide'), '/a-guide');
 });
 test('published paid products require a matching checkout, price and delivery confirmation', () => {
   const product = structuredClone(seed);
@@ -50,7 +74,7 @@ test('campaign attribution carries only safe labels across the catalogue', () =>
   assert.equal(campaignSearch('?utm_source=https://example.com&token=secret'), '');
 });
 test('reserved slugs and incomplete published products are rejected', () => {
-  assert.match(validateProduct({ ...seed, slug: 'help' }), /reserved/);
+  for (const slug of ['help', 'shop', 'admin']) assert.match(validateProduct({ ...seed, slug }), /reserved/);
   assert.match(validateProduct({ ...seed, details: { ...seed.details, summary: '' } }), /summary/);
   assert.match(validateProduct({ ...seed, details: { ...seed.details, download_url: '' } }), /download URL/);
 });

@@ -1,5 +1,6 @@
 import React, { useEffect, lazy, Suspense } from 'react';
-import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useParams, useLocation, Navigate } from 'react-router-dom';
+import { isShopOrigin, shopRoutePath } from './features/shop/shopModel.mjs';
 import { useTheme } from './shared/lib/ThemeContext';
 import ModeTriptych from './features/modeSelection/ui/ModeTriptych';
 import ErrorBoundary from './shared/ui/ErrorBoundary';
@@ -67,10 +68,19 @@ function ModeLoader() {
 }
 
 function App() {
+  const dedicatedShop = isShopOrigin(window.location.origin);
   return (
     <>
       <Toaster position="bottom-right" toastOptions={{ style: { background: '#1c1c1c', color: '#f5f5f5', border: '1px solid #303030' } }} />
       <Routes>
+        {dedicatedShop ? <>
+          <Route path="/" element={<ShopRoute />} />
+          {['help', 'support', 'refunds', 'terms', 'privacy', 'checkout/return'].map(path => (
+            <Route key={path} path={`/${path}`} element={<ShopRoute />} />
+          ))}
+          <Route path="/shop/*" element={<LegacyShopRoute />} />
+          <Route path="/:productSlug" element={<ShopRoute />} />
+        </> : <>
         <Route path="/" element={<SelectorRoute />} />
         <Route path="/admin" element={<AdminRoute />} />
         <Route path="/shop" element={<ShopRoute />} />
@@ -81,11 +91,17 @@ function App() {
         <Route path="/work" element={<AllProjectsRoute />} />
         <Route path="/work/:projectSlug" element={<CaseStudyRoute />} />
         <Route path="/:slug" element={<ModeRoute />} />
+        </>}
         {/* Unknown path -> back to the selector */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );
+}
+
+function LegacyShopRoute() {
+  const { pathname, search, hash } = useLocation();
+  return <Navigate to={`${shopRoutePath(pathname)}${search}${hash}`} replace />;
 }
 
 function ShopRoute() {

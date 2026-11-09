@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { SHOP_ORIGIN } from '../../features/shop/shopModel.mjs';
 import { motion as Motion } from 'framer-motion';
 import { MdDarkMode, MdLightMode, MdMenu, MdClose } from 'react-icons/md';
 import { useTheme } from '../../shared/lib/ThemeContext';
@@ -87,7 +87,7 @@ const Navbar = () => {
                     AGRIM.
                 </button>
 
-                <div className="navbar-links">{renderLinks('navbar-link')}<Link className="navbar-link" to="/shop">Shop</Link></div>
+                <div className="navbar-links">{renderLinks('navbar-link')}<a className="navbar-link" href={SHOP_ORIGIN}>Shop</a></div>
 
                 <button
                     type="button"
@@ -114,7 +114,7 @@ const Navbar = () => {
             {menuOpen && (
                 <div id="navbar-sheet" className="navbar-sheet">
                     {renderLinks('navbar-sheet-link')}
-                    <Link className="navbar-sheet-link" to="/shop" onClick={() => setMenuOpen(false)}>Shop</Link>
+                    <a className="navbar-sheet-link" href={SHOP_ORIGIN} onClick={() => setMenuOpen(false)}>Shop</a>
                 </div>
             )}
         </div>

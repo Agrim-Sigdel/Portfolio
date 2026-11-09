@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import SEO from '../../shared/ui/SEO';
 import { loadProducts, trackShop } from '../../features/shop/shopStore';
-import { SHOP_BRAND, SHOP_EMAIL, campaignSearch, priceLabel, productAction, safeAssetUrl } from '../../features/shop/shopModel.mjs';
+import { SHOP_BRAND, SHOP_EMAIL, SHOP_ORIGIN, PORTFOLIO_ORIGIN, campaignSearch, priceLabel, productAction, safeAssetUrl, shopPath, shopRoutePath } from '../../features/shop/shopModel.mjs';
 import './shop.css';
+
+const shopLink = (path = '') => shopPath(path, window.location.origin);
 
 const info = {
   help: { title: 'A little help with your purchase.', subtitle: 'From checkout to your first download.', sections: [
@@ -52,7 +54,7 @@ function ProductDetail({ product }) {
   const action = productAction(product, window.location.origin);
   const sample = safeAssetUrl(d.sample_url);
   return <>
-    <Link className="shop-back" to="/shop">← All resources</Link>
+    <Link className="shop-back" to={shopLink()}>← All resources</Link>
     <div className="shop-product-layout">
       <ProductCover product={product} />
       <section className="shop-product-copy">
@@ -66,7 +68,7 @@ function ProductDetail({ product }) {
         {d.checkout_mode === 'live' && <p className="shop-fine">Secure checkout and delivery by Dodo Payments. Final taxes and currency shown at checkout.</p>}
         <div className="shop-inline-links">
           {sample && <a href={sample} target="_blank" rel="noreferrer" onClick={() => trackShop('sample_click', product.slug)}>Preview sample ↗</a>}
-          <Link to="/shop/help">Purchase help</Link><Link to="/shop/refunds">Refund policy</Link>
+          <Link to={shopLink('help')}>Purchase help</Link><Link to={shopLink('refunds')}>Refund policy</Link>
         </div>
       </section>
     </div>
@@ -88,15 +90,15 @@ function Catalogue({ products }) {
     <div className="shop-promise"><span>01 / Made to be useful</span><span>02 / Digital, by design</span><span>03 / Yours to put into practice</span></div>
     <section id="resources" className="shop-catalogue"><div className="shop-section-title"><div><p className="shop-eyebrow">The collection</p><h2>Start somewhere good.</h2></div><span className="shop-fine">{products.length} {products.length === 1 ? 'resource' : 'resources'} / More in the making</span></div>
       {formats.length > 2 && <div className="shop-filters" aria-label="Filter resources">{formats.map(f => <button key={f} aria-pressed={format === f} onClick={() => setFormat(f)}>{f}</button>)}</div>}
-      <div className="shop-products">{shown.map(p => <Link className="shop-product-card" key={p.slug} to={`/shop/${p.slug}${campaign}`}><ProductCover product={p} /><div className="shop-card-meta"><span>{p.details.format}</span><span>{priceLabel(p.details)}</span></div><h3>{p.details.title} <span aria-hidden="true">↗</span></h3><p>{p.details.summary}</p></Link>)}</div>
+      <div className="shop-products">{shown.map(p => <Link className="shop-product-card" key={p.slug} to={`${shopLink(p.slug)}${campaign}`}><ProductCover product={p} /><div className="shop-card-meta"><span>{p.details.format}</span><span>{priceLabel(p.details)}</span></div><h3>{p.details.title} <span aria-hidden="true">↗</span></h3><p>{p.details.summary}</p></Link>)}</div>
       {!products.length && <p className="shop-notice">New resources are on their way. Check back soon.</p>}
     </section>
-    <section className="shop-bottom-note"><p className="shop-eyebrow">Simple from the start</p><h2>Find your resource.<br />Make it your own.</h2><div><p>See exactly what’s inside before you download. Clear descriptions, useful previews, and a real person to contact if you get stuck.</p><Link to="/shop/help">How downloads work ↗</Link></div></section>
+    <section className="shop-bottom-note"><p className="shop-eyebrow">Simple from the start</p><h2>Find your resource.<br />Make it your own.</h2><div><p>See exactly what’s inside before you download. Clear descriptions, useful previews, and a real person to contact if you get stuck.</p><Link to={shopLink('help')}>How downloads work ↗</Link></div></section>
   </>;
 }
 
 function InfoPage({ page }) {
-  return <article className="shop-info"><Link className="shop-back" to="/shop">← Back to the shop</Link><p className="shop-eyebrow">{SHOP_BRAND}</p><h1>{page.title}</h1><p className="shop-lead">{page.subtitle}</p>{page.sections.map(([heading, body]) => <section key={heading}><h2>{heading}</h2><p>{body}</p></section>)}<a className="shop-button" href={`mailto:${SHOP_EMAIL}`}>Email support ↗</a>{page === info.privacy && <p className="shop-fine"><a href="https://dodopayments.com/legal/privacy-policy" target="_blank" rel="noreferrer">Dodo Payments privacy policy ↗</a></p>}</article>;
+  return <article className="shop-info"><Link className="shop-back" to={shopLink()}>← Back to the shop</Link><p className="shop-eyebrow">{SHOP_BRAND}</p><h1>{page.title}</h1><p className="shop-lead">{page.subtitle}</p>{page.sections.map(([heading, body]) => <section key={heading}><h2>{heading}</h2><p>{body}</p></section>)}<a className="shop-button" href={`mailto:${SHOP_EMAIL}`}>Email support ↗</a>{page === info.privacy && <p className="shop-fine"><a href="https://dodopayments.com/legal/privacy-policy" target="_blank" rel="noreferrer">Dodo Payments privacy policy ↗</a></p>}</article>;
 }
 
 export default function ShopPage() {
@@ -104,9 +106,10 @@ export default function ShopPage() {
   const { pathname, search } = useLocation();
   const [state, setState] = useState({ products: [], loading: true, error: '' });
   const [reload, setReload] = useState(0);
-  const section = pathname.split('/')[2];
+  const routePath = shopRoutePath(pathname);
+  const section = routePath.split('/')[1];
   const page = info[section];
-  const isReturn = pathname === '/shop/checkout/return';
+  const isReturn = routePath === '/checkout/return';
   const needsCatalogue = !page && !isReturn;
   const product = state.products.find(p => p.slug === productSlug);
 
@@ -123,18 +126,18 @@ export default function ShopPage() {
     return () => { current = false; };
   }, [needsCatalogue, reload]);
   useEffect(() => {
-    if (pathname === '/shop' || pathname === '/shop/') trackShop('shop_view');
+    if (routePath === '/') trackShop('shop_view');
     else if (product) trackShop('product_view', product.slug);
-  }, [pathname, search, product]);
+  }, [routePath, search, product]);
 
   const title = page?.title || (isReturn ? 'After checkout' : product?.details.title || 'Practical digital resources');
   return <div className="shop-shell">
-    <SEO title={`${title} | ${SHOP_BRAND}`} description={product?.details.summary || 'Practical guides, templates and digital resources by Obsidian International, a brand by Agrim Sigdel.'} url={`https://agrimsigdel.com.np${pathname}`} image="https://agrimsigdel.com.np/shop-assets/planner-preview-1.png" />
+    <SEO title={`${title} | ${SHOP_BRAND}`} description={product?.details.summary || 'Practical guides, templates and digital resources by Obsidian International, a brand by Agrim Sigdel.'} url={`${SHOP_ORIGIN}${routePath}`} image="https://agrimsigdel.com.np/shop-assets/planner-preview-1.png" />
     <a className="shop-skip" href="#shop-main">Skip to content</a>
-    <header className="shop-header"><Link className="shop-brand" to="/shop"><span className="shop-mark" aria-hidden="true">O<span>I</span></span><span>OBSIDIAN<small>INTERNATIONAL</small></span></Link><nav aria-label="Shop navigation"><Link to="/shop" aria-current={pathname === '/shop' ? 'page' : undefined}>Shop</Link><Link to="/shop/help">Purchase help</Link><Link className="shop-portfolio-link" to="/">Portfolio ↗</Link></nav></header>
+    <header className="shop-header"><Link className="shop-brand" to={shopLink()}><span className="shop-mark" aria-hidden="true">O<span>I</span></span><span>OBSIDIAN<small>INTERNATIONAL</small></span></Link><nav aria-label="Shop navigation"><Link to={shopLink()} aria-current={routePath === '/' ? 'page' : undefined}>Shop</Link><Link to={shopLink('help')}>Purchase help</Link><a className="shop-portfolio-link" href={PORTFOLIO_ORIGIN}>Portfolio ↗</a></nav></header>
     <main id="shop-main" className="shop-main">
-      {page ? <InfoPage page={page} /> : isReturn ? <article className="shop-info"><p className="shop-eyebrow">After checkout</p><h1>Check your order email.</h1><p className="shop-lead">Your payment status and download access are confirmed by Dodo Payments.</p><p>This page does not verify a payment. If you completed checkout, check your Dodo order page or confirmation email for the result and download links. If payment was cancelled or failed, return to the product to try again. Test checkouts are not real purchases.</p><div className="shop-inline-links"><Link className="shop-button" to="/shop/help">Find my download ↗</Link><Link to="/shop">Back to shop</Link></div></article> : state.loading ? <p className="shop-loading" role="status">Loading the collection…</p> : state.error ? <div className="shop-info" role="alert"><h1>We’ll be right back.</h1><p>{state.error}</p><button className="shop-button" onClick={() => { setState(s => ({ ...s, loading: true })); setReload(n => n + 1); }}>Try again</button></div> : productSlug ? product ? <ProductDetail product={product} /> : <article className="shop-info"><h1>Resource not found.</h1><p>This resource may have moved or is not available yet.</p><Link className="shop-button" to="/shop">Explore the collection ↗</Link></article> : <Catalogue products={state.products} />}
+      {page ? <InfoPage page={page} /> : isReturn ? <article className="shop-info"><p className="shop-eyebrow">After checkout</p><h1>Check your order email.</h1><p className="shop-lead">Your payment status and download access are confirmed by Dodo Payments.</p><p>This page does not verify a payment. If you completed checkout, check your Dodo order page or confirmation email for the result and download links. If payment was cancelled or failed, return to the product to try again. Test checkouts are not real purchases.</p><div className="shop-inline-links"><Link className="shop-button" to={shopLink('help')}>Find my download ↗</Link><Link to={shopLink()}>Back to shop</Link></div></article> : state.loading ? <p className="shop-loading" role="status">Loading the collection…</p> : state.error ? <div className="shop-info" role="alert"><h1>We’ll be right back.</h1><p>{state.error}</p><button className="shop-button" onClick={() => { setState(s => ({ ...s, loading: true })); setReload(n => n + 1); }}>Try again</button></div> : productSlug ? product ? <ProductDetail product={product} /> : <article className="shop-info"><h1>Resource not found.</h1><p>This resource may have moved or is not available yet.</p><Link className="shop-button" to={shopLink()}>Explore the collection ↗</Link></article> : <Catalogue products={state.products} />}
     </main>
-    <footer className="shop-footer"><div><strong>{SHOP_BRAND}</strong><p>Useful things, thoughtfully made.</p><small>A brand by <Link to="/">Agrim Sigdel</Link> · Kathmandu, Nepal</small></div><nav aria-label="Shop policies"><Link to="/shop/support">Support</Link><Link to="/shop/refunds">Refunds</Link><Link to="/shop/terms">Terms</Link><Link to="/shop/privacy">Privacy</Link></nav><span className="shop-copyright">© {new Date().getFullYear()} Agrim Sigdel</span></footer>
+    <footer className="shop-footer"><div><strong>{SHOP_BRAND}</strong><p>Useful things, thoughtfully made.</p><small>A brand by <a href={PORTFOLIO_ORIGIN}>Agrim Sigdel</a> · Kathmandu, Nepal</small></div><nav aria-label="Shop policies"><Link to={shopLink('support')}>Support</Link><Link to={shopLink('refunds')}>Refunds</Link><Link to={shopLink('terms')}>Terms</Link><Link to={shopLink('privacy')}>Privacy</Link></nav><span className="shop-copyright">© {new Date().getFullYear()} Agrim Sigdel</span></footer>
   </div>;
 }
