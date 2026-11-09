@@ -6,6 +6,10 @@ The existing Vite/Netlify portfolio serves `/shop`, `/shop/:productSlug`, `/shop
 
 ## Product management
 
+For automatic Dodo creation, private file uploads and JSON batch imports, see
+[Product automation](SHOP-AUTOMATION.md). The manual-link workflow below remains
+available for existing listings.
+
 Sign in at `/admin` and open **Shop**. Add a resource, its description, contents,
 format, preview images, sample and price. Save drafts privately or publish them.
 Unpublish to archive a listing. Slug changes do not create redirects, so retain

@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "mode": "test",
+  "products": [
+    {
+      "slug": "my-first-guide",
+      "title": "My First Guide",
+      "summary": "Replace this with the specific problem your guide solves.",
+      "description": "Describe the actual contents, outcome and limits before importing.",
+      "audience": "Who this resource is for",
+      "format": "Guide",
+      "price": "5.00",
+      "currency": "USD",
+      "tax_category": "e_book",
+      "published": false,
+      "sort_order": 10,
+      "cover_url": "",
+      "sample_url": "",
+      "previews": [],
+      "includes": ["Replace with the actual contents"],
+      "file_note": "PDF · English · Requires a PDF reader",
+      "file": "../private/shop-products/my-first-guide.pdf"
+    },
+    {
+      "slug": "my-template-bundle",
+      "title": "My Template Bundle",
+      "summary": "Replace this with the task your templates simplify.",
+      "description": "Describe the included templates and the software they require.",
+      "format": "Bundle",
+      "price": "9.00",
+      "currency": "USD",
+      "tax_category": "digital_products",
+      "published": false,
+      "sort_order": 20,
+      "includes": ["Replace with the actual bundle contents"],
+      "file_note": "ZIP · Add the software requirements here",
+      "file": "../private/shop-products/my-template-bundle.zip"
+    }
+  ]
+}

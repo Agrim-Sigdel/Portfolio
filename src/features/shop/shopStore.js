@@ -11,15 +11,21 @@ export async function loadProducts(admin = false) {
 }
 
 export async function saveProduct(product, originalSlug) {
-  const issue = validateProduct(product);
+  if (originalSlug && originalSlug !== product.slug) throw new Error('Keep the slug of an existing product. Create a separate listing for a new URL.');
+  const issue = validateProduct(product.details.api_managed ? {...product, details:{...product.details,checkout_mode:'disabled'}} : product);
   if (issue) throw new Error(issue);
-  const row = { ...product, sort_order: Number(product.sort_order), updated_at: new Date().toISOString() };
-  delete row.created_at;
-  const query = originalSlug
-    ? supabase.from('shop_products').update(row).eq('slug', originalSlug)
-    : supabase.from('shop_products').insert(row);
-  const { data, error } = await query.select().single();
-  if (error) throw new Error(error.code === '23505' ? 'That slug already exists. Choose another.' : 'Could not save. Check your admin access and shop database setup.');
+  const result = await shopAdminRequest({action:'save',product,expected_updated_at:product.updated_at || null});
+  return result.product;
+}
+
+export async function shopAdminRequest(body) {
+  const {data,error} = await supabase.functions.invoke('shop-product-admin',{body});
+  if(error){
+    let message='The shop backend could not be reached. Check your sign-in and connection.';
+    if(error.context instanceof Response){try{message=(await error.context.json()).error || message;}catch{/* Keep the safe fallback. */}}
+    throw new Error(message);
+  }
+  if(data?.error)throw new Error(data.error);
   return data;
 }
 

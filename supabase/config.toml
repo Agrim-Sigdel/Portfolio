@@ -15,3 +15,8 @@ verify_jwt = false
 # requires a genuine user account. See functions/send-reply/index.ts.
 [functions.send-reply]
 verify_jwt = true
+
+# Supports an admin session or the existing server credential used by the local
+# batch tool. The handler validates auth AND shop_admins membership itself.
+[functions.shop-product-admin]
+verify_jwt = false
