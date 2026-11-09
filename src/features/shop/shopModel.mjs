@@ -1,5 +1,5 @@
 export const SHOP_BRAND = 'Obsidian International';
-export const SHOP_EMAIL = 'sigdelagrim35@gmail.com';
+export const SHOP_EMAIL = 'contact@agrimsigdel.com.np';
 export const FORMATS = ['Guide', 'Template', 'Spreadsheet', 'Bundle'];
 export const CHECKOUT_MODES = ['disabled', 'free', 'test', 'live'];
 

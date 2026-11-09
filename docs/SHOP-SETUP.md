@@ -18,6 +18,10 @@ typographic fallback. Preview fields accept image URLs, not PDFs or video URLs.
 
 ## Connect Dodo
 
+Use **contact@agrimsigdel.com.np** for all Obsidian International customer support
+and order enquiries. Set the same address in Dodo's customer-facing business
+support and receipt settings. Website changes do not update Dodo account settings.
+
 1. In Dodo **test mode**, create a one-time product and set its price/currency.
 2. Create a **Digital Files entitlement**, upload the paid files, and attach it
    to that product. Dodo handles confirmation emails and customer downloads.

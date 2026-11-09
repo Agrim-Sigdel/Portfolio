@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { loadProducts, loadShopStats, saveProduct } from '../../features/shop/shopStore';
-import { blankProduct, CHECKOUT_MODES, dodoLink, FORMATS, priceLabel } from '../../features/shop/shopModel.mjs';
+import { blankProduct, CHECKOUT_MODES, dodoLink, FORMATS, priceLabel, SHOP_EMAIL } from '../../features/shop/shopModel.mjs';
 import { TextField, TextAreaField, CheckboxField } from './fields';
 import './shopAdmin.css';
 
@@ -47,7 +47,7 @@ function ProductEditor({ initial, onSaved, onCancel }) {
     <TextField label="Cover image URL" value={d.cover_url} onChange={v => patch('cover_url', v)} hint="Upload a public cover using the Media tab, then paste its URL here. A typographic cover is used if blank." />
     <TextAreaField label="Preview image URLs · one per line" value={previews} onChange={setPreviews} />
     <TextField label="Public sample URL" value={d.sample_url} onChange={v => patch('sample_url', v)} hint="Only share samples here. Paid files belong in Dodo’s Digital Files entitlement, not public media." />
-    <h3>Checkout & delivery</h3><SelectField label="Checkout mode" value={d.checkout_mode} options={CHECKOUT_MODES} onChange={v => patch('checkout_mode', v)} />
+    <h3>Checkout & delivery</h3><p className="admin-hint">Brand support email: {SHOP_EMAIL}. Set this address in Dodo’s customer-facing support and receipt settings too.</p><SelectField label="Checkout mode" value={d.checkout_mode} options={CHECKOUT_MODES} onChange={v => patch('checkout_mode', v)} />
     <p className="admin-hint">Disabled shows “Available soon”. Free links directly to a public file. Test and live redirect to Dodo’s hosted checkout. No API key is needed for reusable product links.</p>
     <div className="shop-admin-grid"><TextField label="Display price" value={d.price} onChange={v => patch('price', v)} /><SelectField label="Display currency" value={d.currency} options={['USD', 'EUR', 'GBP', 'INR', 'NPR']} onChange={v => patch('currency', v)} /></div>
     {d.checkout_mode === 'free' && <TextField label="Free download URL" value={d.download_url} onChange={v => patch('download_url', v)} hint="This URL is public. Never put a paid download here." />}
