@@ -208,6 +208,7 @@ export default function ModeTriptych() {
             </a>
           ))}
         </nav>
+        <Link to="/shop" className="tri-contact-btn">Shop <FiArrowRight aria-hidden="true" /></Link>
         <button
           type="button"
           className="tri-contact-btn"

@@ -37,6 +37,9 @@ export default defineConfig({
         ],
         // SPA deep links resolve to the app shell when offline.
         navigateFallback: '/index.html',
+        // PDF samples and preview files must stay file requests, including when
+        // opened in a new tab after the service worker has taken control.
+        navigateFallbackDenylist: [/^\/shop-assets\//],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,

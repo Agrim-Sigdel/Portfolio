@@ -1,0 +1,23 @@
+{
+  "slug": "problem-to-product-planner",
+  "published": true,
+  "sort_order": 1,
+  "details": {
+    "title": "Problem-to-Product Planner",
+    "summary": "Start with a real problem. Turn scattered ideas into one small, testable offer.",
+    "description": "Too many product ideas, and no clear place to start? This printable planner helps you capture evidence of a problem, choose who to help, and design a small experiment before spending weeks building. Work through three practical pages at your own pace.",
+    "audience": "For first-time creators, freelancers and curious builders deciding what to make next.",
+    "format": "Template",
+    "price": "0",
+    "currency": "USD",
+    "checkout_mode": "free",
+    "checkout_url": "",
+    "delivery_ready": false,
+    "cover_url": "/shop-assets/planner-cover.svg",
+    "sample_url": "/shop-assets/problem-to-product-planner.pdf",
+    "download_url": "/shop-assets/problem-to-product-planner.pdf",
+    "includes": ["Problem evidence worksheet", "One-page offer brief", "Seven-day experiment tracker"],
+    "previews": ["/shop-assets/planner-preview-1.png", "/shop-assets/planner-preview-2.png", "/shop-assets/planner-preview-3.png"],
+    "file_note": "3-page PDF · A4 · English · Print or annotate digitally"
+  }
+}

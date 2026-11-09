@@ -4,6 +4,7 @@ import { useTheme } from '../../shared/lib/ThemeContext';
 import ContentEditor from './ContentEditor';
 import MediaPanel from './MediaPanel';
 import ContactInbox from './ContactInbox';
+import ShopManager from './ShopManager';
 
 /*
  * AdminShell: the signed-in admin frame. Owns the top bar (tabs + who + sign out)
@@ -14,6 +15,7 @@ const TABS = [
   { id: 'content', label: 'Content' },
   { id: 'media', label: 'Media' },
   { id: 'inbox', label: 'Inbox' },
+  { id: 'shop', label: 'Shop' },
 ];
 
 export default function AdminShell({ session, onSignOut }) {
@@ -52,6 +54,7 @@ export default function AdminShell({ session, onSignOut }) {
         {tab === 'content' && <ContentEditor />}
         {tab === 'media' && <MediaPanel />}
         {tab === 'inbox' && <ContactInbox />}
+        {tab === 'shop' && <ShopManager />}
       </main>
     </div>
   );

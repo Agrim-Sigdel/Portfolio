@@ -14,6 +14,7 @@ const FunModePage = lazy(() => import('./pages/funMode/FunModePage'));
 const NormalModePage = lazy(() => import('./pages/normalMode/NormalModePage'));
 const CaseStudyPage = lazy(() => import('./pages/caseStudy/CaseStudyPage'));
 const AllProjectsPage = lazy(() => import('./pages/allProjects/AllProjectsPage'));
+const ShopPage = lazy(() => import('./pages/shop/ShopPage'));
 
 // Hidden admin surface — not linked anywhere public. Access is gated by Supabase
 // auth + RLS, not by the obscurity of the route.
@@ -72,6 +73,11 @@ function App() {
       <Routes>
         <Route path="/" element={<SelectorRoute />} />
         <Route path="/admin" element={<AdminRoute />} />
+        <Route path="/shop" element={<ShopRoute />} />
+        {['help', 'support', 'refunds', 'terms', 'privacy', 'checkout/return'].map(path => (
+          <Route key={path} path={`/shop/${path}`} element={<ShopRoute />} />
+        ))}
+        <Route path="/shop/:productSlug" element={<ShopRoute />} />
         <Route path="/work" element={<AllProjectsRoute />} />
         <Route path="/work/:projectSlug" element={<CaseStudyRoute />} />
         <Route path="/:slug" element={<ModeRoute />} />
@@ -80,6 +86,10 @@ function App() {
       </Routes>
     </>
   );
+}
+
+function ShopRoute() {
+  return <ErrorBoundary><Suspense fallback={<ModeLoader />}><ShopPage /></Suspense></ErrorBoundary>;
 }
 
 /* ----------------------------------------------------- mode selector ('/') */

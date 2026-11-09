@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { motion as Motion } from 'framer-motion';
 import { MdDarkMode, MdLightMode, MdMenu, MdClose } from 'react-icons/md';
 import { useTheme } from '../../shared/lib/ThemeContext';
 import { useScrollContainerRef } from '../../pages/funMode/ScrollContainerContext';
@@ -76,7 +77,7 @@ const Navbar = () => {
 
     return (
         <div className="navbar-wrap">
-            <motion.nav
+            <Motion.nav
                 initial={{ y: -50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8, ease: [0.6, 0.05, 0.01, 0.9] }}
@@ -86,7 +87,7 @@ const Navbar = () => {
                     AGRIM.
                 </button>
 
-                <div className="navbar-links">{renderLinks('navbar-link')}</div>
+                <div className="navbar-links">{renderLinks('navbar-link')}<Link className="navbar-link" to="/shop">Shop</Link></div>
 
                 <button
                     type="button"
@@ -108,11 +109,12 @@ const Navbar = () => {
                 >
                     {menuOpen ? <MdClose aria-hidden="true" /> : <MdMenu aria-hidden="true" />}
                 </button>
-            </motion.nav>
+            </Motion.nav>
 
             {menuOpen && (
                 <div id="navbar-sheet" className="navbar-sheet">
                     {renderLinks('navbar-sheet-link')}
+                    <Link className="navbar-sheet-link" to="/shop" onClick={() => setMenuOpen(false)}>Shop</Link>
                 </div>
             )}
         </div>
