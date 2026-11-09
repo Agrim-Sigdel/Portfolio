@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Paid product masters and source files stay local; only excerpts go in public/.
+private/shop-products/
+
 # Env / secrets — never commit real values; only *.example templates are tracked
 .env
 .env.*

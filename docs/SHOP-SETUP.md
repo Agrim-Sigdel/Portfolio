@@ -11,6 +11,26 @@ format, preview images, sample and price. Save drafts privately or publish them.
 Unpublish to archive a listing. Slug changes do not create redirects, so retain
 published slugs whenever possible. Changes are saved to Supabase immediately.
 
+### Second product: 7-Day Product Validation Sprint
+
+The listing uses `/shop/seven-day-product-validation-sprint` and starts with
+checkout disabled. Its suggested test price is USD 5; match the actual Dodo
+price before enabling checkout. Edit the existing listing in **Admin → Shop**
+when the Dodo product is ready instead of creating a duplicate.
+
+The full five-page PDF and its generator are kept locally in the Git-ignored
+`private/shop-products/` folder. Upload
+`seven-day-product-validation-sprint.pdf` from that folder to Dodo's Digital
+Files entitlement. Back up that private folder separately; it is not in Git
+or the website deployment. Only the cover, the one-page sample PDF and its
+preview image are in `public/shop-assets/`. Do not use the sample PDF as the
+paid deliverable.
+
+Once the Dodo product and entitlement are configured, select **test**, enter
+the matching price and reusable checkout link, confirm delivery is ready,
+and save. Payment and email delivery for this product still require an
+end-to-end test after it is connected.
+
 Public cover images and samples can be uploaded in the existing **Media** tab.
 Do not upload paid product files into that public bucket or into `public/`.
 For a free resource, provide a public download URL. Empty cover fields get a
